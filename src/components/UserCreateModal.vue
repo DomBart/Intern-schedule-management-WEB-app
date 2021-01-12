@@ -96,20 +96,10 @@ export default {
       }
 
       if(this.mode === "add"){
-      axios.post('http://127.0.0.1:8000/api/trainee', student, this.config)
-      .then(data => {
-        this.$root.$emit('Submited');
-        this.modalState = false;
-        this.clear();
-        });
+      //API ADD
 
       } else if (this.mode === "edit"){
-      axios.put('http://127.0.0.1:8000/api/trainee/' + this.id, student, this.config)
-      .then(data => {
-        this.$root.$emit('Submited');
-        this.modalState = false;
-        this.clear();
-        });
+      //API EDIT
       }
 
     }

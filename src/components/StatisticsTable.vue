@@ -127,7 +127,7 @@ export default {
         },
          getStudents(){
             console.log("students loading");
-            //API GET STUDENTS
+            //API GET
         }
     }
 }

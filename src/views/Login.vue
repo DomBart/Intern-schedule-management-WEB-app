@@ -33,7 +33,7 @@ export default {
     },
     methods:{
         login(){
-            //API LOGIN
+        //API LOGIN
         }
     },
     components: { Alert }
