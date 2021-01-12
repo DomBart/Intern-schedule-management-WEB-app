@@ -19,10 +19,8 @@ export default {
       mode: '',
       id: '',
       config: {
-            headers: {
-                Authorization: localStorage.token
-            }
-      },
+           headers: { Authorization: `Bearer ${localStorage.token}` }
+      }
     }
   },
   mounted(){
@@ -38,7 +36,10 @@ export default {
   methods: {
     alertAction(){
       if(this.mode === 'delete'){
-        //API DELETE
+       axios.delete('http://127.0.0.1:8000/api/trainee/'+ this.id,this.config)
+             .then(data => {
+                 this.$root.$emit('Submited');
+             });
       this.alertState = false;
       }
     }

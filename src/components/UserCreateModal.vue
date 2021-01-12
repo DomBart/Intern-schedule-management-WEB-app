@@ -42,9 +42,7 @@ export default {
       position: "",
       id: '',
       config: {
-          headers: {
-              Authorization: localStorage.token
-          }
+           headers: { Authorization: `Bearer ${localStorage.token}` }
       },
       modalState: false,
     }
@@ -61,10 +59,10 @@ export default {
        this.mode = 'edit';
        this.title = "REDAGUOTI " + item.name + " DUOMENIS";
        this.id = item.id;
-       this.first_name = item.name;
-       this.last_name = item.last_name;
+       this.first_name = item.firstname;
+       this.last_name = item.lastname;
        this.email = item.email;
-       this.tel = item.tel;
+       this.tel = item.phone_number;
        this.position = item.position;
 
        this.modalState = true;
@@ -88,18 +86,27 @@ export default {
     onSubmit(){
 
       let student = {
-        name : this.first_name,
-        last_name : this.last_name,
+        firstname : this.first_name,
+        lastname : this.last_name,
         email : this.email,
-        tel : this.tel,
+        phone_number : this.tel,
         position : this.position
       }
 
       if(this.mode === "add"){
-      //API ADD
-
+        axios.post('http://127.0.0.1:8000/api/trainee', student, this.config)
+        .then(data => {
+          this.$root.$emit('Submited');
+          this.modalState = false;
+          this.clear();
+        });
       } else if (this.mode === "edit"){
-      //API EDIT
+        axios.put('http://127.0.0.1:8000/api/trainee/'+this.id, student, this.config)
+        .then(data => {
+          this.$root.$emit('Submited');
+          this.modalState = false;
+          this.clear();
+        });
       }
 
     }

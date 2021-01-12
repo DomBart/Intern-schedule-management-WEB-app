@@ -51,20 +51,20 @@
                   <td>
                       <div class="student_popup" :class="{popup_active:item.id == selected}">
                           <span class="pupup_label unselectable">TELEFONO NUMERIS</span>
-                          <span class="pupup_text">{{item.tel}}</span>
+                          <span class="pupup_text">{{item.phone_number}}</span>
                           <span class="pupup_label unselectable">EL. PAŠTO ADRESAS</span>
                           <span class="pupup_text">{{item.email}}</span>
                       </div>
                       <img class="student_icon unselectable" src="../assets/student.svg" :class="{top:item.id == selected}" @click="togglePopup(item.id)" alt="Student icon">
                   </td>
-                  <td>{{item.name}} {{item.last_name}}</td>
+                  <td>{{item.firstname}} {{item.lastname}}</td>
                   <td>{{item.position}}</td>
                   <td>120/320 val.</td>
                   <td>2020/01/01</td>
                   <td>2020/04/31</td>
                   <td>
                       <img class="edit_icon unselectable" src="../assets/edit.svg" alt="Edit" @click="triggerModal(item)">
-                      <img class="delete_icon unselectable" src="../assets/delete.svg" alt="Delete" @click="deleteStudent(item.id, item.name)">
+                      <img class="delete_icon unselectable" src="../assets/delete.svg" alt="Delete" @click="deleteStudent(item.id, item.firstname)">
                   </td>
               </tr>
           </table>
@@ -163,7 +163,35 @@ export default {
         },
         getStudents(){
             console.log("students loading");
-            //API GET
+            const config = {
+                headers: { Authorization: `Bearer ${localStorage.token}` }
+            };
+            axios.get('http://127.0.0.1:8000/api/trainee',config)
+            .then((resp) => {
+                console.log(resp.data.trainees);
+                 if(this.search != ""){
+                    for(let i = 0; i < resp.data.trainees.length; i++)
+                    {
+                        let name = (resp.data.trainees[i].firstname).toLowerCase();
+                        let last_name = (resp.data.trainees[i].lastname).toLowerCase();
+                        if(name.includes(this.search.toLowerCase()) || last_name.includes(this.search.toLowerCase()))
+                        { }
+                        else {
+                            resp.data.trainees.splice(i,1);
+                            i--;
+                        }
+                    }
+                 }
+                  this.studentList = resp.data.trainees;
+                 if(resp.data.trainees.length % 6 == 0)
+                 {
+                     this.pageCount = Math.floor(resp.data.trainees.length / 6);
+                 }
+                 else
+                 {
+                     this.pageCount = Math.floor(resp.data.trainees.length / 6) + 1;
+                 }
+            })
         },
         deleteStudent(id,name){
             this.$root.$emit('Alert', 'delete', id, 'AR TIKRAI NORITE PAŠALINTI', name);
@@ -183,7 +211,7 @@ export default {
                 this.getStudents();
             }
             if(this.currentSort === "name"){
-                this.studentList.sort((a,b) => (a.name > b.name) ? modifier : -1);
+                this.studentList.sort((a,b) => (a.firstname > b.firstname) ? modifier : -1);
             } else if (this.currentSort === "position"){
                 this.studentList.sort((a,b) => (a.position > b.position) ? modifier : -1);
             }
