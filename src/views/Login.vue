@@ -5,8 +5,8 @@
             <h1>PRISIJUNGIMAS</h1>
             <form @submit.prevent="login()">
             <div class="login_inputs">
-                <label for="em">El pašto adresas</label>
-                <input id="em" type="email" v-model="email" required>
+                <label for="em">Vartotojo vardas</label>
+                <input id="em" type="text" v-model="username" required>
                 <label for="ps">Slaptažodis</label>
                 <input id="ps" type="password" v-model="pass" required>
             </div>
@@ -25,7 +25,7 @@ import axios from 'axios'
 export default {
     data(){
         return {
-            email: "",
+            username: "",
             pass: "",
             failed: false,
             passed: false
@@ -33,7 +33,20 @@ export default {
     },
     methods:{
         login(){
-        //API LOGIN
+            let info = {
+                username : this.username,
+                password : this.pass
+            }
+        axios.post('http://127.0.0.1:8000/api/auth/login', info)
+        .then(response => {
+             localStorage.token = response.data.access_token;
+             console.log(response.data.access_token)
+             this.failed = false;
+             this.passed = true;
+            })
+            .catch((error) => {
+                this.failed = true;
+            })
         }
     },
     components: { Alert }

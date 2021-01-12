@@ -7,12 +7,7 @@
 
 <script>
 export default {
-  name: 'App',
-  mounted(){
-    if(localStorage.token === ""){
-      this.$router.push('/admin');
-    }
-  }
+  name: 'App'
 }
 </script>
 

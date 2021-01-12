@@ -4,7 +4,7 @@ import Home from '@/views/Home'
 
 Vue.use(Router)
 
-export default new Router({
+const router = new Router({
   routes: [
     {
       path: '/',
@@ -30,4 +30,11 @@ export default new Router({
         import("../views/Statistics.vue")
     }
   ]
-})
+});
+
+router.beforeEach((to, from, next) => {
+    if (localStorage.token === "" && to.path !== '/admin') next({ name: 'Prisijungimas' })
+    else next()
+});
+
+export default router;
