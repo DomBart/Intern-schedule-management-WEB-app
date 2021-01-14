@@ -57,7 +57,7 @@
                       </div>
                       <img class="student_icon unselectable" src="../assets/student.svg" :class="{top:item.id == selected}" @click="togglePopup(item.id)" alt="Student icon">
                   </td>
-                  <td>{{item.firstname}} {{item.lastname}}</td>
+                  <td class="student_name" @click="routeSchedule(item.firstname,item.lastname,item.id)">{{item.firstname}} {{item.lastname}}</td>
                   <td>{{item.position}}</td>
                   <td>120/320 val.</td>
                   <td>2020/01/01</td>
@@ -89,6 +89,7 @@
  import Vue from 'vue'
  import axios from 'axios'
  import Paginate from 'vuejs-paginate'
+ import router from '../router/index'
  Vue.component('paginate', Paginate)
 export default {
     data () {
@@ -105,9 +106,7 @@ export default {
         currentSort: "",
         currentSortDir: "",
         config: {
-            headers: {
-                Authorization: localStorage.token
-            }
+                headers: { Authorization: `Bearer ${localStorage.token}` }
         },
         addIcon: require("../assets/add.svg"),
         search: "",
@@ -161,12 +160,11 @@ export default {
             this.page = 1;
             this.clickCallback(this.page);
         },
+        routeSchedule(name,lastname,id){
+            router.push({name: 'Tvarkarastis', params: {name: name,lastname: lastname, id: id}});
+        },
         getStudents(){
-            console.log("students loading");
-            const config = {
-                headers: { Authorization: `Bearer ${localStorage.token}` }
-            };
-            axios.get('http://127.0.0.1:8000/api/trainee',config)
+            axios.get('http://127.0.0.1:8000/api/trainee',this.config)
             .then((resp) => {
                 console.log(resp.data.trainees);
                  if(this.search != ""){
@@ -192,6 +190,12 @@ export default {
                      this.pageCount = Math.floor(resp.data.trainees.length / 6) + 1;
                  }
             })
+            .catch(error => {
+                if(error.response.data.message == "Route [login] not defined."){
+                    localStorage.token = "";
+                    router.push('/admin');
+                }
+            });
         },
         deleteStudent(id,name){
             this.$root.$emit('Alert', 'delete', id, 'AR TIKRAI NORITE PAŠALINTI', name);
@@ -441,6 +445,13 @@ export default {
                  z-index: 99;
             }
 
+            .student_name{
+                cursor: pointer;
+            }
+            .student_name:hover{
+                color:#0054A6;
+            }
+
             .top{
             position: relative;
             }
@@ -527,6 +538,11 @@ export default {
                 padding: 5px;
                 margin: 3px;
                 outline-color: #0054A6;
+                -moz-user-select: -moz-none;
+                -khtml-user-select: none;
+                -webkit-user-select: none;
+                -ms-user-select: none;
+                user-select: none;
             }
             .active a{
                 color:#0054A6;

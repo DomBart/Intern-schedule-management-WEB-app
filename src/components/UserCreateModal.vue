@@ -30,6 +30,7 @@
 
 <script>
 import axios from 'axios'
+import router from '../router/index'
 export default {
   data() {
     return {
@@ -99,6 +100,12 @@ export default {
           this.$root.$emit('Submited');
           this.modalState = false;
           this.clear();
+        })
+        .catch(error => {
+                if(error.response.data.message == "Route [login] not defined."){
+                    localStorage.token = "";
+                    router.push('/admin');
+                }
         });
       } else if (this.mode === "edit"){
         axios.put('http://127.0.0.1:8000/api/trainee/'+this.id, student, this.config)
@@ -106,6 +113,12 @@ export default {
           this.$root.$emit('Submited');
           this.modalState = false;
           this.clear();
+        })
+        .catch(error => {
+                if(error.response.data.message == "Route [login] not defined."){
+                    localStorage.token = "";
+                    router.push('/admin');
+                }
         });
       }
 

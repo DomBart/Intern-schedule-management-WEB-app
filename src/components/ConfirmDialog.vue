@@ -10,6 +10,7 @@
 
 <script>
 import axios from 'axios'
+import router from '../router/index'
 export default {
   data() {
     return {
@@ -39,7 +40,13 @@ export default {
        axios.delete('http://127.0.0.1:8000/api/trainee/'+ this.id,this.config)
              .then(data => {
                  this.$root.$emit('Submited');
-             });
+             })
+             .catch(error => {
+                if(error.response.data.message == "Route [login] not defined."){
+                    localStorage.token = "";
+                    router.push('/admin');
+                }
+            });
       this.alertState = false;
       }
     }

@@ -20,6 +20,7 @@ const router = new Router({
     {
       path: '/schedule',
       name: 'Tvarkarastis',
+      props: true,
       component: () =>
         import("../views/Schedule.vue")
     },

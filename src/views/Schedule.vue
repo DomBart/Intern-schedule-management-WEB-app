@@ -7,7 +7,7 @@
     <generaldata class="data_text">VALANDŲ ŠĮ MĖNESĮ:</generaldata>
     <generaldata class="data_text">BENDRA VALANDŲ SUMA:</generaldata>
   </div>
-  <scheduleblock></scheduleblock>
+  <scheduleblock v-bind:name="name" v-bind:lastname="lastname" v-bind:id="id"></scheduleblock>
   </div>
   </body>
 </template>
@@ -17,6 +17,7 @@ import Navi from '../components/Navigation.vue'
 import Generaldata from '../components/DataBlock.vue'
 import Scheduleblock from '../components/ScheduleBlock.vue'
 export default {
+    props: ['name','lastname','id'],
     components: {Navi, Generaldata, Scheduleblock},
 }
 </script>

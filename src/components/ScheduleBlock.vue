@@ -3,18 +3,18 @@
       <div class="input_container">
           <div class="student_data_row">
             <img class="student_icon" src="../assets/student.svg" alt="Student icon">
-            <h1 class="student_name">Vardenis Pavardenis</h1>
+            <h1 class="student_name">{{traineeFname}} {{traineeLname}}</h1>
           </div>
           <div class="data_input_block">
             <form class="data_input_form" @submit.prevent="timeInput()">
               <div class="data_date_row intern_span">
                   <div class="date_input_wrap">
-                      <label for="">Sutartis nuo</label>
-                      <input class="student_date_from" type="date">
+                      <label for="">Praktika nuo</label>
+                      <input class="student_date_from" type="date" v-model="internFrom">
                   </div>
                   <div class="date_input_wrap">
-                      <label for="">Sutartis iki</label>
-                      <input class="student_date_till" type="date">
+                      <label for="">Praktika iki</label>
+                      <input class="student_date_till" type="date" v-model="internTill">
                   </div>
           </div>
           <div>
@@ -27,17 +27,17 @@
                   <div class="data_date_row">
                   <div class="date_input_wrap">
                   <label for="student_time_from">Laikas nuo</label>
-                  <VueTimepicker name="student_time_from" :hour-range="[8, 9, 10, 11, 12, 13, 14, 15, 16, 17]" :minute-interval="30" hide-disabled-hours v-model="timeFrom" v-bind:class="{ error: fromError }"></VueTimepicker>
+                  <VueTimepicker name="student_time_from" :hour-range="[8, 9, 10, 11, 12, 13, 14, 15, 16, 17]" :minute-interval="5" hide-disabled-hours v-model="timeFrom" v-bind:class="{ error: fromError }"></VueTimepicker>
                   </div>
                   <div class="date_input_wrap">
                   <label for="student_time_till">Laikas iki</label>
-                  <VueTimepicker name="student_time_till" :hour-range="[8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18]" :minute-interval="30" hide-disabled-hours v-model="timeTill" v-bind:class="{ error: tillError }"></VueTimepicker>
+                  <VueTimepicker name="student_time_till" :hour-range="[8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18]" :minute-interval="5" hide-disabled-hours v-model="timeTill" v-bind:class="{ error: tillError }"></VueTimepicker>
                   </div>
                   </div>
                   <label for="student_type">Tipas</label>
                   <select class="student_type" type="time" v-model="timeType" v-bind:class="{ error: typeError }">
                   <option value="default" selected hidden>Pasirinkti tipą</option>
-                  <option value="internship">Praktika</option>
+                  <option value="intern">Praktika</option>
                   <option value="lecture">Paskaita</option>
                   <option value="off-time">Laisvos</option>
                   <option value="break">Pertrauka</option>
@@ -51,13 +51,13 @@
           <div class="shcedule_control_container">
               <div class="schedule_controls">
                 <div class="schedule_date_push" v-bind:class="{ disabled: monthState }">
-                    <button class="date_push_button" :disabled="monthState" @click="pushWeek(-1)">&lt;</button>
-                    <span class="selected_date">{{month[currentWeek][0][0].getMonth()+1}}<span class="date_dash">/</span>{{month[currentWeek][0][0].getDate()}} - {{month[currentWeek][4][0].getMonth()+1}}<span class="date_dash">/</span>{{month[currentWeek][4][0].getDate()}}</span>
-                    <button class="date_push_button" :disabled="monthState" @click="pushWeek(1)">&gt;</button>
+                    <button class="date_push_button unselectable" v-bind:class="{push_disabled: currentWeek == 0}" :disabled="monthState || (currentWeek == 0)" @click="pushWeek(-1)">&lt;</button>
+                    <span class="selected_date unselectable">{{month[currentWeek][0][0].getMonth()+1}}<span class="date_dash unselectable">/</span>{{month[currentWeek][0][0].getDate()}} - {{month[currentWeek][4][0].getMonth()+1}}<span class="date_dash unselectable">/</span>{{month[currentWeek][4][0].getDate()}}</span>
+                    <button class="date_push_button unselectable" v-bind:class="{push_disabled: currentWeek == month.length-1}" :disabled="monthState" @click="pushWeek(1)">&gt;</button>
                 </div>
                 <div class="schedule_span_select">
-                    <button class="schedule_span_button" v-bind:class="{ selected: weekState }" @click="monthState=false; weekState=true">Savaitė</button>
-                    <button class="schedule_span_button" v-bind:class="{ selected: monthState }" @click="monthState=true; weekState=false">Mėnuo</button>
+                    <button class="schedule_span_button unselectable" v-bind:class="{ selected: weekState }" @click="monthState=false; weekState=true">Savaitė</button>
+                    <button class="schedule_span_button unselectable" v-bind:class="{ selected: monthState }" @click="monthState=true; weekState=false">Mėnuo</button>
                 </div>
               </div>
               <div class="schedule_colors">
@@ -67,7 +67,7 @@
                   <span>Pertrauka <div class="color_cube break"></div></span>
               </div>
           </div>
-          <WeekTable v-if="weekState" v-bind:array="month[currentWeek]"></WeekTable>
+          <WeekTable v-if="weekState" v-bind:array="month[currentWeek]" v-bind:selectedDate="calendarData.selectedDate"></WeekTable>
           <MonthTable v-if="monthState" v-bind:array="month" v-bind:month="calendarData.currentDate.getMonth()"></MonthTable>
       </div>
   </div>
@@ -80,6 +80,7 @@ import WeekTable from '../components/WeeklyTable.vue';
 import MonthTable from '../components/MonthlyTable.vue';
 import FunctionalCalendar from 'vue-functional-calendar';
 import VueTimepicker from 'vue2-timepicker'
+import router from '../router/index'
 import 'vue2-timepicker/dist/VueTimepicker.css'
 
 Vue.use(FunctionalCalendar, {
@@ -88,11 +89,14 @@ Vue.use(FunctionalCalendar, {
      "LIEPA","RUGPJŪTIS", "RUGSĖJIS", "SPALIS", "LAPKRITIS", "GRUODIS"]
 });
 export default {
+    props: ['name', 'lastname', 'id'],
     components: {WeekTable, MonthTable, VueTimepicker},
     data () {
       return {
         timespanState: false,
         filterState: false,
+        traineeFname: "",
+        traineeLname: "",
         calendarData: {
             currentDate: new Date(),
             dateRange : {
@@ -113,6 +117,9 @@ export default {
                 isDatePicker: true,
                 isDateRange: false
         },
+        scheduleData: {
+
+        },
         times: [],
         days: [],
         month: [],
@@ -124,6 +131,8 @@ export default {
         timeType: "default",
         timeFrom: "",
         timeTill: "",
+        internFrom: "",
+        internTill: "",
         dateError: false,
         typeError: false,
         fromError: false,
@@ -131,16 +140,17 @@ export default {
         tillError: false,
         unavailableError: false,
         config: {
-            headers: {
-                Authorization: localStorage.token
-            }
+                headers: { Authorization: `Bearer ${localStorage.token}` }
         },
         }
     },
     mounted(){
+        if(this.id){
+            this.traineeFname = this.name;
+            this.traineeLname = this.lastname;
+        }
+        this.loadData();
         this.inputMonth = this.calendarData.currentDate.getFullYear() + '-' + (this.calendarData.currentDate.getMonth()+1);
-        this.getMonth();
-        this.calendarData.selectedDate = this.month[this.currentWeek][0][0].toLocaleDateString('el-GR');
     },
     watch: {
     timeFrom: function() {
@@ -172,6 +182,31 @@ export default {
     }
     },
     methods: {
+        loadData(){
+            let id;
+            if(!this.id){
+                id = 1
+            }else{
+                id = this.id;
+            }
+        axios.get('http://127.0.0.1:8000/api/trainee/schedule/'+id,this.config)
+            .then((resp) => {
+                this.scheduleData = resp.data;
+                this.internFrom = this.scheduleData.trainees.schedules[0].start_date;
+                this.internTill = this.scheduleData.trainees.schedules[0].end_date;
+                if(!this.name || !this.lastname){
+                    this.traineeFname = this.scheduleData.trainees.firstname;
+                    this.traineeLname = this.scheduleData.trainees.lastname
+                }
+                this.getMonth();
+            })
+            .catch(error => {
+                if(error.response.data.message == "Route [login] not defined."){
+                    localStorage.token = "";
+                    router.push('/admin');
+                }
+            });
+        },
         getMonth(){
             this.days=[];
             this.month=[];
@@ -182,6 +217,24 @@ export default {
             var date = new Date(year, month, 1);
             while (date.getMonth() === month) {
                 this.days.push([new Date(date)]);
+                for(let i = 0; i < this.scheduleData.trainees.schedules.length; i++){
+                    for(let f = 0; f < this.scheduleData.trainees.schedules[i].months.length; f++){
+                     if((month+1) == this.scheduleData.trainees.schedules[i].months[f].index && year == this.scheduleData.trainees.schedules[i].months[f].year){
+                         for(let j = 0; j < this.scheduleData.trainees.schedules[i].months[f].days.length; j++){
+                         if(date.getDate() == this.scheduleData.trainees.schedules[i].months[f].days[j].index){
+                             for(let k = 0; k < this.scheduleData.trainees.schedules[i].months[f].days[j].times.length; k++){
+                                let timeData = {
+                                    time_from: this.scheduleData.trainees.schedules[i].months[f].days[j].times[k].time_from,
+                                    time_to: this.scheduleData.trainees.schedules[i].months[f].days[j].times[k].time_to,
+                                    type_of_time: this.scheduleData.trainees.schedules[i].months[f].days[j].times[k].type,
+                                };
+                                this.days[this.days.length-1].push(timeData);
+                             }
+                         }
+                         }
+                     }
+                }
+                }
                 date.setDate(date.getDate() + 1);
             }
             if (this.days[0][0].getDay() > 1)
@@ -190,6 +243,24 @@ export default {
                 while(this.days[0][0].getDay() != 1)
                 {
                     this.days.unshift([new Date(add)]);
+                    for(let i = 0; i < this.scheduleData.trainees.schedules.length; i++){
+                    for(let f = 0; f < this.scheduleData.trainees.schedules[i].months.length; f++){
+                     if((add.getMonth()+1) == this.scheduleData.trainees.schedules[i].months[f].index && add.getFullYear() == this.scheduleData.trainees.schedules[i].months[f].year){
+                         for(let j = 0; j < this.scheduleData.trainees.schedules[i].months[f].days.length; j++){
+                         if(add.getDate() == this.scheduleData.trainees.schedules[i].months[f].days[j].index){
+                             for(let k = 0; k < this.scheduleData.trainees.schedules[i].months[f].days[j].times.length; k++){
+                                let timeData = {
+                                    time_from: this.scheduleData.trainees.schedules[i].months[f].days[j].times[k].time_from,
+                                    time_to: this.scheduleData.trainees.schedules[i].months[f].days[j].times[k].time_to,
+                                    type_of_time: this.scheduleData.trainees.schedules[i].months[f].days[j].times[k].type,
+                                };
+                                this.days[0].push(timeData);
+                             }
+                         }
+                         }
+                     }
+                  }
+                }
                     add.setDate(add.getDate() - 1);
                 }
             }
@@ -198,6 +269,24 @@ export default {
                 while(this.days[this.days.length-1][0].getDay() != 0)
                 {
                     this.days.push([new Date(add)]);
+                    for(let i = 0; i < this.scheduleData.trainees.schedules.length; i++){
+                    for(let f = 0; f < this.scheduleData.trainees.schedules[i].months.length; f++){
+                     if((add.getMonth()+1) == this.scheduleData.trainees.schedules[i].months[f].index && add.getFullYear() == this.scheduleData.trainees.schedules[i].months[f].year){
+                         for(let j = 0; j < this.scheduleData.trainees.schedules[i].months[f].days.length; j++){
+                         if(add.getDate() == this.scheduleData.trainees.schedules[i].months[f].days[j].index){
+                             for(let k = 0; k < this.scheduleData.trainees.schedules[i].months[f].days[j].times.length; k++){
+                                let timeData = {
+                                    time_from: this.scheduleData.trainees.schedules[i].months[f].days[j].times[k].time_from,
+                                    time_to: this.scheduleData.trainees.schedules[i].months[f].days[j].times[k].time_to,
+                                    type_of_time: this.scheduleData.trainees.schedules[i].months[f].days[j].times[k].type,
+                                };
+                                this.days[this.days.length-1].push(timeData);
+                             }
+                         }
+                         }
+                     }
+                  }
+                }
                     add.setDate(add.getDate() + 1);
                 }
             }
@@ -205,21 +294,22 @@ export default {
                 this.month.push(this.days.splice(0, 5));
                 this.days.splice(0,2);
             }
+            this.calendarData.selectedDate = this.month[this.currentWeek][0][0].toLocaleDateString('el-GR');
         },
         pushWeek(direction){
             if(direction < 0 && this.currentWeek > 0){
                 this.currentWeek--;
                 this.calendarData.selectedDate = this.month[this.currentWeek][0][0].toLocaleDateString('el-GR');
             }
-            else if(direction > 0 && this.currentWeek < 4){
+            else if(direction > 0 && this.currentWeek < this.month.length-1){
                 this.currentWeek++;
                 this.calendarData.selectedDate = this.month[this.currentWeek][0][0].toLocaleDateString('el-GR');
             }
         },
         handleMonth(){
+            this.currentWeek = 0;
             this.inputMonth = this.calendarData.currentDate.getFullYear() + '-' + (this.calendarData.currentDate.getMonth()+1);
             this.getMonth();
-            this.currentWeek = 0;
             this.calendarData.selectedDate = this.month[this.currentWeek][0][0].toLocaleDateString('el-GR');
         },
         handleDay(){
@@ -255,18 +345,18 @@ export default {
                 this.timeError = true;
             }
             if(!this.dateError && !this.fromError && !this.tillError && !this.typeError && !this.timeError){
-                let timeData = [
-                    this.timeType,
-                    this.timeFrom,
-                    this.timeTill,
-                ]
+                let timeData = {
+                    time_from: this.timeFrom,
+                    time_to: this.timeTill,
+                    type_of_time: this.timeType,
+                };
                 let timeAvailable = false;
                 for(let i = 0; i < this.month.length; i++){
                     for(let j = 0; j < this.month[i].length; j++){
                         if(this.month[i][j][0].toLocaleDateString('el-GR') === this.calendarData.selectedDate){
                             if(this.month[i][j].length > 1){
                                 for(let k = 1; k < this.month[i][j].length; k++){
-                                    if((this.month[i][j][k][1] >= this.timeTill) || (this.month[i][j][k][2] <= this.timeFrom)){
+                                    if((this.month[i][j][k].time_from >= this.timeTill) || (this.month[i][j][k].time_to <= this.timeFrom)){
                                         timeAvailable = true;
                                     }
                                     else {
@@ -301,6 +391,14 @@ export default {
     .error{
         border: solid 2px #F2A268 !important;
         border-radius: 5px !important;
+    }
+
+    .unselectable{
+        -moz-user-select: -moz-none;
+        -khtml-user-select: none;
+        -webkit-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
     }
 
     .input_error_message{
@@ -453,6 +551,12 @@ export default {
                     button{
                         border-color: #efefef !important;
                     }
+                }
+
+                .push_disabled{
+                    color: #efefef !important;
+                    border-color: #efefef !important;
+                    cursor: default !important;
                 }
 
                 .schedule_span_select{
