@@ -3,10 +3,10 @@
     <div class="navi_wrap">
         <img class="navi_img" src="../assets/logo.svg" alt="Teltonika">
         <div class="navi_links">
-            <a href="/">PAGRINDINIS</a>
-            <a href="#/schedule">GRAFIKAS</a>
-            <a href="#/statistics">STATISTIKA</a>
-            <a @click="toggleActive()" :class="{'text_active': listActive,}" >ŠIUO METU DIRBA : 5 
+            <a class="unselectable" href="/">PAGRINDINIS</a>
+            <a class="unselectable" href="#/schedule">GRAFIKAS</a>
+            <a class="unselectable" href="#/statistics">STATISTIKA</a>
+            <a class="unselectable" @click="toggleActive()" :class="{'text_active': listActive,}" >ŠIUO METU DIRBA : 5 
             <img class="navi_trigger" src="../assets/tick.svg" alt="" :class="{'active': listActive,}"></a>
             <div class="navi_students" :class="{'list_active': listActive}">
                 <ul>
@@ -21,16 +21,22 @@
                   <li>Vardenis Pavardenis <span class="separator">|</span> 08:00 - 15:00</li> 
                 </ul>
             </div>
+            <a class="unselectable" @click="logout()">ATSIJUNGTI</a>
         </div>
     </div>
   </div>
 </template>
 
 <script>
+import axios from 'axios'
+import router from '../router/index'
 export default {
     data() {
         return{
             listActive: false,
+            config: {
+                headers: { Authorization: `Bearer ${localStorage.token}` }
+            }
         }
     },
     methods: {
@@ -38,6 +44,9 @@ export default {
             if(this.listActive)
             this.listActive = false;
             else this.listActive = true;
+        },
+        logout(){
+            this.$root.$emit('Alert', 'logout', 0, 'AR TIKRAI NORITE ATSIJUNGTI', '');
         }
     }
 }
@@ -52,6 +61,18 @@ export default {
     left: 0;
     border-radius: 0px 15px 15px 0px;
     z-index: 98;
+    .unselectable{
+            -moz-user-select: -moz-none;
+            -khtml-user-select: none;
+            -webkit-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            -webkit-user-drag: none;
+            -khtml-user-drag: none;
+            -moz-user-drag: none;
+            -o-user-drag: none;
+            user-drag: none;
+    }
     .navi_img {
         margin: auto;
         display: block;

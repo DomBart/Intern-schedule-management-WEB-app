@@ -48,6 +48,19 @@ export default {
                 }
             });
       this.alertState = false;
+      } else if (this.mode === 'logout'){
+        axios.post('http://127.0.0.1:8000/api/auth/logout',this.config)
+            .then((resp) => {
+                localStorage.token = "";
+                router.push('/admin');
+            })
+            .catch(error => {
+                if(error.response.data.message == "Route [login] not defined."){
+                    localStorage.token = "";
+                    router.push('/admin');
+                }
+            });
+        this.alertState = false;
       }
     }
   }
