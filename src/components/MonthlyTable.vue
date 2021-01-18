@@ -11,14 +11,14 @@
                   </tr>
                   <div class="row_wrap" v-for="(item, index) in time" v-bind:key="index">
                   <tr>
-                      <th class="time_cell" rowspan="4">{{item}}</th>
+                      <th class="time_cell" rowspan="4">{{timeStr[index]}}</th>
                       <td v-for="(day, dind) in days" v-bind:key="dind">
                           <div class="time_data_wrap" v-for="(time, ind) in day.slice(1)" v-bind:key="ind">
-                              <div class="time_data" v-if="parseInt(time.time_from.replace(':','').substring(0, 4)) <= parseInt(item.replace(':','')) && parseInt(time.time_to.replace(':','').substring(0, 4)) > parseInt(item.replace(':',''))"
+                              <div class="time_data" v-if="time.time_from <= item && time.time_to > item"
                                  v-bind:class="{
-                                 single: (parseInt(time.time_to.replace(':','').substring(0, 4)) - parseInt(time.time_from.replace(':','').substring(0, 4)) <= 30),
-                                 first: (parseInt(item.replace(':','').substring(0, 4))) - parseInt(time.time_from.replace(':','').substring(0, 4)) < 15,
-                                 last:  (parseInt(time.time_to.replace(':','').substring(0, 4)) - parseInt(item.replace(':',''))) <= 15,
+                                 single: (time.time_to - time.time_from) <= 30,
+                                 first: (item - time.time_from) < 15,
+                                 last:  (time.time_to - item) <= 15,
                                     intern: time.type_of_time == 'intern', free: time.type_of_time == 'off-time', lecture: time.type_of_time == 'lecture', break: time.type_of_time == 'break'
                                     }">
                               </div>
@@ -28,11 +28,11 @@
                   <tr class="quarter_cell">
                         <td v-for="(day, dind) in days" v-bind:key="dind">
                           <div class="time_data_wrap" v-for="(time, indh) in day.slice(1)" v-bind:key="indh">
-                              <div class="time_data" v-if="parseInt(time.time_from.replace(':','').substring(0, 4)) <= parseInt(halfTime[index].replace(':',''))-15 && parseInt(time.time_to.replace(':','').substring(0, 4)) > parseInt(halfTime[index].replace(':',''))-15"
+                              <div class="time_data" v-if="time.time_from <= halfTime[index]-15 && time.time_to > halfTime[index]-15"
                                 v-bind:class="{
-                                 single: (parseInt(time.time_to.replace(':','').substring(0, 4)) - parseInt(time.time_from.replace(':','').substring(0, 4)) <= 30), 
-                                 first: (parseInt(halfTime[index].replace(':',''))-15) - parseInt(time.time_from.replace(':','').substring(0, 4)) < 15,
-                                 last:  (parseInt(time.time_to.replace(':','').substring(0, 4)) - (parseInt(halfTime[index].replace(':',''))-15))  <= 15,
+                                 single: (time.time_to - time.time_from) <= 30, 
+                                 first: ((halfTime[index]-15) - time.time_from) < 15,
+                                 last:  (time.time_to - (halfTime[index]-15))  <= 15,
                                  intern: time.type_of_time == 'intern', free: time.type_of_time == 'off-time', lecture: time.type_of_time == 'lecture', break: time.type_of_time == 'break'
                                  }">
                                   
@@ -43,11 +43,11 @@
                   <tr class="half_cell">
                         <td v-for="(day, dind) in days" v-bind:key="dind">
                            <div class="time_data_wrap" v-for="(time, indh) in day.slice(1)" v-bind:key="indh">
-                              <div class="time_data" v-if="parseInt(time.time_from.replace(':','').substring(0, 4)) <= parseInt(halfTime[index].replace(':','')) && parseInt(time.time_to.replace(':','').substring(0, 4)) > parseInt(halfTime[index].replace(':',''))"
+                              <div class="time_data" v-if="time.time_from <= halfTime[index] && time.time_to > halfTime[index]"
                                 v-bind:class="{
-                                 single: (parseInt(time.time_to.replace(':','').substring(0, 4)) - parseInt(time.time_from.replace(':','').substring(0, 4)) <= 30), 
-                                 first: (parseInt(halfTime[index].replace(':','')) - parseInt(time.time_from.replace(':','').substring(0, 4))) < 15,
-                                 last:  (parseInt(time.time_to.replace(':','').substring(0, 4)) - parseInt(halfTime[index].replace(':','')))  <= 15,
+                                 single: (time.time_to - time.time_from) <= 30, 
+                                 first: (halfTime[index] - time.time_from) < 15,
+                                 last:  (time.time_to - halfTime[index])  <= 15,
                                  intern: time.type_of_time == 'intern', free: time.type_of_time == 'off-time', lecture: time.type_of_time == 'lecture', break: time.type_of_time == 'break'
                                  }">
                                   
@@ -58,11 +58,11 @@
                     <tr class="quarter_cell">
                         <td v-for="(day, dind) in days" v-bind:key="dind">
                           <div class="time_data_wrap" v-for="(time, indh) in day.slice(1)" v-bind:key="indh">
-                              <div class="time_data" v-if="parseInt(time.time_from.replace(':','').substring(0, 4)) <= parseInt(halfTime[index].replace(':',''))+15 && parseInt(time.time_to.replace(':','').substring(0, 4)) > parseInt(halfTime[index].replace(':',''))+15"
+                              <div class="time_data" v-if="time.time_from <= halfTime[index]+15 && time.time_to > halfTime[index]+15"
                                 v-bind:class="{
-                                 single: (parseInt(time.time_to.replace(':','').substring(0, 4)) - parseInt(time.time_from.replace(':','').substring(0, 4)) <= 30), 
-                                 first: (parseInt(halfTime[index].replace(':',''))+15 - parseInt(time.time_from.replace(':','').substring(0, 4))) < 15,
-                                 last:  (parseInt(time.time_to.replace(':','').substring(0, 4)) - parseInt(halfTime[index].replace(':',''))+15)  <= 85,
+                                 single: (time.time_to - time.time_from) <= 30, 
+                                 first: ((halfTime[index]+15) - time.time_from) < 15,
+                                 last:  (time.time_to - (halfTime[index]+15))  <= 15,
                                  intern: time.type_of_time == 'intern', free: time.type_of_time == 'off-time', lecture: time.type_of_time == 'lecture', break: time.type_of_time == 'break'
                                  }">
                               </div>
@@ -79,10 +79,12 @@ export default {
     data () {
         return {
             dayName: ['Sk','Pr','An','Tr','Kt','Pn','Št'],
-            time: ['8:00','9:00','10:00','11:00','12:00',
+            time: [480,540,600,660,720,
+                 780,840,900,960,1020],
+          halfTime: [510,570,630,690,750,
+                 810,870,930,990,1050],
+          timeStr: ['8:00','9:00','10:00','11:00','12:00',
                  '13:00','14:00','15:00','16:00','17:00'],
-            halfTime: ['08:30','09:30','10:30','11:30','12:30',
-                 '13:30','14:30','15:30','16:30','17:30'],
             days: [],
         }
     },
@@ -206,10 +208,10 @@ methods:{
                 min-height: 0.6rem!important;
             }
             .single.first{
-                     transform: translate(-50%, 25%);
+                     transform: translate(-50%, 20%);
             }
             .single.last{
-                     transform: translate(-50%, -25%);
+                     transform: translate(-50%, -10%);
             }
             .first.last{
                 transform: translate(-50%, 15%);

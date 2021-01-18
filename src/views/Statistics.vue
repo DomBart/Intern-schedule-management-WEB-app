@@ -7,6 +7,7 @@
         <generaldata class="data_text">LAISVŲ VALANDŲ ŠĮ MĖNESĮ</generaldata>
     </div>
     <statisticstable></statisticstable>
+    <confirmdialog></confirmdialog>
 </body>
 </template>
 
@@ -14,8 +15,9 @@
 import Navi from '../components/Navigation.vue'
 import Generaldata from '../components/StatisticsDataBlock.vue'
 import Statisticstable from '../components/StatisticsTable.vue'
+import Confirmdialog from '../components/ConfirmDialog.vue'
 export default {
-  components: {Navi, Generaldata, Statisticstable},
+  components: {Navi, Generaldata, Statisticstable,Confirmdialog},
 }
 </script>
 

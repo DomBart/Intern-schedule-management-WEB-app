@@ -3,9 +3,9 @@
     <div class="navi_wrap">
         <img class="navi_img" src="../assets/logo.svg" alt="Teltonika">
         <div class="navi_links">
-            <a class="unselectable" href="/">PAGRINDINIS</a>
-            <a class="unselectable" href="#/schedule">GRAFIKAS</a>
-            <a class="unselectable" href="#/statistics">STATISTIKA</a>
+            <a class="unselectable" href="/" v-bind:class="{ text_active: $route.name == 'Pagrindinis'}">PAGRINDINIS</a>
+            <a class="unselectable" href="#/schedule" v-bind:class="{ text_active: $route.name == 'Tvarkarastis'}">GRAFIKAS</a>
+            <a class="unselectable" href="#/statistics" v-bind:class="{ text_active: $route.name == 'Statistika'}">STATISTIKA</a>
             <a class="unselectable" @click="toggleActive()" :class="{'text_active': listActive,}" >ŠIUO METU DIRBA : 5 
             <img class="navi_trigger" src="../assets/tick.svg" alt="" :class="{'active': listActive,}"></a>
             <div class="navi_students" :class="{'list_active': listActive}">
@@ -46,7 +46,7 @@ export default {
             else this.listActive = true;
         },
         logout(){
-            this.$root.$emit('Alert', 'logout', 0, 'AR TIKRAI NORITE ATSIJUNGTI', '');
+            this.$root.$emit('Alert', 'logout', 0, '', 'AR TIKRAI NORITE ATSIJUNGTI', '');
         }
     }
 }
@@ -60,7 +60,7 @@ export default {
     position: fixed;
     left: 0;
     border-radius: 0px 15px 15px 0px;
-    z-index: 98;
+    z-index: 100;
     .unselectable{
             -moz-user-select: -moz-none;
             -khtml-user-select: none;
@@ -71,7 +71,6 @@ export default {
             -khtml-user-drag: none;
             -moz-user-drag: none;
             -o-user-drag: none;
-            user-drag: none;
     }
     .navi_img {
         margin: auto;

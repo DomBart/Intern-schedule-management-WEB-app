@@ -1,29 +1,46 @@
 <template>
   <div class="block_container">
-      <div class="input_container">
+      <div class="input_container" v-if="month.length">
+          <a class="schedule_back" @click="$router.go({name: 'Tvarkarastis'})">&#60; STUDENTŲ SĄRAŠAS</a>
           <div class="student_data_row">
+            <button class="schedule_add" title="Pridėti tvarkaraštį" @click="newSchedule()"
+            @mouseover="addIcon = require('../assets/add_active.svg')"
+            @mouseout="addIcon = require('../assets/add.svg')">
+            <img class="unselectable add_icon" :src="addIcon" alt="Add button" title="Pridėti tvarkaraštį"></button>
+            <div class="student_name_wrap">
             <img class="student_icon" src="../assets/student.svg" alt="Student icon">
             <h1 class="student_name">{{traineeFname}} {{traineeLname}}</h1>
+            </div>
           </div>
           <div class="data_input_block">
             <form class="data_input_form" @submit.prevent="timeInput()">
+                <div class="schedule_select_wrap">
+                <label v-if="scheduleData.trainee[0].schedules.length > 1" for="schedule_select">Tvarkaraštis</label>
+                <select v-if="scheduleData.trainee[0].schedules.length > 1" class="schedule_select" v-model="scheduleID">
+                  <option value="default" selected hidden>Pasirinkti tvarkaraštį</option>
+                  <option v-for="(item, index) in scheduleData.trainee[0].schedules" v-bind:key="index" :value="index">{{item.start_date}} / {{item.end_date}}</option>
+                </select>
+                <img class="delete_icon unselectable" v-bind:class="{ one: scheduleData.trainee[0].schedules.length == 1}" @click="deleteSchedule()" src="../assets/delete.svg" title="Trinti tvarkaraštį" alt="Delete">
+                </div>
               <div class="data_date_row intern_span">
                   <div class="date_input_wrap">
-                      <label for="">Praktika nuo</label>
+                      <label for="student_date_from">Praktika nuo</label>
                       <input class="student_date_from" type="date" v-model="internFrom">
                   </div>
                   <div class="date_input_wrap">
-                      <label for="">Praktika iki</label>
+                      <label for="student_date_till">Praktika iki</label>
                       <input class="student_date_till" type="date" v-model="internTill">
                   </div>
           </div>
           <div>
-          <FunctionalCalendar ref="Calendar" v-model="calendarData" v-on:changedMonth="handleMonth" v-on:choseDay="handleDay" :configs="calendarConfigs" v-bind:class="{ error: dateError }"></FunctionalCalendar>
+          <FunctionalCalendar ref="Calendar" v-model="calendarData" v-on:changedMonth="handleMonth" v-on:choseDay="handleDay" :configs="calendarConfigs" v-bind:class="{ error: dateError || dateBeforeError }"></FunctionalCalendar>
           <span class="input_error_message" v-if="dateError">Pasirinkite norimą datą</span>
+          <span class="input_error_message" v-if="dateBeforeError">Įvedimas atgaline data negalimas</span>
           </div>
               <div class="lower_input_column">
                   <span class="input_error_message top" v-if="unavailableError">Šis laikas yra užimtas</span>
                   <span class="input_error_message top" v-if="timeError">Įvestas netinkamas laikas</span>
+                  <span class="input_error_message top" v-if="timeSpanError">Įvesta veikla trumpesnė nei 30 min.</span>
                   <div class="data_date_row">
                   <div class="date_input_wrap">
                   <label for="student_time_from">Laikas nuo</label>
@@ -47,6 +64,30 @@
             </form>
           </div>
       </div>
+          <a class="schedule_back" v-if="createSchedule || selectSchedule" @click="$router.go({name: 'Tvarkarastis'})">&#60; STUDENTŲ SĄRAŠAS</a>
+          <div class="option_wrap" v-if="createSchedule">
+            <img class="student_icon" src="../assets/student.svg" alt="Student icon">
+            <h1>SUKURKITE {{traineeFname}} TVARKARAŠTĮ</h1>
+            <form @submit.prevent="scheduleCreate()">
+                <label for="start">Praktika nuo</label>
+                <input id="start" type="date" v-model="internFrom">
+                <label for="end">Praktika iki</label>
+                <input id="end" type="date" v-model="internTill">
+                <input class="option_submit" type="submit" value="SUKURTI">
+                <button class="option_submit" v-if="scheduleData.trainee[0].schedules.length > 0" @click="createSchedule=false; getMonth();">ATŠAUKTI</button>
+            </form>
+          </div>
+          <div class="option_wrap" v-if="selectSchedule" @submit.prevent="scheduleSelect()">
+              <img class="student_icon" src="../assets/student.svg" alt="Student icon">
+              <h1>PASIRINKITE {{traineeFname}} TVARKARAŠTĮ</h1>
+              <form>
+              <select v-model="scheduleID" required>
+                  <option value="default" selected hidden>Pasirinkti tvarkaraštį</option>
+                  <option v-for="(item, index) in scheduleData.trainee[0].schedules" v-bind:key="index" :value="index">{{item.start_date}} / {{item.end_date}}</option>
+              </select>
+              <input class="option_submit" type="submit" value="PASIRINKTI">
+              </form>
+          </div>
       <div class="schedule_container" v-if="month.length">
           <div class="shcedule_control_container">
               <div class="schedule_controls">
@@ -67,7 +108,7 @@
                   <span>Pertrauka <div class="color_cube break"></div></span>
               </div>
           </div>
-          <WeekTable v-if="weekState" v-bind:array="month[currentWeek]" v-bind:selectedDate="calendarData.selectedDate"></WeekTable>
+          <WeekTable v-if="weekState" v-bind:array="month[currentWeek]" v-bind:selectedDate="calendarData.selectedDate" v-bind:id="id"></WeekTable>
           <MonthTable v-if="monthState" v-bind:array="month" v-bind:month="calendarData.currentDate.getMonth()"></MonthTable>
       </div>
   </div>
@@ -75,7 +116,7 @@
 
 <script>
 import Vue from 'vue';
- import axios from 'axios';
+import axios from 'axios';
 import WeekTable from '../components/WeeklyTable.vue';
 import MonthTable from '../components/MonthlyTable.vue';
 import FunctionalCalendar from 'vue-functional-calendar';
@@ -89,7 +130,7 @@ Vue.use(FunctionalCalendar, {
      "LIEPA","RUGPJŪTIS", "RUGSĖJIS", "SPALIS", "LAPKRITIS", "GRUODIS"]
 });
 export default {
-    props: ['name', 'lastname', 'id'],
+    props: ['id'],
     components: {WeekTable, MonthTable, VueTimepicker},
     data () {
       return {
@@ -117,9 +158,14 @@ export default {
                 isDatePicker: true,
                 isDateRange: false
         },
+        createSchedule: false,
+        selectSchedule: false,
+        tableReload: false,
+        scheduleID: 0,
         scheduleData: {
 
         },
+        addIcon: require("../assets/add.svg"),
         times: [],
         days: [],
         month: [],
@@ -134,10 +180,12 @@ export default {
         internFrom: "",
         internTill: "",
         dateError: false,
+        dateBeforeError: false,
         typeError: false,
         fromError: false,
         timeError: false,
         tillError: false,
+        timeSpanError: false,
         unavailableError: false,
         config: {
                 headers: { Authorization: `Bearer ${localStorage.token}` }
@@ -145,12 +193,25 @@ export default {
         }
     },
     mounted(){
-        if(this.id){
-            this.traineeFname = this.name;
-            this.traineeLname = this.lastname;
-        }
         this.loadData();
         this.inputMonth = this.calendarData.currentDate.getFullYear() + '-' + (this.calendarData.currentDate.getMonth()+1);
+        this.$root.$on('ScheduleDeleted', () => {
+            if(this.scheduleData.trainee[0].schedules.length > 1){
+                this.tableReload = true;
+                if(this.scheduleID > 0){
+                  this.scheduleID--;
+                }
+                this.loadData();
+            } else {
+                this.month = [];
+                this.loadData();
+            }
+        });
+        this.$root.$on('TimeDeleted', () => {
+            this.tableReload = true;
+            this.month = [];
+            this.loadData();
+        });
     },
     watch: {
     timeFrom: function() {
@@ -159,6 +220,9 @@ export default {
           }
           if(this.unavailableError){
               this.unavailableError = false;
+          }
+          if(this.timeSpanError){
+            this.timeSpanError = false;
           }
           if(this.timeError){
             this.timeError = false;
@@ -171,6 +235,9 @@ export default {
         if(this.unavailableError){
               this.unavailableError = false;
         }
+        if(this.timeSpanError){
+            this.timeSpanError = false;
+        }
         if(this.timeError){
             this.timeError = false;
         }
@@ -179,33 +246,94 @@ export default {
         if(this.timeType != "default"){
               this.typeError = false;
         }
+    },
+    scheduleID: function() {
+        if(!this.selectSchedule && !this.createSchedule){
+        this.scheduleSelect();
+        }
     }
     },
     methods: {
         loadData(){
-            let id;
-            if(!this.id){
-                id = 1
-            }else{
-                id = this.id;
-            }
-        axios.get('http://127.0.0.1:8000/api/trainee/schedule/'+id,this.config)
+        axios.get('http://127.0.0.1:8000/api/trainee/schedule/'+this.id,this.config)
             .then((resp) => {
-                this.scheduleData = resp.data;
-                this.internFrom = this.scheduleData.trainees.schedules[0].start_date;
-                this.internTill = this.scheduleData.trainees.schedules[0].end_date;
-                if(!this.name || !this.lastname){
-                    this.traineeFname = this.scheduleData.trainees.firstname;
-                    this.traineeLname = this.scheduleData.trainees.lastname
-                }
-                this.getMonth();
+                 this.scheduleData = resp.data;
+                 console.log(this.scheduleData);
+                 this.traineeFname = this.scheduleData.trainee[0].firstname;
+                 this.traineeLname = this.scheduleData.trainee[0].lastname;
+                 if(this.scheduleData.trainee[0].schedules.length == 0){
+                     console.log('0 schedule');
+                     this.createSchedule = true;
+                 }else if(this.scheduleData.trainee[0].schedules.length == 1 && !this.createSchedule){
+                 console.log('1 schedule');
+                 this.internFrom = this.scheduleData.trainee[0].schedules[0].start_date;
+                 this.internTill = this.scheduleData.trainee[0].schedules[0].end_date;
+                 this.getMonth();
+                 }else if(this.scheduleData.trainee[0].schedules.length > 1 && !this.createSchedule && !this.tableReload){
+                     console.log('more than 1 schedule');
+                     this.selectSchedule = true;
+                 }else if(this.createSchedule){
+                        console.log('create schedule action');
+                        this.scheduleID = (this.scheduleData.trainee[0].schedules.length)-1;
+                        this.internFrom = this.scheduleData.trainee[0].schedules[this.scheduleID].start_date;
+                        this.internTill = this.scheduleData.trainee[0].schedules[this.scheduleID].end_date;
+                        this.getMonth();
+                        this.createSchedule=false;
+                 } else if(this.tableReload){
+                     this.tableReload = false;
+                     this.getMonth();
+                 }
             })
             .catch(error => {
                 if(error.response.data.message == "Route [login] not defined."){
                     localStorage.token = "";
-                    router.push('/admin');
+                    router.push({name: 'Prisijungimas'});
                 }
             });
+        },
+        scheduleCreate(){
+            var today = new Date();
+            var internFrom = new Date(this.internFrom);
+            var internTill = new Date(this.internTill);
+            if(internFrom >= today){
+                if(internFrom < internTill){
+                    let internSpan = {
+                        start_date : this.internFrom,
+                        end_date : this.internTill
+                    }
+                    axios.post('http://127.0.0.1:8000/api/schedule/'+this.id,internSpan,this.config)
+                    .then(resp => {
+                        this.loadData();
+                    })
+                    .catch(error => {
+                        if(error.response.data.message == "Route [login] not defined."){
+                            localStorage.token = "";
+                            router.push({name: 'Prisijungimas'});
+                        }
+                    });
+                } else {
+                    console.log('end sooner than start error');
+                }
+            }else {
+                console.log('from before error');
+            }
+        },
+        scheduleSelect(){
+            this.selectSchedule = false;
+            this.internFrom = this.scheduleData.trainee[0].schedules[this.scheduleID].start_date;
+            this.internTill = this.scheduleData.trainee[0].schedules[this.scheduleID].end_date;
+            this.getMonth();
+        },
+        newSchedule(){
+            this.internFrom = '';
+            this.internTill = '';
+            this.month = [];
+            this.createSchedule = true;
+        },
+        deleteSchedule(){
+            let deleteID = this.scheduleData.trainee[0].schedules[this.scheduleID].id;
+            let title = this.scheduleData.trainee[0].schedules[this.scheduleID].start_date + '/' + this.scheduleData.trainee[0].schedules[this.scheduleID].end_date;
+            this.$root.$emit('Alert', 'scheduleDelete', this.id, deleteID, 'AR TIKRAI NORITE PAŠALINTI TVARKARAŠTĮ', title);
         },
         getMonth(){
             this.days=[];
@@ -217,23 +345,22 @@ export default {
             var date = new Date(year, month, 1);
             while (date.getMonth() === month) {
                 this.days.push([new Date(date)]);
-                for(let i = 0; i < this.scheduleData.trainees.schedules.length; i++){
-                    for(let f = 0; f < this.scheduleData.trainees.schedules[i].months.length; f++){
-                     if((month+1) == this.scheduleData.trainees.schedules[i].months[f].index && year == this.scheduleData.trainees.schedules[i].months[f].year){
-                         for(let j = 0; j < this.scheduleData.trainees.schedules[i].months[f].days.length; j++){
-                         if(date.getDate() == this.scheduleData.trainees.schedules[i].months[f].days[j].index){
-                             for(let k = 0; k < this.scheduleData.trainees.schedules[i].months[f].days[j].times.length; k++){
+                    for(let f = 0; f < this.scheduleData.trainee[0].schedules[this.scheduleID].months.length; f++){
+                     if((month+1) == this.scheduleData.trainee[0].schedules[this.scheduleID].months[f].index && year == this.scheduleData.trainee[0].schedules[this.scheduleID].months[f].year){
+                         for(let j = 0; j < this.scheduleData.trainee[0].schedules[this.scheduleID].months[f].days.length; j++){
+                         if(date.getDate() == this.scheduleData.trainee[0].schedules[this.scheduleID].months[f].days[j].index){
+                             for(let k = 0; k < this.scheduleData.trainee[0].schedules[this.scheduleID].months[f].days[j].times.length; k++){
                                 let timeData = {
-                                    time_from: this.scheduleData.trainees.schedules[i].months[f].days[j].times[k].time_from,
-                                    time_to: this.scheduleData.trainees.schedules[i].months[f].days[j].times[k].time_to,
-                                    type_of_time: this.scheduleData.trainees.schedules[i].months[f].days[j].times[k].type,
+                                    time_from: this.scheduleData.trainee[0].schedules[this.scheduleID].months[f].days[j].times[k].time_from,
+                                    time_to: this.scheduleData.trainee[0].schedules[this.scheduleID].months[f].days[j].times[k].time_to,
+                                    type_of_time: this.scheduleData.trainee[0].schedules[this.scheduleID].months[f].days[j].times[k].type,
+                                    time_id: this.scheduleData.trainee[0].schedules[this.scheduleID].months[f].days[j].times[k].id
                                 };
                                 this.days[this.days.length-1].push(timeData);
                              }
                          }
                          }
                      }
-                }
                 }
                 date.setDate(date.getDate() + 1);
             }
@@ -243,20 +370,19 @@ export default {
                 while(this.days[0][0].getDay() != 1)
                 {
                     this.days.unshift([new Date(add)]);
-                    for(let i = 0; i < this.scheduleData.trainees.schedules.length; i++){
-                    for(let f = 0; f < this.scheduleData.trainees.schedules[i].months.length; f++){
-                     if((add.getMonth()+1) == this.scheduleData.trainees.schedules[i].months[f].index && add.getFullYear() == this.scheduleData.trainees.schedules[i].months[f].year){
-                         for(let j = 0; j < this.scheduleData.trainees.schedules[i].months[f].days.length; j++){
-                         if(add.getDate() == this.scheduleData.trainees.schedules[i].months[f].days[j].index){
-                             for(let k = 0; k < this.scheduleData.trainees.schedules[i].months[f].days[j].times.length; k++){
+                    for(let f = 0; f < this.scheduleData.trainee[0].schedules[this.scheduleID].months.length; f++){
+                     if((add.getMonth()+1) == this.scheduleData.trainee[0].schedules[this.scheduleID].months[f].index && add.getFullYear() == this.scheduleData.trainee[0].schedules[this.scheduleID].months[f].year){
+                         for(let j = 0; j < this.scheduleData.trainee[0].schedules[this.scheduleID].months[f].days.length; j++){
+                         if(add.getDate() == this.scheduleData.trainee[0].schedules[this.scheduleID].months[f].days[j].index){
+                             for(let k = 0; k < this.scheduleData.trainee[0].schedules[this.scheduleID].months[f].days[j].times.length; k++){
                                 let timeData = {
-                                    time_from: this.scheduleData.trainees.schedules[i].months[f].days[j].times[k].time_from,
-                                    time_to: this.scheduleData.trainees.schedules[i].months[f].days[j].times[k].time_to,
-                                    type_of_time: this.scheduleData.trainees.schedules[i].months[f].days[j].times[k].type,
+                                    time_from: this.scheduleData.trainee[0].schedules[this.scheduleID].months[f].days[j].times[k].time_from,
+                                    time_to: this.scheduleData.trainee[0].schedules[this.scheduleID].months[f].days[j].times[k].time_to,
+                                    type_of_time: this.scheduleData.trainee[0].schedules[this.scheduleID].months[f].days[j].times[k].type,
+                                    time_id: this.scheduleData.trainee[0].schedules[this.scheduleID].months[f].days[j].times[k].id
                                 };
                                 this.days[0].push(timeData);
                              }
-                         }
                          }
                      }
                   }
@@ -269,20 +395,19 @@ export default {
                 while(this.days[this.days.length-1][0].getDay() != 0)
                 {
                     this.days.push([new Date(add)]);
-                    for(let i = 0; i < this.scheduleData.trainees.schedules.length; i++){
-                    for(let f = 0; f < this.scheduleData.trainees.schedules[i].months.length; f++){
-                     if((add.getMonth()+1) == this.scheduleData.trainees.schedules[i].months[f].index && add.getFullYear() == this.scheduleData.trainees.schedules[i].months[f].year){
-                         for(let j = 0; j < this.scheduleData.trainees.schedules[i].months[f].days.length; j++){
-                         if(add.getDate() == this.scheduleData.trainees.schedules[i].months[f].days[j].index){
-                             for(let k = 0; k < this.scheduleData.trainees.schedules[i].months[f].days[j].times.length; k++){
+                    for(let f = 0; f < this.scheduleData.trainee[0].schedules[this.scheduleID].months.length; f++){
+                     if((add.getMonth()+1) == this.scheduleData.trainee[0].schedules[this.scheduleID].months[f].index && add.getFullYear() == this.scheduleData.trainee[0].schedules[this.scheduleID].months[f].year){
+                         for(let j = 0; j < this.scheduleData.trainee[0].schedules[this.scheduleID].months[f].days.length; j++){
+                         if(add.getDate() == this.scheduleData.trainee[0].schedules[this.scheduleID].months[f].days[j].index){
+                             for(let k = 0; k < this.scheduleData.trainee[0].schedules[this.scheduleID].months[f].days[j].times.length; k++){
                                 let timeData = {
-                                    time_from: this.scheduleData.trainees.schedules[i].months[f].days[j].times[k].time_from,
-                                    time_to: this.scheduleData.trainees.schedules[i].months[f].days[j].times[k].time_to,
-                                    type_of_time: this.scheduleData.trainees.schedules[i].months[f].days[j].times[k].type,
+                                    time_from: this.scheduleData.trainee[0].schedules[this.scheduleID].months[f].days[j].times[k].time_from,
+                                    time_to: this.scheduleData.trainee[0].schedules[this.scheduleID].months[f].days[j].times[k].time_to,
+                                    type_of_time: this.scheduleData.trainee[0].schedules[this.scheduleID].months[f].days[j].times[k].type,
+                                    time_id: this.scheduleData.trainee[0].schedules[this.scheduleID].months[f].days[j].times[k].id
                                 };
                                 this.days[this.days.length-1].push(timeData);
                              }
-                         }
                          }
                      }
                   }
@@ -294,7 +419,9 @@ export default {
                 this.month.push(this.days.splice(0, 5));
                 this.days.splice(0,2);
             }
+            if(!this.calendarData.selectedDate){
             this.calendarData.selectedDate = this.month[this.currentWeek][0][0].toLocaleDateString('el-GR');
+            }
         },
         pushWeek(direction){
             if(direction < 0 && this.currentWeek > 0){
@@ -314,6 +441,7 @@ export default {
         },
         handleDay(){
             this.dateError = false;
+            this.dateBeforeError = false;
             let selected = this.calendarData.selectedDate.split('/');
             let dateSelected = new Date(selected[2],selected[1]-1,selected[0]);
             if(dateSelected < this.month[this.currentWeek][0][0]){
@@ -329,8 +457,15 @@ export default {
             }
         },
         timeInput(){
+            let fromInput = (parseInt(this.timeFrom.substring(0,2))*60) + parseInt(this.timeFrom.substring(3,5));
+            let tillInput = (parseInt(this.timeTill.substring(0,2))*60) + parseInt(this.timeTill.substring(3,5));
+            let dateInput = this.calendarData.selectedDate.split('/');
+            dateInput = new Date(dateInput[2],dateInput[1]-1,dateInput[0]);
             if(!this.calendarData.selectedDate){
                 this.dateError = true;
+            }
+            if(dateInput < new Date()){
+                this.dateBeforeError = true;
             }
             if(this.timeFrom === "" || this.timeFrom.includes('HH') || this.timeFrom.includes('mm')){
                 this.fromError = true;
@@ -341,14 +476,20 @@ export default {
             if (this.timeType === "default"){
                 this.typeError = true;
             }
-            if (this.timeFrom >= this.timeTill && this.timeFrom != "" && this.timeTill != ""){
+            if (fromInput >= tillInput && this.timeFrom != "" && this.timeTill != ""){
                 this.timeError = true;
             }
-            if(!this.dateError && !this.fromError && !this.tillError && !this.typeError && !this.timeError){
+            if (tillInput - fromInput < 30){
+                this.timeSpanError = true;
+            }
+            if(!this.dateError && !this.fromError && !this.tillError && !this.typeError && !this.timeError && !this.timeSpanError && !this.dateBeforeError){
+                let inputDate = this.calendarData.selectedDate.split('/');
                 let timeData = {
-                    time_from: this.timeFrom,
-                    time_to: this.timeTill,
-                    type_of_time: this.timeType,
+                    date: inputDate[2]+'-'+inputDate[1]+'-'+inputDate[0],
+                    time_from: fromInput,
+                    time_to: tillInput,
+                    type: this.timeType,
+                    schedule_id: this.scheduleData.trainee[0].schedules[this.scheduleID].id
                 };
                 let timeAvailable = false;
                 for(let i = 0; i < this.month.length; i++){
@@ -356,7 +497,7 @@ export default {
                         if(this.month[i][j][0].toLocaleDateString('el-GR') === this.calendarData.selectedDate){
                             if(this.month[i][j].length > 1){
                                 for(let k = 1; k < this.month[i][j].length; k++){
-                                    if((this.month[i][j][k].time_from >= this.timeTill) || (this.month[i][j][k].time_to <= this.timeFrom)){
+                                    if((this.month[i][j][k].time_from >= tillInput) || (this.month[i][j][k].time_to <= fromInput)){
                                         timeAvailable = true;
                                     }
                                     else {
@@ -367,7 +508,20 @@ export default {
                                 }
                             } else {timeAvailable = true;}
                             if(timeAvailable){
-                                this.month[i][j].push(timeData);
+                                this.unavailableError = false;
+                                this.timeError = false;
+                                this.timeSpanError = false;
+                                axios.post('http://127.0.0.1:8000/api/time/'+this.id, timeData, this.config)
+                                .then(data => {
+                                    this.tableReload = true;
+                                    this.loadData();
+                                })
+                                .catch(error => {
+                                    if(error.response.data.message == "Route [login] not defined."){
+                                        localStorage.token = "";
+                                        router.push({name: 'Prisijungimas'});
+                                    }
+                                });                                
                             }
                         }
                     }
@@ -399,6 +553,10 @@ export default {
         -webkit-user-select: none;
         -ms-user-select: none;
         user-select: none;
+        -webkit-user-drag: none;
+        -khtml-user-drag: none;
+        -moz-user-drag: none;
+        -o-user-drag: none;
     }
 
     .input_error_message{
@@ -416,6 +574,36 @@ export default {
         margin-bottom: 15px;
     }
 
+    .schedule_back{
+        font-family: 'Open Sans';
+        font-size: 0.9rem;
+        margin-left: 2rem;
+        margin-top: 1rem;
+        cursor: pointer;
+    }
+    .schedule_back:hover{
+        color: #0054a6;
+    }
+
+    .schedule_add{
+        height: 3rem;
+        width: 3rem;
+        border-radius: 50%;
+        background-color: #ffffff;
+        border: 0;
+        outline: none;
+        box-shadow: 0px 0px 4px 4px rgba(0, 0, 0, 0.10);
+        cursor:pointer;
+    }
+    .schedule_add:hover{
+        box-shadow: 0px 0px 4px 4px rgba(0,84,166, 0.3);
+    }
+
+    .add_icon{
+        width: 1.25rem;
+        height: auto;
+    }
+
     .input_container{
         display: flex;
         flex-direction: column;
@@ -428,16 +616,22 @@ export default {
         .student_data_row{
             display: flex;
             flex-direction: row;
-            justify-content: space-evenly;
-            padding: 1.5rem 0.5rem 0.5rem 0.5rem;
+            justify-content: space-around;
+            padding: 0.5rem 1.5rem;
+            .student_name_wrap{
+            display: flex;
+            flex-direction: row;
+            justify-content: start;
             h1{
                 font-family: 'Open Sans';
                 font-size: 1.2rem;
+                padding-left: 1rem;
                 color: #5C5C5C;
                 margin: auto 0;
             }
             .student_icon{
                 width: 2.5rem;
+            }
             }
         }
         .data_input_block{
@@ -465,7 +659,26 @@ export default {
             input::placeholder{
                 color: #C4C4C4;
             }
-
+            .schedule_select_wrap{
+                margin-bottom: 1rem;
+                select{
+                    margin-top: 0.25rem;
+                }
+                .schedule_select{
+                    width: 85%;
+                }
+            }
+            .delete_icon{
+                margin: 0 0 -0.35rem 0.8rem;
+                width: 1.3rem;
+                cursor: pointer;
+            }
+            .delete_icon:hover{
+                content:url("../assets/delete_active.svg");
+            }
+            .delete_icon.one{
+                width: 1.7rem;
+            }
             .data_date_row{
                 display: flex;
                 flex-direction: row;
@@ -493,6 +706,56 @@ export default {
                 color: #f2f2f2;
                 font-size: 0.9rem;
                 margin: 1rem auto;
+                padding: 0.3rem 1.5rem;
+                border: none;
+                border-radius: 5px;
+                cursor: pointer;
+            }
+        }
+    }
+    .option_wrap{
+        display: flex;
+        flex-direction: column;
+        align-self: center;
+        margin: auto;
+        h1{
+            color: #5C5C5C;
+            text-align: center;
+            font-family: 'Oswald';
+            font-weight: 400;
+            margin: 2rem 0;
+            text-transform: uppercase;
+        }
+        form{
+            font-family: 'Open Sans';
+            width: 75%;
+            display: flex;
+            align-self: center;
+            flex-direction: column;
+            justify-content: center;
+
+            input, select{
+                color: #5C5C5C;
+                outline: none;
+                border: none;
+                font-size: 1.2rem;
+                box-shadow: 0px 0px 4px 1px  rgba(0, 0, 0, 0.20);
+                border-radius: 6px;
+                padding: 0.5rem 0.8rem;
+                margin-bottom: 1.5rem;
+            }
+            label{
+                color: #5C5C5C;
+                margin: 0 0 0.5rem 0.5rem;
+                font-size: 1rem;
+            }
+            .option_submit{
+                display: block;
+                font-family: "Oswald";
+                background-color:#0054a6;
+                color: #f2f2f2;
+                font-size: 1.2rem;
+                margin: 1.2rem auto;
                 padding: 0.3rem 1.5rem;
                 border: none;
                 border-radius: 5px;

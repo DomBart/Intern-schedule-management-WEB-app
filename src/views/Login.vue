@@ -89,7 +89,7 @@ export default {
             axios.post('http://127.0.0.1:8000/api/auth/login', info)
             .then(response => {
                 localStorage.token = response.data.access_token;
-                console.log(response.data.access_token)
+                console.log(localStorage.token);
                 this.failed = false;
                 this.passed = true;
                 })

@@ -58,7 +58,7 @@ export default {
      }
      else {
        this.mode = 'edit';
-       this.title = "REDAGUOTI " + item.name + " DUOMENIS";
+       this.title = "REDAGUOTI " + item.firstname + " DUOMENIS";
        this.id = item.id;
        this.first_name = item.firstname;
        this.last_name = item.lastname;
@@ -104,7 +104,7 @@ export default {
         .catch(error => {
                 if(error.response.data.message == "Route [login] not defined."){
                     localStorage.token = "";
-                    router.push('/admin');
+                    router.push({name: 'Prisijungimas'});
                 }
         });
       } else if (this.mode === "edit"){
@@ -117,7 +117,7 @@ export default {
         .catch(error => {
                 if(error.response.data.message == "Route [login] not defined."){
                     localStorage.token = "";
-                    router.push('/admin');
+                    router.push({name: 'Prisijungimas'});
                 }
         });
       }

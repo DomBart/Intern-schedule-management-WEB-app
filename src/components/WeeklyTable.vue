@@ -15,20 +15,21 @@
                   </tr>
                   <div class="row_wrap" v-for="(item, index) in time" v-bind:key="index">
                   <tr>
-                      <th class="time_cell" rowspan="4">{{item}}</th>
+                      <th class="time_cell" rowspan="4">{{timeStr[index]}}</th>
                       <td v-for="count in 5" v-bind:key="count">
                           <div v-if="array[count-1]">
                           <div class="time_data_wrap" v-for="(time, ind) in array[count-1].slice(1)" v-bind:key="ind">
-                              <span class="time_data_text"  v-if="(parseInt(item.replace(':','').substring(0, 4))) - parseInt(time.time_from.replace(':','').substring(0, 4)) < 15 && parseInt(time.time_from.replace(':','').substring(0, 4)) <= parseInt(item.replace(':',''))"
-                              v-bind:class="{single: (parseInt(time.time_to.replace(':','').substring(0, 4)) - parseInt(time.time_from.replace(':','').substring(0, 4)) <= 30),
+                              <span class="time_data_text"  v-if="(item - time.time_from < 15 && time.time_from <= item)"
+                              v-bind:class="{single: (time.time_to - time.time_from <= 30),
                               dark: time.type_of_time == 'break' || time.type_of_time == 'lecture'}">
-                              {{time.time_from.substring(0, 5)}} - {{time.time_to.substring(0, 5)}}
+                               <span>{{Math.floor(time.time_from/60)}}:{{('0'+(time.time_from%60).toString()).slice(-2)}} - {{Math.floor(time.time_to/60)}}:{{('0'+(time.time_to%60).toString()).slice(-2)}}</span>
+                               <button @click="deleteTime(time.time_id,time.time_from,time.time_to)">X</button>
                               </span>
-                              <div class="time_data" v-if="parseInt(time.time_from.replace(':','').substring(0, 4)) <= parseInt(item.replace(':','')) && parseInt(time.time_to.replace(':','').substring(0, 4)) > parseInt(item.replace(':',''))"
+                              <div class="time_data" v-if="time.time_from <= item && time.time_to > item"
                                  v-bind:class="{
-                                 single: (parseInt(time.time_to.replace(':','').substring(0, 4)) - parseInt(time.time_from.replace(':','').substring(0, 4)) <= 30),
-                                 first: (parseInt(item.replace(':','').substring(0, 4))) - parseInt(time.time_from.replace(':','').substring(0, 4)) < 15,
-                                 last:  (parseInt(time.time_to.replace(':','').substring(0, 4)) - parseInt(item.replace(':',''))) <= 15,
+                                 single: (time.time_to - time.time_from <= 30),
+                                 first: (item - time.time_from) < 15,
+                                 last:  (time.time_to - item) <= 15,
                                     intern: time.type_of_time == 'intern', free: time.type_of_time == 'off-time', lecture: time.type_of_time == 'lecture', break: time.type_of_time == 'break'
                                     }">
                               </div>
@@ -40,16 +41,17 @@
                         <td v-for="count in 5" v-bind:key="count">
                           <div v-if="array[count-1]">
                           <div class="time_data_wrap" v-for="(time, indh) in array[count-1].slice(1)" v-bind:key="indh">
-                              <span class="time_data_text" v-if="(parseInt(halfTime[index].replace(':',''))-15) - parseInt(time.time_from.replace(':','').substring(0, 4)) < 15 && parseInt(time.time_from.replace(':','').substring(0, 4)) <= parseInt(halfTime[index].replace(':',''))-15"
-                              v-bind:class="{single: (parseInt(time.time_to.replace(':','').substring(0, 4)) - parseInt(time.time_from.replace(':','').substring(0, 4)) <= 30),
+                              <span class="time_data_text" v-if="((halfTime[index]-15) - time.time_from) < 15 && (time.time_from <= (halfTime[index]-15))"
+                              v-bind:class="{single: (time.time_to - time.time_from <= 30),
                               dark: time.type_of_time == 'break' || time.type_of_time == 'lecture'}">
-                              {{time.time_from.substring(0, 5)}} - {{time.time_to.substring(0, 5)}}
+                               <span>{{Math.floor(time.time_from/60)}}:{{('0'+(time.time_from%60).toString()).slice(-2)}} - {{Math.floor(time.time_to/60)}}:{{('0'+(time.time_to%60).toString()).slice(-2)}}</span>
+                               <button @click="deleteTime(time.time_id,time.time_from,time.time_to)">X</button>
                               </span>
-                              <div class="time_data" v-if="parseInt(time.time_from.replace(':','').substring(0, 4)) <= parseInt(halfTime[index].replace(':',''))-15 && parseInt(time.time_to.replace(':','').substring(0, 4)) > parseInt(halfTime[index].replace(':',''))-15"
+                              <div class="time_data" v-if="time.time_from <= halfTime[index]-15 && time.time_to > halfTime[index]-15"
                                 v-bind:class="{
-                                 single: (parseInt(time.time_to.replace(':','').substring(0, 4)) - parseInt(time.time_from.replace(':','').substring(0, 4)) <= 30), 
-                                 first: (parseInt(halfTime[index].replace(':',''))-15) - parseInt(time.time_from.replace(':','').substring(0, 4)) < 15,
-                                 last:  (parseInt(time.time_to.replace(':','').substring(0, 4)) - (parseInt(halfTime[index].replace(':',''))-15))  <= 15,
+                                 single: (time.time_to - time.time_from <= 30), 
+                                 first: (halfTime[index]-15 - time.time_from) < 15,
+                                 last:  (time.time_to - (halfTime[index]-15))  <= 15,
                                  intern: time.type_of_time == 'intern', free: time.type_of_time == 'off-time', lecture: time.type_of_time == 'lecture', break: time.type_of_time == 'break'
                                  }">
                                   
@@ -62,16 +64,17 @@
                         <td v-for="count in 5" v-bind:key="count">
                           <div v-if="array[count-1]">
                           <div class="time_data_wrap" v-for="(time, indh) in array[count-1].slice(1)" v-bind:key="indh">
-                              <span class="time_data_text" v-if="(parseInt(halfTime[index].replace(':','')) - parseInt(time.time_from.replace(':','').substring(0, 4))) < 15 && parseInt(time.time_from.replace(':','').substring(0, 4)) <= parseInt(halfTime[index].replace(':',''))"
-                              v-bind:class="{single: (parseInt(time.time_to.replace(':','').substring(0, 4)) - parseInt(time.time_from.replace(':','').substring(0, 4)) <= 30),
+                              <span class="time_data_text" v-if="(halfTime[index] - time.time_from) < 15 && (time.time_from <= halfTime[index])"
+                              v-bind:class="{single: ((time.time_to - time.time_from) <= 30),
                               dark: time.type_of_time == 'break' || time.type_of_time == 'lecture'}">
-                              {{time.time_from.substring(0, 5)}} - {{time.time_to.substring(0, 5)}}
+                              <span>{{Math.floor(time.time_from/60)}}:{{('0'+(time.time_from%60).toString()).slice(-2)}} - {{Math.floor(time.time_to/60)}}:{{('0'+(time.time_to%60).toString()).slice(-2)}}</span>
+                              <button @click="deleteTime(time.time_id,time.time_from,time.time_to)">X</button>
                               </span>
-                              <div class="time_data" v-if="parseInt(time.time_from.replace(':','').substring(0, 4)) <= parseInt(halfTime[index].replace(':','')) && parseInt(time.time_to.replace(':','').substring(0, 4)) > parseInt(halfTime[index].replace(':',''))"
+                              <div class="time_data" v-if="time.time_from <= halfTime[index] && time.time_to > halfTime[index]"
                                 v-bind:class="{
-                                 single: (parseInt(time.time_to.replace(':','').substring(0, 4)) - parseInt(time.time_from.replace(':','').substring(0, 4)) <= 30), 
-                                 first: (parseInt(halfTime[index].replace(':','')) - parseInt(time.time_from.replace(':','').substring(0, 4))) < 15,
-                                 last:  (parseInt(time.time_to.replace(':','').substring(0, 4)) - parseInt(halfTime[index].replace(':','')))  <= 15,
+                                 single: (time.time_to - time.time_from) <= 30, 
+                                 first: (halfTime[index] - time.time_from) < 15,
+                                 last:  (time.time_to - halfTime[index])  <= 15,
                                  intern: time.type_of_time == 'intern', free: time.type_of_time == 'off-time', lecture: time.type_of_time == 'lecture', break: time.type_of_time == 'break'
                                  }">
                                   
@@ -84,16 +87,17 @@
                         <td v-for="count in 5" v-bind:key="count">
                           <div v-if="array[count-1]">
                           <div class="time_data_wrap" v-for="(time, indh) in array[count-1].slice(1)" v-bind:key="indh">
-                              <span class="time_data_text" v-if="(parseInt(halfTime[index].replace(':',''))+15 - parseInt(time.time_from.replace(':','').substring(0, 4))) < 15 && parseInt(time.time_from.replace(':','').substring(0, 4)) <= parseInt(halfTime[index].replace(':',''))+15"
-                              v-bind:class="{single: (parseInt(time.time_to.replace(':','').substring(0, 4)) - parseInt(time.time_from.replace(':','').substring(0, 4)) <= 30),
+                              <span class="time_data_text" v-if="((halfTime[index]+15) - time.time_from) < 15 && time.time_from <= (halfTime[index]+15)"
+                              v-bind:class="{single: (time.time_to - time.time_from) <= 30,
                               dark: time[0] == 'break' || time[0] == 'lecture'}">
-                              {{time.time_from.substring(0, 5)}} - {{time.time_to.substring(0, 5)}}
+                              <span>{{Math.floor(time.time_from/60)}}:{{('0'+(time.time_from%60).toString()).slice(-2)}} - {{Math.floor(time.time_to/60)}}:{{('0'+(time.time_to%60).toString()).slice(-2)}}</span>
+                              <button @click="deleteTime(time.time_id,time.time_from,time.time_to)">X</button>
                               </span>
-                              <div class="time_data" v-if="parseInt(time.time_from.replace(':','').substring(0, 4)) <= parseInt(halfTime[index].replace(':',''))+15 && parseInt(time.time_to.replace(':','').substring(0, 4)) > parseInt(halfTime[index].replace(':',''))+15"
+                              <div class="time_data" v-if="time.time_from <= (halfTime[index]+15) && time.time_to > (halfTime[index]+15)"
                                 v-bind:class="{
-                                 single: (parseInt(time.time_to.replace(':','').substring(0, 4)) - parseInt(time.time_from.replace(':','').substring(0, 4)) <= 30), 
-                                 first: (parseInt(halfTime[index].replace(':',''))+15 - parseInt(time.time_from.replace(':','').substring(0, 4))) < 15,
-                                 last:  (parseInt(time.time_to.replace(':','').substring(0, 4)) - parseInt(halfTime[index].replace(':',''))+15)  <= 85,
+                                 single: (time.time_to - time.time_from) <= 30, 
+                                 first: ((halfTime[index]+15) - time.time_from) < 15,
+                                 last:  (time.time_to - (halfTime[index]+15))  <= 15,
                                  intern: time.type_of_time == 'intern', free: time.type_of_time == 'off-time', lecture: time.type_of_time == 'lecture', break: time.type_of_time == 'break'
                                  }">
                               </div>
@@ -109,15 +113,23 @@
 <script>
 export default {
     
-props: ['array','selectedDate'],
+props: ['array','selectedDate','id'],
     data () {
       return {
-          time: ['08:00','09:00','10:00','11:00','12:00',
-                 '13:00','14:00','15:00','16:00','17:00'],
-          halfTime: ['08:30','09:30','10:30','11:30','12:30',
-                 '13:30','14:30','15:30','16:30','17:30'],
+          time: [480,540,600,660,720,
+                 780,840,900,960,1020],
+          halfTime: [510,570,630,690,750,
+                 810,870,930,990,1050],
+          timeStr: ['8:00','9:00','10:00','11:00','12:00',
+                    '13:00','14:00','15:00','16:00','17:00']
       }
     },
+    methods:{
+        deleteTime(time_id, time_from, time_to){
+            this.$root.$emit('Alert', 'timeDelete', this.id, time_id, 'AR TIKRAI NORITE PAŠALINTI LAIKĄ',
+            Math.floor(time_from/60)+':'+('0'+(time_from%60).toString()).slice(-2) + ' - ' + Math.floor(time_to/60)+':'+('0'+(time_to%60).toString()).slice(-2))
+        }
+    }
 }
 </script>
 
@@ -192,16 +204,16 @@ props: ['array','selectedDate'],
                 }
             }
             .single{
-                height: 1vh!important;
-                min-height: 0.6rem!important;
+                height: 1.2vh!important;
+                min-height: 0.7rem!important;
             }
             .single.first{
-                -ms-transform: translate(-50%, 20%);
-                transform: translate(-50%, 20%);
+                -ms-transform: translate(-50%, 5%);
+                transform: translate(-50%, 5%);
             }
             .single.last{
-                -ms-transform: translate(-50%, -20%);
-                transform: translate(-50%, -20%);
+                -ms-transform: translate(-50%, -10%);
+                transform: translate(-50%, -10%);
             }
             .first.last{
                 -ms-transform: translate(-50%, 10%);
@@ -213,23 +225,48 @@ props: ['array','selectedDate'],
                 font-family: 'Oswald';
                 position: absolute;
                 font-size: 0.9rem;
+                width: 100%;
                 padding-top: 1%;
+                white-space: nowrap;
                 left: 50%;
                 top: 50%;
-                -ms-transform: translate(-50%, 30%);
-                transform: translate(-50%, 30%);
+                -ms-transform: translate(-50%, 50%);
+                transform: translate(-50%, 50%);
                 z-index: 20;
+                span{
+                    position: absolute;
+                    text-align: center;
+                    width: 100%;
+                    top: 5px;
+                }
+                button{
+                    position: absolute;
+                    color: #ffffff;
+                    font-family: 'Open Sans';
+                    font-weight: 600;
+                    background: none;
+                    outline: none;
+                    border: none;
+                    cursor: pointer;
+                    right: 15px;
+                    top: 5px;
+                }
+                button:hover{
+                    color: #FF7B7B;
+                }
             }
             .dark{
                 color: #5f5f5f;
             }
-            // .time_data_text.single{
-            //     -ms-transform: translate(-50%, -5%);
-            //     transform: translate(-50%,-5%);
-            //     font-size: 0.6rem;
-            // }
             .time_data_text.single{
-                display: none;
+                -ms-transform: translate(-50%,0%);
+                transform: translate(-50%,0%);
+                span{
+                    top:5%;
+                }
+                button{
+                    top: 3%;
+                }
             }
             .intern{
                 background-color: #0054A6;
@@ -314,22 +351,22 @@ props: ['array','selectedDate'],
                     height: 0.95rem;
                 }
                 .single.first{
-                     transform: translate(-50%, 15%);
+                     transform: translate(-50%, 5%);
                      height: 0.7rem;
                 }
                 .single.last{
-                     transform: translate(-50%, 5%);
+                     transform: translate(-50%, -5%);
                      height: 0.7rem;
                 }
                 .first.last{
                     height: 1.2rem;
                     transform: translate(-50%, 10%);
                 }
-                // .time_data_text.single{
-                //     -ms-transform: translate(-50%, -40%);
-                //     transform: translate(-50%, -40%);
-                //     font-size: 0.6rem;
-                // }
+                .time_data_text.single{
+                    -ms-transform: translate(-50%, -30%);
+                    transform: translate(-50%, -30%);
+                    font-size: 0.9rem;
+                }
                 }
             }
         }

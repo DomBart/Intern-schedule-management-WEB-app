@@ -33,9 +33,4 @@ const router = new Router({
   ]
 });
 
-router.beforeEach((to, from, next) => {
-    if (localStorage.token === "" && to.path !== '/admin') next({ name: 'Prisijungimas' })
-    else next()
-});
-
 export default router;

@@ -11,7 +11,6 @@
 export default {
     methods: {
         closeModal(){
-            this.$root.$emit('Submited');
             if(this.push === '')
             this.$root.$emit('Close');
             else

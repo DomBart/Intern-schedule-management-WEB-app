@@ -1,10 +1,10 @@
 <template>
   <div class="main_container">
       <div class="list_control">
-        <button class="student_add" @click="triggerModal('')"
+        <button class="student_add" title="Pridėti praktikantą" @click="triggerModal('')"
         @mouseover="addIcon = require('../assets/add_active.svg')"
         @mouseout="addIcon = require('../assets/add.svg')">
-        <img class="unselectable" :src="addIcon" alt="Add button"></button>
+        <img class="unselectable" title="Pridėti praktikantą" :src="addIcon" alt="Add button"></button>
         <input type="text" v-model="search" @keyup.enter="searchFilter()" class="student_searchbar">
         <div class="filter_wrap">
             <div class="student_filter" v-bind:class="{ filter_active: filterActive }" @click="triggerFilter()">
@@ -21,8 +21,8 @@
         </div>
       </div>
       <div class="table_container">
-
-          <table class="student_table">
+          <h1 class="list_empty" v-if="empty">PRAKTIKANTŲ SĄRAŠAS TUŠČIAS</h1>
+          <table v-if="studentList.length > 0" class="student_table">
               <tr class="student_table_header">
                   <th class="icon_column" ></th>
                   <th class="name_column unselectable" @click="sort('name')" v-bind:class="{ sort_active: currentSort==='name' }">
@@ -55,21 +55,21 @@
                           <span class="pupup_label unselectable">EL. PAŠTO ADRESAS</span>
                           <span class="pupup_text">{{item.email}}</span>
                       </div>
-                      <img class="student_icon unselectable" src="../assets/student.svg" :class="{top:item.id == selected}" @click="togglePopup(item.id)" alt="Student icon">
+                      <img class="student_icon unselectable" title="Kontaktai" src="../assets/student.svg" :class="{top:item.id == selected}" @click="togglePopup(item.id)" alt="Student icon">
                   </td>
-                  <td class="student_name" @click="routeSchedule(item.firstname,item.lastname,item.id)">{{item.firstname}} {{item.lastname}}</td>
+                  <td class="student_name" @click="routeSchedule(item.id)">{{item.firstname}} {{item.lastname}}</td>
                   <td>{{item.position}}</td>
                   <td>120/320 val.</td>
                   <td>2020/01/01</td>
                   <td>2020/04/31</td>
                   <td>
-                      <img class="edit_icon unselectable" src="../assets/edit.svg" alt="Edit" @click="triggerModal(item)">
-                      <img class="delete_icon unselectable" src="../assets/delete.svg" alt="Delete" @click="deleteStudent(item.id, item.firstname)">
+                      <img class="edit_icon unselectable" title="Redaguoti" src="../assets/edit.svg" alt="Edit" @click="triggerModal(item)">
+                      <img class="delete_icon unselectable" title="Trinti" src="../assets/delete.svg" alt="Delete" @click="deleteStudent(item.id, item.firstname)">
                   </td>
               </tr>
           </table>
       </div>
-      <div class="pagination_container">
+      <div v-if="studentList.length > 0" class="pagination_container">
         <paginate
           v-model="page"
           :page-count="pageCount"
@@ -105,18 +105,17 @@ export default {
         filterActive: false,
         currentSort: "",
         currentSortDir: "",
-        config: {
-                headers: { Authorization: `Bearer ${localStorage.token}` }
-        },
+        config: {headers: { Authorization: `Bearer ${localStorage.token}` }},
         addIcon: require("../assets/add.svg"),
         search: "",
         selected: undefined,
+        empty: false
       }
     },
     mounted(){
         this.getStudents();
         this.$root.$on('Submited', () => {
-            this.getStudents();
+             this.getStudents();
         });
     },
     methods: {
@@ -160,13 +159,17 @@ export default {
             this.page = 1;
             this.clickCallback(this.page);
         },
-        routeSchedule(name,lastname,id){
-            router.push({name: 'Tvarkarastis', params: {name: name,lastname: lastname, id: id}});
+        routeSchedule(id){
+            router.push({name: 'Tvarkarastis', params: {id: id}});
         },
         getStudents(){
             axios.get('http://127.0.0.1:8000/api/trainee',this.config)
             .then((resp) => {
-                console.log(resp.data.trainees);
+                if(resp.data.trainees.length == 0){
+                    this.empty = true;
+                } else {
+                    this.empty = false;
+                }
                  if(this.search != ""){
                     for(let i = 0; i < resp.data.trainees.length; i++)
                     {
@@ -193,12 +196,12 @@ export default {
             .catch(error => {
                 if(error.response.data.message == "Route [login] not defined."){
                     localStorage.token = "";
-                    router.push('/admin');
+                    router.push({name: 'Prisijungimas'});
                 }
             });
         },
         deleteStudent(id,name){
-            this.$root.$emit('Alert', 'delete', id, 'AR TIKRAI NORITE PAŠALINTI', name);
+            this.$root.$emit('Alert', 'delete', id, '', 'AR TIKRAI NORITE PAŠALINTI', name);
         },
         sort(type){
             let modifier = 1;
@@ -358,6 +361,14 @@ export default {
          margin: auto;
          overflow: auto;
 
+     }
+     .list_empty{
+         font-family: 'Oswald';
+         color: #5c5c5c;
+         font-weight: 400;
+         text-align: center;
+         white-space: nowrap;
+         margin-top: 10%;
      }
      .student_table{
          display: flex;
@@ -520,7 +531,6 @@ export default {
             -khtml-user-drag: none;
             -moz-user-drag: none;
             -o-user-drag: none;
-            user-drag: none;
     }
  }
 </style>
