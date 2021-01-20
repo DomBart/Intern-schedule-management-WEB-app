@@ -42,9 +42,6 @@ export default {
       tel: "",
       position: "",
       id: '',
-      config: {
-           headers: { Authorization: `Bearer ${localStorage.token}` }
-      },
       modalState: false,
     }
   },
@@ -85,6 +82,9 @@ export default {
       this.clear();
     },
     onSubmit(){
+      let config= {
+          headers: { Authorization: `Bearer ${localStorage.token}` }
+      };
 
       let student = {
         firstname : this.first_name,
@@ -95,28 +95,28 @@ export default {
       }
 
       if(this.mode === "add"){
-        axios.post('http://127.0.0.1:8000/api/trainee', student, this.config)
+        axios.post('http://127.0.0.1:8000/api/trainee', student, config)
         .then(data => {
-          this.$root.$emit('Submited');
           this.modalState = false;
           this.clear();
+          this.$root.$emit('Submited');
         })
         .catch(error => {
+              console.log(error.response.data);
                 if(error.response.data.message == "Route [login] not defined."){
-                    localStorage.token = "";
                     router.push({name: 'Prisijungimas'});
                 }
         });
       } else if (this.mode === "edit"){
-        axios.put('http://127.0.0.1:8000/api/trainee/'+this.id, student, this.config)
+        axios.put('http://127.0.0.1:8000/api/trainee/'+this.id, student, config)
         .then(data => {
-          this.$root.$emit('Submited');
           this.modalState = false;
           this.clear();
+          this.$root.$emit('Submited');
         })
         .catch(error => {
+                console.log(error.response.data);
                 if(error.response.data.message == "Route [login] not defined."){
-                    localStorage.token = "";
                     router.push({name: 'Prisijungimas'});
                 }
         });

@@ -1,4 +1,10 @@
 <template>
+  <div class="schedule_wrap">
+  <div class="generaldata_container">
+    <generaldata class="data_text" v-bind:data="scheduleData.trainee[0].schedules[scheduleID].works_hours.week_hours">VALANDŲ ŠIĄ SAVAITĘ:</generaldata>
+    <generaldata class="data_text" v-bind:data="scheduleData.trainee[0].schedules[scheduleID].works_hours.month_hours">VALANDŲ ŠĮ MĖNESĮ:</generaldata>
+    <generaldata class="data_text" v-bind:data="scheduleData.trainee[0].schedules[scheduleID].works_hours.total_hours">BENDRA VALANDŲ SUMA:</generaldata>
+  </div>
   <div class="block_container">
       <div class="input_container" v-if="month.length">
           <a class="schedule_back" @click="$router.go({name: 'Tvarkarastis'})">&#60; STUDENTŲ SĄRAŠAS</a>
@@ -48,7 +54,7 @@
                   </div>
                   <div class="date_input_wrap">
                   <label for="student_time_till">Laikas iki</label>
-                  <VueTimepicker name="student_time_till" :hour-range="[8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18]" :minute-interval="5" hide-disabled-hours v-model="timeTill" v-bind:class="{ error: tillError }"></VueTimepicker>
+                  <VueTimepicker name="student_time_till" :hour-range="[8, 9, 10, 11, 12, 13, 14, 15, 16, 17]" :minute-interval="5" hide-disabled-hours v-model="timeTill" v-bind:class="{ error: tillError }"></VueTimepicker>
                   </div>
                   </div>
                   <label for="student_type">Tipas</label>
@@ -108,17 +114,19 @@
                   <span>Pertrauka <div class="color_cube break"></div></span>
               </div>
           </div>
-          <WeekTable v-if="weekState" v-bind:array="month[currentWeek]" v-bind:selectedDate="calendarData.selectedDate" v-bind:id="id"></WeekTable>
+          <WeekTable v-if="weekState" v-bind:array="month[currentWeek]" v-bind:selectedDate="calendarData.selectedDate" v-bind:id="id" v-bind:scheduleID="scheduleData.trainee[0].schedules[scheduleID].id"></WeekTable>
           <MonthTable v-if="monthState" v-bind:array="month" v-bind:month="calendarData.currentDate.getMonth()"></MonthTable>
       </div>
   </div>
+</div>
 </template>
 
 <script>
 import Vue from 'vue';
 import axios from 'axios';
-import WeekTable from '../components/WeeklyTable.vue';
-import MonthTable from '../components/MonthlyTable.vue';
+import Generaldata from './DataBlock.vue'
+import WeekTable from './WeeklyTable.vue';
+import MonthTable from './MonthlyTable.vue';
 import FunctionalCalendar from 'vue-functional-calendar';
 import VueTimepicker from 'vue2-timepicker'
 import router from '../router/index'
@@ -131,7 +139,7 @@ Vue.use(FunctionalCalendar, {
 });
 export default {
     props: ['id'],
-    components: {WeekTable, MonthTable, VueTimepicker},
+    components: {Generaldata, WeekTable, MonthTable, VueTimepicker},
     data () {
       return {
         timespanState: false,
@@ -186,10 +194,7 @@ export default {
         timeError: false,
         tillError: false,
         timeSpanError: false,
-        unavailableError: false,
-        config: {
-                headers: { Authorization: `Bearer ${localStorage.token}` }
-        },
+        unavailableError: false
         }
     },
     mounted(){
@@ -255,25 +260,23 @@ export default {
     },
     methods: {
         loadData(){
-        axios.get('http://127.0.0.1:8000/api/trainee/schedule/'+this.id,this.config)
+        let config= {
+                headers: { Authorization: `Bearer ${localStorage.token}` }
+        };
+        axios.get('http://127.0.0.1:8000/api/trainee/schedule/'+this.id,config)
             .then((resp) => {
                  this.scheduleData = resp.data;
-                 console.log(this.scheduleData);
                  this.traineeFname = this.scheduleData.trainee[0].firstname;
                  this.traineeLname = this.scheduleData.trainee[0].lastname;
                  if(this.scheduleData.trainee[0].schedules.length == 0){
-                     console.log('0 schedule');
                      this.createSchedule = true;
                  }else if(this.scheduleData.trainee[0].schedules.length == 1 && !this.createSchedule){
-                 console.log('1 schedule');
                  this.internFrom = this.scheduleData.trainee[0].schedules[0].start_date;
                  this.internTill = this.scheduleData.trainee[0].schedules[0].end_date;
                  this.getMonth();
                  }else if(this.scheduleData.trainee[0].schedules.length > 1 && !this.createSchedule && !this.tableReload){
-                     console.log('more than 1 schedule');
                      this.selectSchedule = true;
                  }else if(this.createSchedule){
-                        console.log('create schedule action');
                         this.scheduleID = (this.scheduleData.trainee[0].schedules.length)-1;
                         this.internFrom = this.scheduleData.trainee[0].schedules[this.scheduleID].start_date;
                         this.internTill = this.scheduleData.trainee[0].schedules[this.scheduleID].end_date;
@@ -286,12 +289,14 @@ export default {
             })
             .catch(error => {
                 if(error.response.data.message == "Route [login] not defined."){
-                    localStorage.token = "";
                     router.push({name: 'Prisijungimas'});
                 }
             });
         },
         scheduleCreate(){
+            let config= {
+                headers: { Authorization: `Bearer ${localStorage.token}` }
+            };
             var today = new Date();
             var internFrom = new Date(this.internFrom);
             var internTill = new Date(this.internTill);
@@ -301,13 +306,12 @@ export default {
                         start_date : this.internFrom,
                         end_date : this.internTill
                     }
-                    axios.post('http://127.0.0.1:8000/api/schedule/'+this.id,internSpan,this.config)
+                    axios.post('http://127.0.0.1:8000/api/schedule/'+this.id,internSpan,config)
                     .then(resp => {
                         this.loadData();
                     })
                     .catch(error => {
                         if(error.response.data.message == "Route [login] not defined."){
-                            localStorage.token = "";
                             router.push({name: 'Prisijungimas'});
                         }
                     });
@@ -421,6 +425,8 @@ export default {
             }
             if(!this.calendarData.selectedDate){
             this.calendarData.selectedDate = this.month[this.currentWeek][0][0].toLocaleDateString('el-GR');
+            //this.calendarData.selectedDate = new Date(this.internFrom).toLocaleDateString('el-GR');
+            //this.handleDay();
             }
         },
         pushWeek(direction){
@@ -457,14 +463,17 @@ export default {
             }
         },
         timeInput(){
+            let config= {
+                headers: { Authorization: `Bearer ${localStorage.token}` }
+            };
             let fromInput = (parseInt(this.timeFrom.substring(0,2))*60) + parseInt(this.timeFrom.substring(3,5));
             let tillInput = (parseInt(this.timeTill.substring(0,2))*60) + parseInt(this.timeTill.substring(3,5));
             let dateInput = this.calendarData.selectedDate.split('/');
-            dateInput = new Date(dateInput[2],dateInput[1]-1,dateInput[0]);
+            dateInput = new Date(dateInput[2],dateInput[1]-1,dateInput[0]).setHours(0,0,0,0);
             if(!this.calendarData.selectedDate){
                 this.dateError = true;
             }
-            if(dateInput < new Date()){
+            if(dateInput < new Date().setHours(0,0,0,0)){
                 this.dateBeforeError = true;
             }
             if(this.timeFrom === "" || this.timeFrom.includes('HH') || this.timeFrom.includes('mm')){
@@ -488,8 +497,7 @@ export default {
                     date: inputDate[2]+'-'+inputDate[1]+'-'+inputDate[0],
                     time_from: fromInput,
                     time_to: tillInput,
-                    type: this.timeType,
-                    schedule_id: this.scheduleData.trainee[0].schedules[this.scheduleID].id
+                    type: this.timeType
                 };
                 let timeAvailable = false;
                 for(let i = 0; i < this.month.length; i++){
@@ -511,14 +519,13 @@ export default {
                                 this.unavailableError = false;
                                 this.timeError = false;
                                 this.timeSpanError = false;
-                                axios.post('http://127.0.0.1:8000/api/time/'+this.id, timeData, this.config)
+                                axios.post('http://127.0.0.1:8000/api/time/'+this.id+'/'+this.scheduleData.trainee[0].schedules[this.scheduleID].id, timeData, config)
                                 .then(data => {
                                     this.tableReload = true;
                                     this.loadData();
                                 })
                                 .catch(error => {
                                     if(error.response.data.message == "Route [login] not defined."){
-                                        localStorage.token = "";
                                         router.push({name: 'Prisijungimas'});
                                     }
                                 });                                
@@ -533,11 +540,27 @@ export default {
 </script>
 
 <style scoped lang="scss">
+.generaldata_container{
+    display: flex;
+    padding: 1% 0;
+    height: 150px;
+    min-width: 1300px;
+    margin: 0 4rem 1.2rem 22rem;
+    justify-content: space-between;
+    .data_text{
+      margin-right: 1rem;
+      padding: 1rem 0;
+    }
+    .data_text:last-child{
+      margin:0;
+    }
+  }
 .block_container{
      display: flex;
      background-color: #ffffff;
      margin: 0 4rem 1% 22rem;
-     height: 80%;
+     width: calc(100vw - 420px);
+     height: calc(100vh - 200px);
      min-width: 1300px;
      min-height: 700px;
      border-radius: 15px;
@@ -577,6 +600,7 @@ export default {
     .schedule_back{
         font-family: 'Open Sans';
         font-size: 0.9rem;
+        height: max-content;
         margin-left: 2rem;
         margin-top: 1rem;
         cursor: pointer;
@@ -607,8 +631,8 @@ export default {
     .input_container{
         display: flex;
         flex-direction: column;
-        justify-content: space-around;
-        width: 25%;
+        justify-content: center;
+        width: 400px;
         height: 100%;
         border-radius: 15px;
         box-shadow: 3px 0px 5px -1px rgba(0, 0, 0, 0.10);
@@ -764,7 +788,7 @@ export default {
         }
     }
     .schedule_container{
-        width: 75%;
+        width: calc(100% - 400px);
         float: right;
 
         .shcedule_control_container{

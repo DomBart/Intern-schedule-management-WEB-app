@@ -6,9 +6,9 @@
 
 <script>
 export default {
+  props: ['data'],
   data () {
     return {
-      data: 100,
     }
   }
 }
@@ -30,7 +30,7 @@ export default {
         color: #5c5c5c;
         vertical-align: middle;
         display: table-cell;
-        padding: 1rem 3rem;
+        padding: 1rem 2.5rem;
     }
     .data_count{
         padding-left: 3rem;

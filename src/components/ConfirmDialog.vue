@@ -20,9 +20,6 @@ export default {
       mode: '',
       id: '',
       itemid: '',
-      config: {
-           headers: { Authorization: `Bearer ${localStorage.token}` }
-      }
     }
   },
   mounted(){
@@ -37,53 +34,51 @@ export default {
   },
   methods: {
     alertAction(){
+      let config= {
+                headers: { Authorization: `Bearer ${localStorage.token}` }
+      };
       if(this.mode == 'delete'){
-       axios.delete('http://127.0.0.1:8000/api/trainee/'+ this.id,this.config)
+       axios.delete('http://127.0.0.1:8000/api/trainee/'+ this.id,config)
              .then(data => {
                  this.$root.$emit('Submited');
+                 console.log('deleted');
              })
              .catch(error => {
                 if(error.response.data.message == "Route [login] not defined."){
-                    localStorage.token = "";
                     router.push({name: 'Prisijungimas'});
                 }
             });
       this.alertState = false;
       } else if(this.mode == 'scheduleDelete'){
           console.log(this.itemid);
-          axios.delete('http://127.0.0.1:8000/api/schedule/'+this.id+'/'+this.itemid,this.config)
+          axios.delete('http://127.0.0.1:8000/api/schedule/'+this.id+'/'+this.itemid,config)
             .then(resp => {
               this.$root.$emit('ScheduleDeleted');
               this.alertState = false;
             })
             .catch(error => {
               if(error.response.data.message == "Route [login] not defined."){
-                localStorage.token = "";
                 router.push({name: 'Prisijungimas'});
               }
             });  
       } else if(this.mode == 'timeDelete'){
-        console.log(this.itemid);
-        axios.delete('http://127.0.0.1:8000/api/time/'+this.id+'/'+this.itemid,this.config)
+        axios.delete('http://127.0.0.1:8000/api/time/'+this.id+'/'+this.itemid[0]+'/'+this.itemid[1],config)
             .then(resp => {
               this.$root.$emit('TimeDeleted');
               this.alertState = false;
             })
             .catch(error => {
               if(error.response.data.message == "Route [login] not defined."){
-                localStorage.token = "";
                 router.push({name: 'Prisijungimas'});
               }
             });  
       }else if (this.mode == 'logout'){
-        axios.post('http://127.0.0.1:8000/api/auth/logout',this.config)
+        axios.post('http://127.0.0.1:8000/api/auth/logout','',config)
             .then((resp) => {
-                localStorage.token = "";
                 router.push({ name: 'Prisijungimas' });
             })
             .catch(error => {
                 if(error.response.data.message == "Route [login] not defined."){
-                    localStorage.token = "";
                     router.push({ name: 'Prisijungimas' });
                 }
             });

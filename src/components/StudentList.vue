@@ -1,4 +1,10 @@
 <template>
+<div>
+  <div class="generaldata_container">
+    <generaldata class="data_text" v-bind:data="monthHours">MĖNESIO VALANDŲ:</generaldata>
+    <generaldata class="data_text" v-bind:data="weekHours">SAVAITĖS VALANDŲ:</generaldata>
+    <generaldata class="data_text" v-bind:data="studentList.length">VISO PRAKTIKANTŲ:</generaldata>
+  </div>
   <div class="main_container">
       <div class="list_control">
         <button class="student_add" title="Pridėti praktikantą" @click="triggerModal('')"
@@ -29,25 +35,25 @@
                       <img class="sort_trigger" src="../assets/sort.svg" 
                       v-bind:class="{ sort_dsc: currentSortDir==='dsc' && currentSort==='name', sort_asc: currentSortDir==='asc' && currentSort==='name'}" alt=""> 
                       VARDAS PAVARDĖ</th>
-                  <th class="position_column unselectable" @click="sort('position')" v-bind:class="{ sort_active: currentSort==='position' }">
+                  <th class="position_column unselectable center" @click="sort('position')" v-bind:class="{ sort_active: currentSort==='position' }">
                       <img class="sort_trigger" src="../assets/sort.svg" 
                       v-bind:class="{ sort_dsc: currentSortDir==='dsc' && currentSort==='position', sort_asc: currentSortDir==='asc' && currentSort==='position'}" alt=""> 
                       POZICIJA</th>
-                  <th class="hour_column unselectable" @click="sort('hours')" v-bind:class="{ sort_active: currentSort==='hours' }">
+                  <th class="hour_column unselectable center" @click="sort('hours')" v-bind:class="{ sort_active: currentSort==='hours' }">
                       <img class="sort_trigger" src="../assets/sort.svg"
                       v-bind:class="{ sort_dsc: currentSortDir==='dsc' && currentSort==='hours', sort_asc: currentSortDir==='asc' && currentSort==='hours'}" alt=""> 
                       VALANDOS</th>
-                  <th class="begin_column unselectable" @click="sort('startDate')" v-bind:class="{ sort_active: currentSort==='startDate' }">
+                  <th class="begin_column unselectable center" @click="sort('startDate')" v-bind:class="{ sort_active: currentSort==='startDate' }">
                       <img class="sort_trigger" src="../assets/sort.svg"
                       v-bind:class="{ sort_dsc: currentSortDir==='dsc' && currentSort==='startDate', sort_asc: currentSortDir==='asc' && currentSort==='startDate'}" alt=""> 
                       PRADŽIA</th>
-                  <th class="end_column unselectable" @click="sort('endDate')" v-bind:class="{ sort_active: currentSort==='endDate' }">
+                  <th class="end_column unselectable center" @click="sort('endDate')" v-bind:class="{ sort_active: currentSort==='endDate' }">
                       <img class="sort_trigger" src="../assets/sort.svg"
                       v-bind:class="{ sort_dsc: currentSortDir==='dsc' && currentSort==='endDate', sort_asc: currentSortDir==='asc' && currentSort==='endDate'}" alt=""> 
                       PABAIGA</th>
                   <th class="tool_column unselectable" >ĮRANKIAI</th>
               </tr>
-              <tr class="student_table_row" v-bind="studentList.id" v-for="item in studentList.slice(offset, pageItems)" :key="item.id">
+              <tr class="student_table_row" v-bind="studentList.id" v-for="(item, index) in studentList.slice(offset, pageItems)" :key="index">
                   <td>
                       <div class="student_popup" :class="{popup_active:item.id == selected}">
                           <span class="pupup_label unselectable">TELEFONO NUMERIS</span>
@@ -58,10 +64,10 @@
                       <img class="student_icon unselectable" title="Kontaktai" src="../assets/student.svg" :class="{top:item.id == selected}" @click="togglePopup(item.id)" alt="Student icon">
                   </td>
                   <td class="student_name" @click="routeSchedule(item.id)">{{item.firstname}} {{item.lastname}}</td>
-                  <td>{{item.position}}</td>
-                  <td>120/320 val.</td>
-                  <td>2020/01/01</td>
-                  <td>2020/04/31</td>
+                  <td class="center">{{item.position}}</td>
+                  <td class="center">{{studentTimeData[offset+index].attended_hours}}/{{studentTimeData[offset+index].total_hours}} val.</td>
+                  <td class="center">{{studentTimeData[offset+index].start_date}}</td>
+                  <td class="center">{{studentTimeData[offset+index].end_date}}</td>
                   <td>
                       <img class="edit_icon unselectable" title="Redaguoti" src="../assets/edit.svg" alt="Edit" @click="triggerModal(item)">
                       <img class="delete_icon unselectable" title="Trinti" src="../assets/delete.svg" alt="Delete" @click="deleteStudent(item.id, item.firstname)">
@@ -83,20 +89,26 @@
         </paginate>
       </div>
   </div>
+</div>
 </template>
 
 <script>
  import Vue from 'vue'
  import axios from 'axios'
+ import Generaldata from './DataBlock.vue'
  import Paginate from 'vuejs-paginate'
  import router from '../router/index'
  Vue.component('paginate', Paginate)
+ Vue.component('generaldata', Generaldata)
 export default {
     data () {
       return {
         page: 0,
         filterState: false,
         studentList: [],
+        studentTimeData: [],
+        monthHours: 0,
+        weekHours: 0,
         pageCount: 0,
         offset: 0,
         pageItems: 6,
@@ -105,7 +117,6 @@ export default {
         filterActive: false,
         currentSort: "",
         currentSortDir: "",
-        config: {headers: { Authorization: `Bearer ${localStorage.token}` }},
         addIcon: require("../assets/add.svg"),
         search: "",
         selected: undefined,
@@ -115,6 +126,7 @@ export default {
     mounted(){
         this.getStudents();
         this.$root.$on('Submited', () => {
+            console.log('fucked on submit')
              this.getStudents();
         });
     },
@@ -163,7 +175,12 @@ export default {
             router.push({name: 'Tvarkarastis', params: {id: id}});
         },
         getStudents(){
-            axios.get('http://127.0.0.1:8000/api/trainee',this.config)
+            let config= {
+                headers: { Authorization: `Bearer ${localStorage.token}` }
+            };
+            this.monthHours = 0;
+            this.weekHours = 0;
+            axios.get('http://127.0.0.1:8000/api/trainee',config)
             .then((resp) => {
                 if(resp.data.trainees.length == 0){
                     this.empty = true;
@@ -192,16 +209,56 @@ export default {
                  {
                      this.pageCount = Math.floor(resp.data.trainees.length / 6) + 1;
                  }
+                this.countListData();
+                this.countData();
             })
             .catch(error => {
+                let config= {
+                headers: { Authorization: `Bearer ${localStorage.token}` }
+                };
+                console.log(error.response.data);
+                console.log(config);
                 if(error.response.data.message == "Route [login] not defined."){
-                    localStorage.token = "";
                     router.push({name: 'Prisijungimas'});
                 }
             });
         },
         deleteStudent(id,name){
             this.$root.$emit('Alert', 'delete', id, '', 'AR TIKRAI NORITE PAŠALINTI', name);
+        },
+        countListData(){
+            let attended, total;
+            let startDate='', endDate='';
+            for(let i = 0; i < this.studentList.length; i++){
+                attended = 0;
+                total = 0;
+                startDate = '—';
+                endDate = '—';
+                for(let j = 0; j < this.studentList[i].schedules.length; j++){
+                    attended = attended + Math.round(this.studentList[i].schedules[j].works_hours.attended_hours/60);
+                    total = total + Math.round(this.studentList[i].schedules[j].works_hours.total_hours/60);
+                    if(startDate == '—'){
+                        startDate = this.studentList[i].schedules[j].start_date;
+                        endDate = this.studentList[i].schedules[j].end_date;
+                    }else if(this.studentList[i].schedules[j].start_date > startDate){
+                        startDate = this.studentList[i].schedules[j].start_date;
+                        endDate = this.studentList[i].schedules[j].end_date;
+                    }
+                }
+                this.studentTimeData.push({
+                    attended_hours: attended,
+                    total_hours: total,
+                    start_date: startDate,
+                    end_date: endDate});
+            }
+        },
+        countData(){
+            for(let i = 0; i < this.studentList.length; i++){
+                for(let j = 0; j < this.studentList[i].schedules.length; j++){
+                    this.monthHours = this.monthHours + Math.round((this.studentList[i].schedules[j].works_hours.month_hours/60));
+                    this.weekHours = this.weekHours + Math.round((this.studentList[i].schedules[j].works_hours.week_hours/60));
+                }
+            }
         },
         sort(type){
             let modifier = 1;
@@ -228,12 +285,25 @@ export default {
 </script>
 <style scoped lang="scss">
   $color-text1: #5c5c5c;
+  .generaldata_container{
+  display: flex;
+  padding: 1% 0;
+  height: 11rem;
+  margin: 0 4rem 1% 22rem;
+  justify-content: space-between;
+  .data_text{
+    margin-right: 1rem;
+  }
+  .data_text:last-child{
+    margin:0;
+  }
+}
  .main_container{
      background-color: #ffffff;
      margin: 0 4rem 0 22rem;
-     height: 77%;
+     height: calc(97vh - 12rem);;
      border-radius: 15px;
-    //  min-width: 800px;
+     min-width: 1000px;
      .list_control{
          display: flex;
          justify-content: space-between;
@@ -376,18 +446,22 @@ export default {
          justify-content: space-evenly;
          font-family: 'Open Sans';
 
-         tr th:nth-child(1) { width: 10%; padding-left: 3.5%; }
-         tr th:nth-child(2) { width: 20%; }
-         tr th:nth-child(3) { width: 15%; }
-         tr th:nth-child(4) { width: 15%; }
-         tr th:nth-child(5) { width: 15%; }
+         tr th:nth-child(1) { width: 4.5%; padding-left: 2%; }
+         tr th:nth-child(2) { width: 13%; }
+         tr th:nth-child(3) { width: 16%; }
+         tr th:nth-child(4) { width: 10%; }
+         tr th:nth-child(5) { width: 10%; }
          tr th:nth-child(6) { width: 15%;}
-         tr th:nth-child(7) { width: 10%; padding-right: 2.5%; }
+         tr th:nth-child(7) { width: 9%; padding-right: 2.5%; }
 
          tr{
                 border-bottom: 2px solid #c4c4c4;
                 overflow: auto;
          }
+
+        .center{
+                text-align: center!important;
+        }
 
         .student_table_header{
          display: flex;
@@ -440,13 +514,13 @@ export default {
                  white-space: nowrap;
             }
 
-            td:nth-child(1) { width: 10%; padding-left: 3.5%; }
-            td:nth-child(2) { width: 20%; }
-            td:nth-child(3) { width: 15%; }
-            td:nth-child(4) { width: 15%; }
-            td:nth-child(5) { width: 15%; }
+            td:nth-child(1) { width: 4%; padding-left: 1.5%; }
+            td:nth-child(2) { width: 12%; }
+            td:nth-child(3) { width: 16%; }
+            td:nth-child(4) { width: 10%; }
+            td:nth-child(5) { width: 10%; }
             td:nth-child(6) { width: 15%;}
-            td:nth-child(7) { width: 10%; padding-right: 2.5%; }
+            td:nth-child(7) { width: 7%; padding-right: 2.5%; }
 
             .student_icon{
                  width: 43px;

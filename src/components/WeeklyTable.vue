@@ -23,7 +23,7 @@
                               v-bind:class="{single: (time.time_to - time.time_from <= 30),
                               dark: time.type_of_time == 'break' || time.type_of_time == 'lecture'}">
                                <span>{{Math.floor(time.time_from/60)}}:{{('0'+(time.time_from%60).toString()).slice(-2)}} - {{Math.floor(time.time_to/60)}}:{{('0'+(time.time_to%60).toString()).slice(-2)}}</span>
-                               <button @click="deleteTime(time.time_id,time.time_from,time.time_to)">X</button>
+                               <button @click="deleteTime(time.time_id,time.time_from,time.time_to)" v-bind:class="{dark: time.type_of_time == 'break' || time.type_of_time == 'lecture'}">X</button>
                               </span>
                               <div class="time_data" v-if="time.time_from <= item && time.time_to > item"
                                  v-bind:class="{
@@ -45,7 +45,7 @@
                               v-bind:class="{single: (time.time_to - time.time_from <= 30),
                               dark: time.type_of_time == 'break' || time.type_of_time == 'lecture'}">
                                <span>{{Math.floor(time.time_from/60)}}:{{('0'+(time.time_from%60).toString()).slice(-2)}} - {{Math.floor(time.time_to/60)}}:{{('0'+(time.time_to%60).toString()).slice(-2)}}</span>
-                               <button @click="deleteTime(time.time_id,time.time_from,time.time_to)">X</button>
+                               <button @click="deleteTime(time.time_id,time.time_from,time.time_to)" v-bind:class="{dark: time.type_of_time == 'break' || time.type_of_time == 'lecture'}">X</button>
                               </span>
                               <div class="time_data" v-if="time.time_from <= halfTime[index]-15 && time.time_to > halfTime[index]-15"
                                 v-bind:class="{
@@ -68,7 +68,7 @@
                               v-bind:class="{single: ((time.time_to - time.time_from) <= 30),
                               dark: time.type_of_time == 'break' || time.type_of_time == 'lecture'}">
                               <span>{{Math.floor(time.time_from/60)}}:{{('0'+(time.time_from%60).toString()).slice(-2)}} - {{Math.floor(time.time_to/60)}}:{{('0'+(time.time_to%60).toString()).slice(-2)}}</span>
-                              <button @click="deleteTime(time.time_id,time.time_from,time.time_to)">X</button>
+                              <button @click="deleteTime(time.time_id,time.time_from,time.time_to)" v-bind:class="{dark: time.type_of_time == 'break' || time.type_of_time == 'lecture'}">X</button>
                               </span>
                               <div class="time_data" v-if="time.time_from <= halfTime[index] && time.time_to > halfTime[index]"
                                 v-bind:class="{
@@ -89,9 +89,9 @@
                           <div class="time_data_wrap" v-for="(time, indh) in array[count-1].slice(1)" v-bind:key="indh">
                               <span class="time_data_text" v-if="((halfTime[index]+15) - time.time_from) < 15 && time.time_from <= (halfTime[index]+15)"
                               v-bind:class="{single: (time.time_to - time.time_from) <= 30,
-                              dark: time[0] == 'break' || time[0] == 'lecture'}">
+                              dark: time.type_of_time == 'break' || time.type_of_time == 'lecture'}">
                               <span>{{Math.floor(time.time_from/60)}}:{{('0'+(time.time_from%60).toString()).slice(-2)}} - {{Math.floor(time.time_to/60)}}:{{('0'+(time.time_to%60).toString()).slice(-2)}}</span>
-                              <button @click="deleteTime(time.time_id,time.time_from,time.time_to)">X</button>
+                              <button @click="deleteTime(time.time_id,time.time_from,time.time_to)" v-bind:class="{dark: time.type_of_time == 'break' || time.type_of_time == 'lecture'}">X</button>
                               </span>
                               <div class="time_data" v-if="time.time_from <= (halfTime[index]+15) && time.time_to > (halfTime[index]+15)"
                                 v-bind:class="{
@@ -113,7 +113,7 @@
 <script>
 export default {
     
-props: ['array','selectedDate','id'],
+props: ['array','selectedDate','id','scheduleID'],
     data () {
       return {
           time: [480,540,600,660,720,
@@ -126,7 +126,8 @@ props: ['array','selectedDate','id'],
     },
     methods:{
         deleteTime(time_id, time_from, time_to){
-            this.$root.$emit('Alert', 'timeDelete', this.id, time_id, 'AR TIKRAI NORITE PAŠALINTI LAIKĄ',
+            let itemids = [this.scheduleID,time_id];
+            this.$root.$emit('Alert', 'timeDelete', this.id, itemids, 'AR TIKRAI NORITE PAŠALINTI LAIKĄ',
             Math.floor(time_from/60)+':'+('0'+(time_from%60).toString()).slice(-2) + ' - ' + Math.floor(time_to/60)+':'+('0'+(time_to%60).toString()).slice(-2))
         }
     }
@@ -184,23 +185,23 @@ props: ['array','selectedDate','id'],
             .first{
                  border-top-left-radius: 10px;
                  border-top-right-radius: 10px;
-                 -ms-transform: translate(-50%, 20%);
-                 transform: translate(-50%, 20%);
+                 -ms-transform: translate(-50%, 25%);
+                 transform: translate(-50%, 25%);
             }
             .last{
                  border-bottom-left-radius: 10px;
                  border-bottom-right-radius: 10px;
-                 -ms-transform: translate(-50%, -15%);
-                 transform: translate(-50%, -15%);
+                 -ms-transform: translate(-50%, -30%);
+                 transform: translate(-50%, -30%);
             }
             .quarter_cell{
                 .first{
-                    -ms-transform: translate(-50%, 20%);
-                    transform: translate(-50%, 20%);
+                    -ms-transform: translate(-50%, 25%);
+                    transform: translate(-50%, 25%);
                 }
                 .last{
-                    -ms-transform: translate(-50%, -25%);
-                    transform: translate(-50%, -25%);
+                    -ms-transform: translate(-50%, -35%);
+                    transform: translate(-50%, -35%);
                 }
             }
             .single{
@@ -212,8 +213,18 @@ props: ['array','selectedDate','id'],
                 transform: translate(-50%, 5%);
             }
             .single.last{
-                -ms-transform: translate(-50%, -10%);
-                transform: translate(-50%, -10%);
+                -ms-transform: translate(-50%, -15%);
+                transform: translate(-50%, -15%);
+            }
+            .half_cell{
+                .single.first{
+                    -ms-transform: translate(-50%, 15%);
+                    transform: translate(-50%, 15%);
+                }
+                .single.last{
+                    -ms-transform: translate(-50%, -20%);
+                    transform: translate(-50%, -20%);
+                }
             }
             .first.last{
                 -ms-transform: translate(-50%, 10%);
@@ -252,11 +263,11 @@ props: ['array','selectedDate','id'],
                     top: 5px;
                 }
                 button:hover{
-                    color: #FF7B7B;
+                    color: #FF7B7B!important;
                 }
             }
             .dark{
-                color: #5f5f5f;
+                color: #5f5f5f!important;
             }
             .time_data_text.single{
                 -ms-transform: translate(-50%,0%);
@@ -338,34 +349,45 @@ props: ['array','selectedDate','id'],
                 .last{
                     transform: translate(-50%, -20%);
                 }
-                .quarter_cell{
-                    .first{
-                    transform: translate(-50%, 30%);
-                    }
-                    .last{
-                    transform: translate(-50%, -25%);
-                    }
-                }
                 .time_data_wrap{
                  .time_data{
                     height: 0.95rem;
                 }
                 .single.first{
-                     transform: translate(-50%, 5%);
+                     -ms-transform: translate(-50%, 10%);
+                     transform: translate(-50%, 10%);
                      height: 0.7rem;
                 }
                 .single.last{
-                     transform: translate(-50%, -5%);
+                     -ms-transform: translate(-50%, -10%);
+                     transform: translate(-50%, -10%);
                      height: 0.7rem;
                 }
                 .first.last{
                     height: 1.2rem;
+                    -ms-transform: translate(-50%, 10%);
                     transform: translate(-50%, 10%);
                 }
+                .quarter_cell{
+                    .first{
+                    -ms-transform: translate(-50%, 30%);
+                    transform: translate(-50%, 30%);
+                    }
+                    .last{
+                    -ms-transform: translate(-50%, -25%);
+                    transform: translate(-50%, -25%);
+                    }
+                }
                 .time_data_text.single{
-                    -ms-transform: translate(-50%, -30%);
-                    transform: translate(-50%, -30%);
+                    -ms-transform: translate(-50%, -20%);
+                    transform: translate(-50%, -20%);
                     font-size: 0.9rem;
+                    span{
+                        top:10%;
+                    }
+                    button{
+                        top: 10%;
+                    }
                 }
                 }
             }

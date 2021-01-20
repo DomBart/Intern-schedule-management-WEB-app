@@ -2,11 +2,6 @@
   <body>
   <div class="main_container">
   <navi></navi>
-  <div class="generaldata_container" v-if="!selectTrainee">
-    <generaldata class="data_text">VALANDŲ ŠIĄ SAVAITĘ:</generaldata>
-    <generaldata class="data_text">VALANDŲ ŠĮ MĖNESĮ:</generaldata>
-    <generaldata class="data_text">BENDRA VALANDŲ SUMA:</generaldata>
-  </div>
   <div class="select_trainee_container" v-if="selectTrainee">
     <h1>PASIRINKITE PRAKTIKANTĄ</h1>
     <img class="scroll_up" src="../assets/tick.svg" @click="scrollList(-1)" alt="">
@@ -28,12 +23,11 @@
 import axios from 'axios';
 import router from '../router/index'
 import Navi from '../components/Navigation.vue'
-import Generaldata from '../components/DataBlock.vue'
 import Scheduleblock from '../components/ScheduleBlock.vue'
 import Confirmdialog from '../components/ConfirmDialog.vue'
 export default {
     props: ['id'],
-    components: {Navi, Generaldata, Scheduleblock,Confirmdialog},
+    components: {Navi, Scheduleblock, Confirmdialog},
     data () {
       return {
         selectTrainee: false,
@@ -95,21 +89,6 @@ html, body{
   height: 100%;
   width: 100%;
   overflow: auto;
-  .generaldata_container{
-    display: flex;
-    padding: 1% 0;
-    height: max-content;
-    min-width: 1300px;
-    margin: 0 4rem 0.5rem 22rem;
-    justify-content: space-between;
-    .data_text{
-      margin-right: 1rem;
-      padding: 1rem 0;
-    }
-    .data_text:last-child{
-      margin:0;
-    }
-  }
   .select_trainee_container{
     position: absolute;
     display: flex;

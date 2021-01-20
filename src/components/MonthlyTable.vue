@@ -195,28 +195,36 @@ methods:{
                  border-bottom-right-radius: 10px; 
                  transform: translate(-50%, -25%);
             }
+            .single{
+                height: 1.1vh!important;
+                min-height: 0.6rem!important;
+            }
+            .single.first{
+                     transform: translate(-50%, 10%);
+            }
+            .single.last{
+                     transform: translate(-50%, -15%);
+            }
+            .first.last{
+                transform: translate(-50%, 15%);
+                height: 1.2vh;
+                border-radius: 6px;
+            }
             .quarter_cell{
+                .first{
+                    transform: translate(-50%, 20%);
+                }
+                .last{
+                    transform: translate(-50%, -10%);
+                }
+            }
+            .half_cell{
                 .first{
                     transform: translate(-50%, 20%);
                 }
                 .last{
                     transform: translate(-50%, -25%);
                 }
-            }
-            .single{
-                height: 1.1vh!important;
-                min-height: 0.6rem!important;
-            }
-            .single.first{
-                     transform: translate(-50%, 20%);
-            }
-            .single.last{
-                     transform: translate(-50%, -10%);
-            }
-            .first.last{
-                transform: translate(-50%, 15%);
-                height: 1.2vh;
-                border-radius: 6px;
             }
             .intern{
                 background-color: #0054A6;
