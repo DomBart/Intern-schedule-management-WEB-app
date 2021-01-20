@@ -1,9 +1,9 @@
 <template>
   <div class="schedule_wrap">
   <div class="generaldata_container">
-    <generaldata class="data_text" v-bind:data="scheduleData.trainee[0].schedules[scheduleID].works_hours.week_hours">VALANDŲ ŠIĄ SAVAITĘ:</generaldata>
-    <generaldata class="data_text" v-bind:data="scheduleData.trainee[0].schedules[scheduleID].works_hours.month_hours">VALANDŲ ŠĮ MĖNESĮ:</generaldata>
-    <generaldata class="data_text" v-bind:data="scheduleData.trainee[0].schedules[scheduleID].works_hours.total_hours">BENDRA VALANDŲ SUMA:</generaldata>
+    <generaldata class="data_text" v-bind:data="Math.floor(scheduleData.trainee[0].schedules[scheduleID].works_hours.week_hours/60)">VALANDŲ ŠIĄ SAVAITĘ:</generaldata>
+    <generaldata class="data_text" v-bind:data="Math.floor(scheduleData.trainee[0].schedules[scheduleID].works_hours.month_hours/60)">VALANDŲ ŠĮ MĖNESĮ:</generaldata>
+    <generaldata class="data_text" v-bind:data="Math.floor(scheduleData.trainee[0].schedules[scheduleID].works_hours.total_hours/60)">BENDRA VALANDŲ SUMA:</generaldata>
   </div>
   <div class="block_container">
       <div class="input_container" v-if="month.length">
