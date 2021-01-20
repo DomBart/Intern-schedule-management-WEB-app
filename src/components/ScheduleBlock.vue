@@ -1,11 +1,11 @@
 <template>
   <div class="schedule_wrap">
-  <div class="generaldata_container">
+  <div class="generaldata_container" v-if="scheduleData.trainee[0].schedules.length > 0">
     <generaldata class="data_text" v-bind:data="Math.floor(scheduleData.trainee[0].schedules[scheduleID].works_hours.week_hours/60)">VALANDŲ ŠIĄ SAVAITĘ:</generaldata>
     <generaldata class="data_text" v-bind:data="Math.floor(scheduleData.trainee[0].schedules[scheduleID].works_hours.month_hours/60)">VALANDŲ ŠĮ MĖNESĮ:</generaldata>
     <generaldata class="data_text" v-bind:data="Math.floor(scheduleData.trainee[0].schedules[scheduleID].works_hours.total_hours/60)">BENDRA VALANDŲ SUMA:</generaldata>
   </div>
-  <div class="block_container">
+  <div class="block_container" v-bind:class="{middle: scheduleData.trainee[0].schedules.length == 0}">
       <div class="input_container" v-if="month.length">
           <a class="schedule_back" @click="$router.go({name: 'Tvarkarastis'})">&#60; STUDENTŲ SĄRAŠAS</a>
           <div class="student_data_row">
@@ -910,6 +910,12 @@ export default {
             }
         }
     }
+}
+.middle{
+    height: 90vh;
+    position: absolute;
+    top:50%;
+    transform: translateY(-50%);
 }
 </style>
 
