@@ -111,7 +111,7 @@ export default {
         weekHours: 0,
         pageCount: 0,
         offset: 0,
-        pageItems: 6,
+        pageItems: 0,
         startDate: "",
         endDate: "",
         filterActive: false,
@@ -123,17 +123,37 @@ export default {
         empty: false
       }
     },
+    created() {
+        window.addEventListener("resize", this.countPagination);
+    },
     mounted(){
         this.getStudents();
         this.$root.$on('Submited', () => {
-            console.log('fucked on submit')
              this.getStudents();
         });
     },
     methods: {
         clickCallback(pageNum){
-            this.pageItems = pageNum * 6;
-            this.offset = (pageNum * 6) - 6;
+            this.pageItems = Math.floor(window.innerHeight/100);
+            this.pageItems = pageNum * this.pageItems;
+            this.offset = this.pageItems - Math.floor(window.innerHeight/100);
+        },
+        countPagination(){
+            this.pageItems = Math.floor(window.innerHeight/100);
+            if(this.studentList.length % Math.floor(window.innerHeight/100) == 0)
+            {
+                this.pageCount = Math.floor(this.studentList.length / Math.floor(window.innerHeight/100));
+            }
+            else
+            {
+                this.pageCount = Math.floor(this.studentList.length / Math.floor(window.innerHeight/100)) + 1;
+            }
+            if(this.page > this.pageCount){
+                this.page = this.pageCount;
+            } else if(this.page != 0){
+                this.pageItems = this.page * this.pageItems;
+            }
+            this.offset = this.pageItems - Math.floor(window.innerHeight/100);
         },
         triggerModal(item){
             this.selected = undefined;
@@ -201,14 +221,7 @@ export default {
                     }
                  }
                   this.studentList = resp.data.trainees;
-                 if(resp.data.trainees.length % 6 == 0)
-                 {
-                     this.pageCount = Math.floor(resp.data.trainees.length / 6);
-                 }
-                 else
-                 {
-                     this.pageCount = Math.floor(resp.data.trainees.length / 6) + 1;
-                 }
+                  this.countPagination();
                 this.countListData();
                 this.countData();
             })
@@ -288,8 +301,8 @@ export default {
   .generaldata_container{
   display: flex;
   padding: 1% 0;
-  height: 11rem;
-  margin: 0 4rem 1% 22rem;
+  height: 8rem;
+  margin: 0 4rem 0.5rem 22rem;
   justify-content: space-between;
   .data_text{
     margin-right: 1rem;
@@ -299,9 +312,12 @@ export default {
   }
 }
  .main_container{
+     display: flex;
+     flex-direction: column;
+     justify-content: space-around;
      background-color: #ffffff;
      margin: 0 4rem 0 22rem;
-     height: calc(97vh - 12rem);;
+     height: calc(97vh - 8.5rem);;
      border-radius: 15px;
      min-width: 1000px;
      .list_control{
@@ -430,7 +446,7 @@ export default {
      }
      .table_container{
          width: 85%;
-         height: 65%;
+         height: 76%;
          margin: auto;
          overflow: auto;
 
@@ -527,8 +543,8 @@ export default {
 
             .student_icon{
                  width: 35px;
-                 margin-top: 0.8rem;
-                 margin-bottom: 0.5rem;
+                 margin-top: 0.7rem;
+                 margin-bottom: 0.4rem;
                  cursor: pointer;
                  z-index: 99;
             }
@@ -582,6 +598,7 @@ export default {
             }
 
             .edit_icon{
+                width: 2rem;
                 padding-right: 0.5rem;
                 cursor: pointer;
             }
@@ -590,6 +607,7 @@ export default {
             }
 
             .delete_icon{
+                width: 1.5rem;
                 cursor: pointer;
             }
             .delete_icon:hover{

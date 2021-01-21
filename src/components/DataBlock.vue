@@ -26,11 +26,11 @@ export default {
         position: relative;
         font-family: 'Oswald';
         font-weight: 400;
-        font-size: 1.8rem;
+        font-size: 1.3rem;
         color: #5c5c5c;
         vertical-align: middle;
         display: table-cell;
-        padding: 1rem 2.5rem;
+        padding: 0.5rem 2.5rem;
     }
     .data_count{
         padding-left: 3rem;
