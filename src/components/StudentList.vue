@@ -10,7 +10,7 @@
         <button class="student_add" title="Pridėti praktikantą" @click="triggerModal('')"
         @mouseover="addIcon = require('../assets/add_active.svg')"
         @mouseout="addIcon = require('../assets/add.svg')">
-        <img class="unselectable" title="Pridėti praktikantą" :src="addIcon" alt="Add button"></button>
+        <img class="add_icon unselectable" title="Pridėti praktikantą" :src="addIcon" alt="Add button"></button>
         <input type="text" v-model="search" @keyup.enter="searchFilter()" class="student_searchbar">
         <div class="filter_wrap">
             <div class="student_filter" v-bind:class="{ filter_active: filterActive }" @click="triggerFilter()">
@@ -309,11 +309,14 @@ export default {
          justify-content: space-between;
          width: 100%;
          height: max-content;
-         padding: 3rem 8rem;
+         padding: 2rem 8rem;
          font-family: 'Open Sans';
+         .add_icon{
+             width: 50%;
+         }
         .student_add{
-            height: 5rem;
-            width: 5rem;
+            height: 4rem;
+            width: 4rem;
             border-radius: 50%;
             background-color: #ffffff;
             border: 0;
@@ -523,7 +526,7 @@ export default {
             td:nth-child(7) { width: 7%; padding-right: 2.5%; }
 
             .student_icon{
-                 width: 43px;
+                 width: 35px;
                  margin-top: 0.8rem;
                  margin-bottom: 0.5rem;
                  cursor: pointer;

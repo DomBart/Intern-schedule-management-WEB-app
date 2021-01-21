@@ -1,11 +1,11 @@
 <template>
   <div class="schedule_wrap">
-  <div class="generaldata_container" v-if="scheduleData.trainee[0].schedules.length > 0">
-    <generaldata class="data_text" v-bind:data="Math.floor(scheduleData.trainee[0].schedules[scheduleID].works_hours.week_hours/60)">VALANDŲ ŠIĄ SAVAITĘ:</generaldata>
-    <generaldata class="data_text" v-bind:data="Math.floor(scheduleData.trainee[0].schedules[scheduleID].works_hours.month_hours/60)">VALANDŲ ŠĮ MĖNESĮ:</generaldata>
-    <generaldata class="data_text" v-bind:data="Math.floor(scheduleData.trainee[0].schedules[scheduleID].works_hours.total_hours/60)">BENDRA VALANDŲ SUMA:</generaldata>
+  <div class="generaldata_container" v-if="scheduleState">
+    <generaldata class="data_text" v-bind:data="weekHours">VALANDŲ ŠIĄ SAVAITĘ:</generaldata>
+    <generaldata class="data_text" v-bind:data="monthHours">VALANDŲ ŠĮ MĖNESĮ:</generaldata>
+    <generaldata class="data_text" v-bind:data="totalHours">BENDRA VALANDŲ SUMA:</generaldata>
   </div>
-  <div class="block_container" v-bind:class="{middle: scheduleData.trainee[0].schedules.length == 0}">
+  <div class="block_container" v-bind:class="{middle: !scheduleState}">
       <div class="input_container" v-if="month.length">
           <a class="schedule_back" @click="$router.go({name: 'Tvarkarastis'})">&#60; STUDENTŲ SĄRAŠAS</a>
           <div class="student_data_row">
@@ -114,8 +114,8 @@
                   <span>Pertrauka <div class="color_cube break"></div></span>
               </div>
           </div>
-          <WeekTable v-if="weekState" v-bind:array="month[currentWeek]" v-bind:selectedDate="calendarData.selectedDate" v-bind:id="id" v-bind:scheduleID="scheduleData.trainee[0].schedules[scheduleID].id"></WeekTable>
-          <MonthTable v-if="monthState" v-bind:array="month" v-bind:month="calendarData.currentDate.getMonth()"></MonthTable>
+          <WeekTable v-if="weekState && scheduleData.trainee[0].schedules.length > 0" v-bind:array="month[currentWeek]" v-bind:selectedDate="calendarData.selectedDate" v-bind:id="id" v-bind:scheduleID="scheduleData.trainee[0].schedules[scheduleID].id"></WeekTable>
+          <MonthTable v-if="monthState && scheduleData.trainee[0].schedules.length > 0" v-bind:array="month" v-bind:month="calendarData.currentDate.getMonth()"></MonthTable>
       </div>
   </div>
 </div>
@@ -173,7 +173,11 @@ export default {
         scheduleData: {
 
         },
+        scheduleState: false,
         addIcon: require("../assets/add.svg"),
+        weekHours: 0,
+        monthHours: 0,
+        totalHours: 0,
         times: [],
         days: [],
         month: [],
@@ -269,10 +273,15 @@ export default {
                  this.traineeFname = this.scheduleData.trainee[0].firstname;
                  this.traineeLname = this.scheduleData.trainee[0].lastname;
                  if(this.scheduleData.trainee[0].schedules.length == 0){
+                     this.scheduleState = false;
                      this.createSchedule = true;
                  }else if(this.scheduleData.trainee[0].schedules.length == 1 && !this.createSchedule){
+                 this.scheduleState = true;
                  this.internFrom = this.scheduleData.trainee[0].schedules[0].start_date;
                  this.internTill = this.scheduleData.trainee[0].schedules[0].end_date;
+                 this.weekHours = Math.floor(this.scheduleData.trainee[0].schedules[this.scheduleID].works_hours.week_hours/60);
+                 this.monthHours = Math.floor(this.scheduleData.trainee[0].schedules[this.scheduleID].works_hours.month_hours/60);
+                 this.totalHours = Math.floor(this.scheduleData.trainee[0].schedules[this.scheduleID].works_hours.total_hours/60);
                  this.getMonth();
                  }else if(this.scheduleData.trainee[0].schedules.length > 1 && !this.createSchedule && !this.tableReload){
                      this.selectSchedule = true;
@@ -280,6 +289,9 @@ export default {
                         this.scheduleID = (this.scheduleData.trainee[0].schedules.length)-1;
                         this.internFrom = this.scheduleData.trainee[0].schedules[this.scheduleID].start_date;
                         this.internTill = this.scheduleData.trainee[0].schedules[this.scheduleID].end_date;
+                        this.weekHours = Math.floor(this.scheduleData.trainee[0].schedules[this.scheduleID].works_hours.week_hours/60);
+                        this.monthHours = Math.floor(this.scheduleData.trainee[0].schedules[this.scheduleID].works_hours.month_hours/60);
+                        this.totalHours = Math.floor(this.scheduleData.trainee[0].schedules[this.scheduleID].works_hours.total_hours/60);
                         this.getMonth();
                         this.createSchedule=false;
                  } else if(this.tableReload){
@@ -326,6 +338,10 @@ export default {
             this.selectSchedule = false;
             this.internFrom = this.scheduleData.trainee[0].schedules[this.scheduleID].start_date;
             this.internTill = this.scheduleData.trainee[0].schedules[this.scheduleID].end_date;
+            this.weekHours = Math.floor(this.scheduleData.trainee[0].schedules[this.scheduleID].works_hours.week_hours/60);
+            this.monthHours = Math.floor(this.scheduleData.trainee[0].schedules[this.scheduleID].works_hours.month_hours/60);
+            this.totalHours = Math.floor(this.scheduleData.trainee[0].schedules[this.scheduleID].works_hours.total_hours/60);
+            this.scheduleState = true;
             this.getMonth();
         },
         newSchedule(){

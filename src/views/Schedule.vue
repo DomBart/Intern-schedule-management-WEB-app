@@ -42,7 +42,6 @@ export default {
         this.getStudents();
       }else{
         this.traineeID = this.id;
-        console.log(this.traineeID);
       }
     },
     methods: {
