@@ -34,20 +34,5 @@ $base-color:#efefefef;
 $main-color:#0054A6;
 html, body{
       background-color:$base-color;
-      height: 100vh;
-      width: 100%;
 }
-// .generaldata_container{
-//   display: flex;
-//   padding: 1% 0;
-//   height: 16%;
-//   margin: 0 4rem 1% 22rem;
-//   justify-content: space-between;
-//   .data_text{
-//     margin-right: 1rem;
-//   }
-//   .data_text:last-child{
-//     margin:0;
-//   }
-// }
 </style>

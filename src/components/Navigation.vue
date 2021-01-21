@@ -56,7 +56,7 @@ export default {
 .navi_wrap {
     background-color: #ffffff;
     width: 18rem;
-    height: 100%;
+    height: 100vh;
     position: fixed;
     left: 0;
     border-radius: 0px 15px 15px 0px;

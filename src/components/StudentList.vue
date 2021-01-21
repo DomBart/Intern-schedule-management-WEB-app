@@ -5,7 +5,7 @@
     <generaldata class="data_text" v-bind:data="weekHours">SAVAITĖS VALANDŲ:</generaldata>
     <generaldata class="data_text" v-bind:data="studentList.length">VISO PRAKTIKANTŲ:</generaldata>
   </div>
-  <div class="main_container">
+  <div class="main_container" ref="mainContainer">
       <div class="list_control">
         <button class="student_add" title="Pridėti praktikantą" @click="triggerModal('')"
         @mouseover="addIcon = require('../assets/add_active.svg')"
@@ -61,7 +61,7 @@
                           <span class="pupup_label unselectable">EL. PAŠTO ADRESAS</span>
                           <span class="pupup_text">{{item.email}}</span>
                       </div>
-                      <img class="student_icon unselectable" title="Kontaktai" src="../assets/student.svg" :class="{top:item.id == selected}" @click="togglePopup(item.id)" alt="Student icon">
+                      <img class="student_icon unselectable" title="Kontaktai" src="../assets/student.svg" :class="{top:item.id == selected, alert: (studentTimeData[offset+index].total_hours-studentTimeData[offset+index].attended_hours) < 30 && studentTimeData[offset+index].total_hours > 0}" @click="togglePopup(item.id)" alt="Student icon">
                   </td>
                   <td class="student_name" @click="routeSchedule(item.id)">{{item.firstname}} {{item.lastname}}</td>
                   <td class="center">{{item.position}}</td>
@@ -134,26 +134,26 @@ export default {
     },
     methods: {
         clickCallback(pageNum){
-            this.pageItems = Math.floor(window.innerHeight/100);
+            this.pageItems = Math.floor(this.$refs["mainContainer"].offsetHeight/85);
             this.pageItems = pageNum * this.pageItems;
-            this.offset = this.pageItems - Math.floor(window.innerHeight/100);
+            this.offset = this.pageItems - Math.floor((this.$refs["mainContainer"].offsetHeight/85));
         },
         countPagination(){
-            this.pageItems = Math.floor(window.innerHeight/100);
-            if(this.studentList.length % Math.floor(window.innerHeight/100) == 0)
+            this.pageItems = Math.floor((this.$refs["mainContainer"].offsetHeight/85));
+            if(this.studentList.length % Math.floor((this.$refs["mainContainer"].offsetHeight/85)) == 0)
             {
-                this.pageCount = Math.floor(this.studentList.length / Math.floor(window.innerHeight/100));
+                this.pageCount = Math.floor(this.studentList.length / Math.floor((this.$refs["mainContainer"].offsetHeight/85)));
             }
             else
             {
-                this.pageCount = Math.floor(this.studentList.length / Math.floor(window.innerHeight/100)) + 1;
+                this.pageCount = Math.floor(this.studentList.length / Math.floor((this.$refs["mainContainer"].offsetHeight/85))) + 1;
             }
             if(this.page > this.pageCount){
                 this.page = this.pageCount;
             } else if(this.page != 0){
                 this.pageItems = this.page * this.pageItems;
             }
-            this.offset = this.pageItems - Math.floor(window.innerHeight/100);
+            this.offset = this.pageItems - Math.floor((this.$refs["mainContainer"].offsetHeight/85));
         },
         triggerModal(item){
             this.selected = undefined;
@@ -320,6 +320,7 @@ export default {
      height: calc(97vh - 8.5rem);;
      border-radius: 15px;
      min-width: 1000px;
+     min-height: 715px;
      .list_control{
          display: flex;
          justify-content: space-between;
@@ -447,10 +448,9 @@ export default {
      .table_container{
          width: 85%;
          height: 76%;
-         margin: auto;
-         overflow: auto;
-
+         margin: auto;        
      }
+
      .list_empty{
          font-family: 'Oswald';
          color: #5c5c5c;
@@ -547,6 +547,10 @@ export default {
                  margin-bottom: 0.4rem;
                  cursor: pointer;
                  z-index: 99;
+            }
+
+            .alert{
+                content:url("../assets/student_alert.svg");
             }
 
             .student_name{
