@@ -320,6 +320,7 @@ export default {
                     }
                     axios.post('http://127.0.0.1:8000/api/schedule/'+this.id,internSpan,config)
                     .then(resp => {
+                        this.scheduleState = true;
                         this.loadData();
                     })
                     .catch(error => {
@@ -617,8 +618,7 @@ export default {
         font-family: 'Open Sans';
         font-size: 0.9rem;
         height: max-content;
-        margin-left: 2rem;
-        margin-top: 1rem;
+        margin: 1rem 0 1rem 2rem;
         cursor: pointer;
     }
     .schedule_back:hover{
