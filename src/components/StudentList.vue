@@ -139,21 +139,23 @@ export default {
             this.offset = this.pageItems - Math.floor((this.$refs["mainContainer"].offsetHeight/85));
         },
         countPagination(){
-            this.pageItems = Math.floor((this.$refs["mainContainer"].offsetHeight/85));
-            if(this.studentList.length % Math.floor((this.$refs["mainContainer"].offsetHeight/85)) == 0)
-            {
-                this.pageCount = Math.floor(this.studentList.length / Math.floor((this.$refs["mainContainer"].offsetHeight/85)));
+            if(this.$refs["mainContainer"].offsetHeight){
+                this.pageItems = Math.floor((this.$refs["mainContainer"].offsetHeight/85));
+                if(this.studentList.length % Math.floor((this.$refs["mainContainer"].offsetHeight/85)) == 0)
+                {
+                    this.pageCount = Math.floor(this.studentList.length / Math.floor((this.$refs["mainContainer"].offsetHeight/85)));
+                }
+                else
+                {
+                    this.pageCount = Math.floor(this.studentList.length / Math.floor((this.$refs["mainContainer"].offsetHeight/85))) + 1;
+                }
+                if(this.page > this.pageCount){
+                    this.page = this.pageCount;
+                } else if(this.page != 0){
+                    this.pageItems = this.page * this.pageItems;
+                }
+                this.offset = this.pageItems - Math.floor((this.$refs["mainContainer"].offsetHeight/85));
             }
-            else
-            {
-                this.pageCount = Math.floor(this.studentList.length / Math.floor((this.$refs["mainContainer"].offsetHeight/85))) + 1;
-            }
-            if(this.page > this.pageCount){
-                this.page = this.pageCount;
-            } else if(this.page != 0){
-                this.pageItems = this.page * this.pageItems;
-            }
-            this.offset = this.pageItems - Math.floor((this.$refs["mainContainer"].offsetHeight/85));
         },
         triggerModal(item){
             this.selected = undefined;
@@ -316,7 +318,7 @@ export default {
      flex-direction: column;
      justify-content: space-around;
      background-color: #ffffff;
-     margin: 0 4rem 0 22rem;
+     margin: 0 4rem 1rem 22rem;
      height: calc(97vh - 8.5rem);;
      border-radius: 15px;
      min-width: 1000px;
@@ -405,7 +407,7 @@ export default {
             display: flex;
             width: 16rem;
             flex-direction: column;
-            margin-top: 5rem;
+            margin-top: 4.2rem;
             padding: 1rem 1rem;
             background-color: #ffffff;
             border-radius: 8px;

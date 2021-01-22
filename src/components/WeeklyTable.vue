@@ -23,7 +23,7 @@
                               v-bind:class="{single: (time.time_to - time.time_from <= 30),
                               dark: time.type_of_time == 'break' || time.type_of_time == 'lecture'}">
                                <span>{{Math.floor(time.time_from/60)}}:{{('0'+(time.time_from%60).toString()).slice(-2)}} - {{Math.floor(time.time_to/60)}}:{{('0'+(time.time_to%60).toString()).slice(-2)}}</span>
-                               <button @click="deleteTime(time.time_id,time.time_from,time.time_to)" v-bind:class="{dark: time.type_of_time == 'break' || time.type_of_time == 'lecture'}">X</button>
+                               <button v-if="array[count-1][0].setHours(0,0,0,0) >= new Date().setHours(0,0,0,0)" @click="deleteTime(time.time_id,time.time_from,time.time_to)" v-bind:class="{dark: time.type_of_time == 'break' || time.type_of_time == 'lecture'}">X</button>
                               </span>
                               <div class="time_data" v-if="time.time_from <= item && time.time_to > item"
                                  v-bind:class="{
@@ -45,7 +45,7 @@
                               v-bind:class="{single: (time.time_to - time.time_from <= 30),
                               dark: time.type_of_time == 'break' || time.type_of_time == 'lecture'}">
                                <span>{{Math.floor(time.time_from/60)}}:{{('0'+(time.time_from%60).toString()).slice(-2)}} - {{Math.floor(time.time_to/60)}}:{{('0'+(time.time_to%60).toString()).slice(-2)}}</span>
-                               <button @click="deleteTime(time.time_id,time.time_from,time.time_to)" v-bind:class="{dark: time.type_of_time == 'break' || time.type_of_time == 'lecture'}">X</button>
+                               <button v-if="array[count-1][0].setHours(0,0,0,0) >= new Date().setHours(0,0,0,0)" @click="deleteTime(time.time_id,time.time_from,time.time_to)" v-bind:class="{dark: time.type_of_time == 'break' || time.type_of_time == 'lecture'}">X</button>
                               </span>
                               <div class="time_data" v-if="time.time_from <= halfTime[index]-15 && time.time_to > halfTime[index]-15"
                                 v-bind:class="{
@@ -68,7 +68,7 @@
                               v-bind:class="{single: ((time.time_to - time.time_from) <= 30),
                               dark: time.type_of_time == 'break' || time.type_of_time == 'lecture'}">
                               <span>{{Math.floor(time.time_from/60)}}:{{('0'+(time.time_from%60).toString()).slice(-2)}} - {{Math.floor(time.time_to/60)}}:{{('0'+(time.time_to%60).toString()).slice(-2)}}</span>
-                              <button @click="deleteTime(time.time_id,time.time_from,time.time_to)" v-bind:class="{dark: time.type_of_time == 'break' || time.type_of_time == 'lecture'}">X</button>
+                              <button v-if="array[count-1][0].setHours(0,0,0,0) >= new Date().setHours(0,0,0,0)" @click="deleteTime(time.time_id,time.time_from,time.time_to)" v-bind:class="{dark: time.type_of_time == 'break' || time.type_of_time == 'lecture'}">X</button>
                               </span>
                               <div class="time_data" v-if="time.time_from <= halfTime[index] && time.time_to > halfTime[index]"
                                 v-bind:class="{
@@ -91,7 +91,7 @@
                               v-bind:class="{single: (time.time_to - time.time_from) <= 30,
                               dark: time.type_of_time == 'break' || time.type_of_time == 'lecture'}">
                               <span>{{Math.floor(time.time_from/60)}}:{{('0'+(time.time_from%60).toString()).slice(-2)}} - {{Math.floor(time.time_to/60)}}:{{('0'+(time.time_to%60).toString()).slice(-2)}}</span>
-                              <button @click="deleteTime(time.time_id,time.time_from,time.time_to)" v-bind:class="{dark: time.type_of_time == 'break' || time.type_of_time == 'lecture'}">X</button>
+                              <button v-if="array[count-1][0].setHours(0,0,0,0) >= new Date().setHours(0,0,0,0)" @click="deleteTime(time.time_id,time.time_from,time.time_to)" v-bind:class="{dark: time.type_of_time == 'break' || time.type_of_time == 'lecture'}">X</button>
                               </span>
                               <div class="time_data" v-if="time.time_from <= (halfTime[index]+15) && time.time_to > (halfTime[index]+15)"
                                 v-bind:class="{
