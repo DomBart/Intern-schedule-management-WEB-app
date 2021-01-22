@@ -25,6 +25,12 @@ const router = new Router({
         import("../views/Schedule.vue")
     },
     {
+      path: '/profile',
+      name: 'Profilis',
+      component: () =>
+        import("../views/Profile.vue")
+    },
+    {
       path: '/statistics',
       name: 'Statistika',
       component: () =>

@@ -14,6 +14,8 @@
                 <input id="us" type="text" v-model="username" required>
                 <label for="em" v-if="mode == 'register'">El. pašto adresas</label>
                 <input id="em" type="email" v-if="mode == 'register'" v-model="email" required>
+                <label for="pos" v-if="mode == 'register'">Pozicija</label>
+                <input id="pos" type="text" v-if="mode == 'register'" v-model="position" required>
                 <label for="ps">Slaptažodis</label>
                 <input id="ps" type="password" v-model="pass" minlength="6" required>
                 <label for="psr" v-if="mode == 'register'">Pakartokite slaptažodį</label>
@@ -46,6 +48,7 @@ export default {
             username: "",
             pass: "",
             passrep: "",
+            position: "",
             failed: false,
             missmatch: false,
             passed: false,
@@ -66,6 +69,7 @@ export default {
                     lastname : this.lastname,
                     username : this.username,
                     email : this.email,
+                    position: this.position,
                     password : this.pass
                 }
             if(this.pass == this.passrep){

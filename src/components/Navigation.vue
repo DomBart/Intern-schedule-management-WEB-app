@@ -3,9 +3,9 @@
     <div class="navi_wrap">
         <img class="navi_img" src="../assets/logo.svg" alt="Teltonika">
         <div class="navi_links">
-            <a class="unselectable" href="/" v-bind:class="{ text_active: $route.name == 'Pagrindinis'}">PAGRINDINIS</a>
-            <a class="unselectable" href="#/schedule" v-bind:class="{ text_active: $route.name == 'Tvarkarastis'}">GRAFIKAS</a>
-            <a class="unselectable" href="#/statistics" v-bind:class="{ text_active: $route.name == 'Statistika'}">STATISTIKA</a>
+            <a class="unselectable" @click="push('Pagrindinis')" v-bind:class="{ text_active: $route.name == 'Pagrindinis'}">PAGRINDINIS</a>
+            <a class="unselectable" @click="push('Tvarkarastis')" v-bind:class="{ text_active: $route.name == 'Tvarkarastis'}">GRAFIKAS</a>
+            <a class="unselectable" @click="push('Statistika')" v-bind:class="{ text_active: $route.name == 'Statistika'}">STATISTIKA</a>
             <a class="unselectable" @click="toggleActive()" :class="{'text_active': listActive,}" >ŠIUO METU DIRBA : 5 
             <img class="navi_trigger" src="../assets/tick.svg" alt="" :class="{'active': listActive,}"></a>
             <div class="navi_students" :class="{'list_active': listActive}">
@@ -21,6 +21,7 @@
                   <li>Vardenis Pavardenis <span class="separator">|</span> 08:00 - 15:00</li> 
                 </ul>
             </div>
+            <a class="unselectable" @click="push('Profilis')" v-bind:class="{ text_active: $route.name == 'Profilis'}">PROFILIS</a>
             <a class="unselectable" @click="logout()">ATSIJUNGTI</a>
         </div>
     </div>
@@ -29,7 +30,6 @@
 
 <script>
 import axios from 'axios'
-import router from '../router/index'
 export default {
     data() {
         return{
@@ -47,6 +47,11 @@ export default {
         },
         logout(){
             this.$root.$emit('Alert', 'logout', 0, '', 'AR TIKRAI NORITE ATSIJUNGTI', '');
+        },
+        push(route){
+            if(this.$route.name !== route){
+            this.$router.push({name: route});
+            }
         }
     }
 }
@@ -56,7 +61,8 @@ export default {
 .navi_wrap {
     background-color: #ffffff;
     width: 18rem;
-    height: 100vh;
+    height: 100%;
+    min-height: 800px;
     position: fixed;
     left: 0;
     border-radius: 0px 15px 15px 0px;

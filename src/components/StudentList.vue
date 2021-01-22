@@ -139,7 +139,7 @@ export default {
             this.offset = this.pageItems - Math.floor((this.$refs["mainContainer"].offsetHeight/85));
         },
         countPagination(){
-            if(this.$refs["mainContainer"].offsetHeight){
+            if(this.$refs["mainContainer"]){
                 this.pageItems = Math.floor((this.$refs["mainContainer"].offsetHeight/85));
                 if(this.studentList.length % Math.floor((this.$refs["mainContainer"].offsetHeight/85)) == 0)
                 {
@@ -228,11 +228,6 @@ export default {
                 this.countData();
             })
             .catch(error => {
-                let config= {
-                headers: { Authorization: `Bearer ${localStorage.token}` }
-                };
-                console.log(error.response.data);
-                console.log(config);
                 if(error.response.data.message == "Route [login] not defined."){
                     router.push({name: 'Prisijungimas'});
                 }
@@ -319,7 +314,7 @@ export default {
      justify-content: space-around;
      background-color: #ffffff;
      margin: 0 4rem 1rem 22rem;
-     height: calc(97vh - 8.5rem);;
+     height: calc(97vh - 8.5rem);
      border-radius: 15px;
      min-width: 1000px;
      min-height: 715px;
