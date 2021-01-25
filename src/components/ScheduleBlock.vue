@@ -84,8 +84,8 @@
                 <input id="start" type="date" v-model="internFrom" required>
                 <label for="end">Praktika iki</label>
                 <input id="end" type="date" v-model="internTill" required>
-                <span class="input_error_message" v-if="scheduleBeforeError">Įvedimas atgaline data negalimas!</span>
-                <span class="input_error_message" v-if="scheduleEndError">Praktikos pabaiga ankstesnė už pradžią!</span>
+                <span class="input_error_message static" v-if="scheduleBeforeError">Įvedimas atgaline data negalimas!</span>
+                <span class="input_error_message static" v-if="scheduleEndError">Praktikos pabaiga ankstesnė už pradžią!</span>
                 <input class="option_submit" type="submit" value="SUKURTI">
                 <input class="option_submit" type="button" value="ATŠAUKTI" v-if="scheduleData.trainee[0].schedules.length > 0" @click="scheduleCreateCancel()">
             </form>
@@ -767,6 +767,11 @@ export default {
 
     .top{
         margin-bottom: 15px;
+    }
+
+    .static{
+        position: static!important;
+        transform: none;
     }
 
     .schedule_back{
