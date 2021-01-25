@@ -326,8 +326,9 @@ export default {
   $color-text1: #5c5c5c;
   .generaldata_container{
   display: flex;
-  padding: 1% 0;
+  padding: 1rem 0;
   height: 8rem;
+  min-width: 1000px;
   margin: 0 4rem 0.5rem 22rem;
   justify-content: space-between;
   .data_text{

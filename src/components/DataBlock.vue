@@ -17,7 +17,7 @@ export default {
 <style scoped lang='scss'>
 .data_container{
     display: table;
-    width: max-content;
+    width: 25%;
     height: 100%;
     background: #ffffff;
     text-align: center;
