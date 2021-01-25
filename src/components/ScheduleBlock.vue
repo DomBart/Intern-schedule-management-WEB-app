@@ -233,6 +233,7 @@ export default {
             this.tableReload = true;
             this.month = [];
             this.loadData();
+            this.handleMonth();
         });
         this.$root.$on('TimeEdit', (item,date) => {
             this.editTime(item,date);
