@@ -31,19 +31,20 @@
               <div class="data_date_row intern_span">
                   <div class="date_input_wrap">
                       <label for="student_date_from">Praktika nuo</label>
-                      <input class="student_date_from" type="date" v-model="internFrom">
+                      <input class="student_date_from" type="date" v-model="internFrom" v-bind:class="{error: scheduleSpanError}">
                   </div>
                   <div class="date_input_wrap">
                       <label for="student_date_till">Praktika iki</label>
-                      <input class="student_date_till" type="date" v-model="internTill">
+                      <input class="student_date_till" type="date" v-model="internTill" v-bind:class="{error: scheduleSpanError}">
                   </div>
           </div>
           <div>
-          <FunctionalCalendar ref="Calendar" v-model="calendarData" v-on:changedMonth="handleMonth" v-on:choseDay="handleDay" :configs="calendarConfigs" v-bind:class="{ error: dateError || dateBeforeError, edit_disable: timeEdit }"></FunctionalCalendar>
+          <FunctionalCalendar ref="Calendar" v-model="calendarData" v-on:changedMonth="handleMonth" v-on:choseDay="handleDay" :configs="calendarConfigs" v-bind:class="{ error: dateError || dateBeforeError || scheduleSpanError, edit_disable: timeEdit }"></FunctionalCalendar>
           </div>
               <div class="lower_input_column">
                   <span class="input_error_message" v-if="dateError">Pasirinkite norimą datą</span>
                   <span class="input_error_message" v-if="dateBeforeError">Įvedimas atgaline data negalimas</span>
+                  <span class="input_error_message" v-if="scheduleSpanError">Įvedamo laiko data nepriklauso praktikos laikotarpiui</span>
                   <span class="input_error_message top" v-if="unavailableError">Šis laikas yra užimtas</span>
                   <span class="input_error_message top" v-if="timeError">Įvestas netinkamas laikas</span>
                   <span class="input_error_message top" v-if="timeSpanError">Įvesta veikla trumpesnė nei 30 min.</span>
@@ -275,6 +276,7 @@ export default {
         if(this.scheduleBeforeError || this.scheduleEndError){
             this.scheduleBeforeError = false;
             this.scheduleEndError = false;
+            this.scheduleSpanError = false;
         }
         if(!this.createSchedule){
             this.updateScheduleDates();
@@ -283,6 +285,7 @@ export default {
     internTill: function() {
         if(this.scheduleEndError){
             this.scheduleEndError = false;
+            this.scheduleSpanError = false;
         }
         if(!this.createSchedule){
             this.updateScheduleDates();
@@ -506,6 +509,7 @@ export default {
         handleDay(){
             this.dateError = false;
             this.dateBeforeError = false;
+            this.scheduleSpanError = false;
             let selected = this.calendarData.selectedDate.split('/');
             let dateSelected = new Date(selected[2],selected[1]-1,selected[0]);
             if(dateSelected < this.month[this.currentWeek][0][0]){
