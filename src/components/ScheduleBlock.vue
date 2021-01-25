@@ -275,10 +275,16 @@ export default {
             this.scheduleBeforeError = false;
             this.scheduleEndError = false;
         }
+        if(!this.createSchedule){
+            this.updateScheduleDates();
+        }
     },
     internTill: function() {
         if(this.scheduleEndError){
             this.scheduleEndError = false;
+        }
+        if(!this.createSchedule){
+            this.updateScheduleDates();
         }
     },
     scheduleID: function() {
@@ -620,6 +626,30 @@ export default {
             this.tillError = false;
             this.timeError = false;
             this.timeSpanError = false;
+        },
+        updateScheduleDates(){
+            let oldFrom = this.scheduleData.trainee[0].schedules[this.scheduleID].start_date;
+            let oldTill = this.scheduleData.trainee[0].schedules[this.scheduleID].end_date;
+            if(this.internFrom !== oldFrom || this.internTill !== oldTill){
+                let config= {
+                headers: { Authorization: `Bearer ${localStorage.token}` },
+                };
+                let data= {
+                    start_date: this.internFrom,
+                    end_date: this.internTill
+                };
+                axios.put('http://127.0.0.1:8000/api/schedule/'+this.id+'/'+this.scheduleData.trainee[0].schedules[this.scheduleID].id, data, config)
+                .then(data => {
+                    this.tableReload = true;
+                    this.loadData();
+                })
+                .catch(error => {
+                    console.log(error.response.data.message);
+                    if(error.response.data.message == "Route [login] not defined."){
+                        router.push({name: 'Prisijungimas'});
+                    }
+                });                 
+            }
         },
         downloadSchedule(){
             let config= {
