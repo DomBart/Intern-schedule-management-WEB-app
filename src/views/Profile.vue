@@ -32,6 +32,7 @@
   </div>
 </div>
 <alert v-if="passed" v-bind:push="''">REDAGAVIMAS SĖKMINGAS!</alert>
+<confirmdialog></confirmdialog>
 </div>
 </template>
 
@@ -39,9 +40,10 @@
 import axios from 'axios'
 import Alert from '../components/AlertDialog.vue'
 import Navi from '../components/Navigation.vue'
+import Confirmdialog from '../components/ConfirmDialog.vue'
 export default {
 name: 'Profilis',
-components: {Navi, Alert},
+components: {Navi, Alert,Confirmdialog},
 data () {
     return {
         userData: {},
