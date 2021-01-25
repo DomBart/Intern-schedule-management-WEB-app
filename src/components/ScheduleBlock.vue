@@ -209,6 +209,7 @@ export default {
         timeError: false,
         tillError: false,
         timeSpanError: false,
+        scheduleSpanError: false,
         unavailableError: false
         }
     },
@@ -548,7 +549,10 @@ export default {
             if (tillInput - fromInput < 30 && !this.timeError){
                 this.timeSpanError = true;
             }
-            if(!this.dateError && !this.fromError && !this.tillError && !this.typeError && !this.timeError && !this.timeSpanError && !this.dateBeforeError){
+            if (dateInput < new Date(this.internFrom).setHours(0,0,0,0) || dateInput > new Date(this.internTill).setHours(0,0,0,0)){
+                this.scheduleSpanError = true
+            }
+            if(!this.dateError && !this.fromError && !this.tillError && !this.typeError && !this.timeError && !this.timeSpanError && !this.dateBeforeError && !this.scheduleSpanError){
                 let inputDate = this.calendarData.selectedDate.split('/');
                 let timeData = {
                     date: inputDate[2]+'-'+inputDate[1]+'-'+inputDate[0],
@@ -661,7 +665,6 @@ export default {
                 responseType: 'blob'
             };
             let getID = this.scheduleData.trainee[0].schedules[this.scheduleID].id;
-            console.log('http://127.0.0.1:8000/api/document/'+ this.id + '/' + getID);
             axios.get('http://127.0.0.1:8000/api/document/'+ this.id + '/' + getID,config)
             .then((response) => {
                 var fileURL = window.URL.createObjectURL(new Blob([response.data]));

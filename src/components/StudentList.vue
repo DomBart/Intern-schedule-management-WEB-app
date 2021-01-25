@@ -239,6 +239,7 @@ export default {
         countListData(){
             let attended, total;
             let startDate='', endDate='';
+            this.studentTimeData = [];
             for(let i = 0; i < this.studentList.length; i++){
                 attended = 0;
                 total = 0;
