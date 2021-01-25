@@ -273,7 +273,7 @@ export default {
         }
     },
     internFrom: function() {
-        if(this.scheduleBeforeError || this.scheduleEndError){
+        if(this.scheduleBeforeError || this.scheduleEndError || this.scheduleSpanError){
             this.scheduleBeforeError = false;
             this.scheduleEndError = false;
             this.scheduleSpanError = false;
@@ -283,7 +283,7 @@ export default {
         }
     },
     internTill: function() {
-        if(this.scheduleEndError){
+        if(this.scheduleEndError || this.scheduleSpanError){
             this.scheduleEndError = false;
             this.scheduleSpanError = false;
         }
