@@ -501,6 +501,9 @@ export default {
             }
         },
         handleMonth(){
+            this.dateError = false;
+            this.dateBeforeError = false;
+            this.scheduleSpanError = false;
             this.currentWeek = 0;
             this.inputMonth = this.calendarData.currentDate.getFullYear() + '-' + (this.calendarData.currentDate.getMonth()+1);
             this.getMonth();
@@ -535,28 +538,28 @@ export default {
             if(!this.calendarData.selectedDate){
                 this.dateError = true;
             }
-            if(dateInput < new Date().setHours(0,0,0,0)){
+            else if(dateInput < new Date().setHours(0,0,0,0)){
                 this.dateBeforeError = true;
             }
-            if(this.timeFrom === "" || this.timeFrom.includes('HH') || this.timeFrom.includes('mm')){
+            else if(this.timeFrom === "" || this.timeFrom.includes('HH') || this.timeFrom.includes('mm')){
                 this.fromError = true;
             }
-            if(this.timeTill === "" || this.timeTill.includes('HH') || this.timeTill.includes('mm')){
+            else if(this.timeTill === "" || this.timeTill.includes('HH') || this.timeTill.includes('mm')){
                 this.tillError = true;
             }
-            if (this.timeType === "default"){
+            else if (this.timeType === "default"){
                 this.typeError = true;
             }
-            if (fromInput >= tillInput && this.timeFrom != "" && this.timeTill != ""){
+            else if (fromInput >= tillInput && this.timeFrom != "" && this.timeTill != ""){
                 this.timeError = true;
             }
-            if (tillInput - fromInput < 30 && !this.timeError){
+            else if (tillInput - fromInput < 30){
                 this.timeSpanError = true;
             }
-            if (dateInput < new Date(this.internFrom).setHours(0,0,0,0) || dateInput > new Date(this.internTill).setHours(0,0,0,0)){
+            else if ((dateInput < new Date(this.internFrom).setHours(0,0,0,0) || dateInput > new Date(this.internTill).setHours(0,0,0,0))){
                 this.scheduleSpanError = true
             }
-            if(!this.dateError && !this.fromError && !this.tillError && !this.typeError && !this.timeError && !this.timeSpanError && !this.dateBeforeError && !this.scheduleSpanError){
+            else{
                 let inputDate = this.calendarData.selectedDate.split('/');
                 let timeData = {
                     date: inputDate[2]+'-'+inputDate[1]+'-'+inputDate[0],
