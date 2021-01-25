@@ -28,6 +28,7 @@
       </div>
       <div class="table_container">
           <h1 class="list_empty" v-if="empty">PRAKTIKANTŲ SĄRAŠAS TUŠČIAS</h1>
+          <h1 class="list_empty" v-if="searchEmpty">PAIEŠKOS REZULTATAI TUŠTI</h1>
           <table v-if="studentList.length > 0" class="student_table">
               <tr class="student_table_header">
                   <th class="icon_column" ></th>
@@ -119,7 +120,8 @@ export default {
         addIcon: require("../assets/add.svg"),
         search: "",
         selected: undefined,
-        empty: false
+        empty: false,
+        searchEmpty: false
       }
     },
     created() {
@@ -203,6 +205,7 @@ export default {
             };
             this.monthHours = 0;
             this.weekHours = 0;
+            this.searchEmpty = false;
             axios.get('http://127.0.0.1:8000/api/trainee',config)
             .then((resp) => {
                 if(resp.data.trainees.length == 0){
@@ -221,6 +224,9 @@ export default {
                             resp.data.trainees.splice(i,1);
                             i--;
                         }
+                    }
+                    if(resp.data.trainees.length == 0){
+                        this.searchEmpty = true;
                     }
                  }
                   this.studentList = resp.data.trainees;
