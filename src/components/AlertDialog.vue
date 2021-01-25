@@ -28,7 +28,7 @@ export default {
     width: 100vw;
     top: 0;
     left: 0;
-    background: rgba(0, 0, 0, 0.8);
+    background: rgba(255,255,255,0.95);
     z-index: 99;
 }
 .alert_container{
@@ -41,9 +41,10 @@ export default {
   width: 500px;
   height: 200px;
   background-color: #ffffff;
-  border-radius: 4px;
+  border-radius: 15px;
   top: 50%;
   left: 50%;
+  box-shadow: 0px 0px 4px 3px rgba(0, 0, 0, 0.10);
   -ms-transform: translate(-50%, -50%);
   transform: translate(-50%, -50%);
 }

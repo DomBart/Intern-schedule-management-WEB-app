@@ -23,7 +23,8 @@
                               v-bind:class="{single: (time.time_to - time.time_from <= 30),
                               dark: time.type_of_time == 'break' || time.type_of_time == 'lecture'}">
                                <span>{{Math.floor(time.time_from/60)}}:{{('0'+(time.time_from%60).toString()).slice(-2)}} - {{Math.floor(time.time_to/60)}}:{{('0'+(time.time_to%60).toString()).slice(-2)}}</span>
-                               <button v-if="array[count-1][0].setHours(0,0,0,0) >= new Date().setHours(0,0,0,0)" @click="deleteTime(time.time_id,time.time_from,time.time_to)" v-bind:class="{dark: time.type_of_time == 'break' || time.type_of_time == 'lecture'}">X</button>
+                               <img class="edit_time" v-if="array[count-1][0].setHours(0,0,0,0) >= new Date().setHours(0,0,0,0)" title="Redaguoti" src="../assets/edit_time_light.svg" alt="Edit" @click="editTime(time, array[count-1][0])" v-bind:class="{dark_edit: time.type_of_time == 'break' || time.type_of_time == 'lecture'}">
+                               <button v-if="array[count-1][0].setHours(0,0,0,0) >= new Date().setHours(0,0,0,0)" title="Trinti" @click="deleteTime(time.time_id,time.time_from,time.time_to)" v-bind:class="{dark: time.type_of_time == 'break' || time.type_of_time == 'lecture'}">X</button>
                               </span>
                               <div class="time_data" v-if="time.time_from <= item && time.time_to > item"
                                  v-bind:class="{
@@ -45,7 +46,8 @@
                               v-bind:class="{single: (time.time_to - time.time_from <= 30),
                               dark: time.type_of_time == 'break' || time.type_of_time == 'lecture'}">
                                <span>{{Math.floor(time.time_from/60)}}:{{('0'+(time.time_from%60).toString()).slice(-2)}} - {{Math.floor(time.time_to/60)}}:{{('0'+(time.time_to%60).toString()).slice(-2)}}</span>
-                               <button v-if="array[count-1][0].setHours(0,0,0,0) >= new Date().setHours(0,0,0,0)" @click="deleteTime(time.time_id,time.time_from,time.time_to)" v-bind:class="{dark: time.type_of_time == 'break' || time.type_of_time == 'lecture'}">X</button>
+                               <img class="edit_time" v-if="array[count-1][0].setHours(0,0,0,0) >= new Date().setHours(0,0,0,0)" title="Redaguoti" src="../assets/edit_time_light.svg" alt="Edit" @click="editTime(time,array[count-1][0])" v-bind:class="{dark_edit: time.type_of_time == 'break' || time.type_of_time == 'lecture'}">
+                               <button v-if="array[count-1][0].setHours(0,0,0,0) >= new Date().setHours(0,0,0,0)" title="Trinti" @click="deleteTime(time.time_id,time.time_from,time.time_to)" v-bind:class="{dark: time.type_of_time == 'break' || time.type_of_time == 'lecture'}">X</button>
                               </span>
                               <div class="time_data" v-if="time.time_from <= halfTime[index]-15 && time.time_to > halfTime[index]-15"
                                 v-bind:class="{
@@ -68,7 +70,8 @@
                               v-bind:class="{single: ((time.time_to - time.time_from) <= 30),
                               dark: time.type_of_time == 'break' || time.type_of_time == 'lecture'}">
                               <span>{{Math.floor(time.time_from/60)}}:{{('0'+(time.time_from%60).toString()).slice(-2)}} - {{Math.floor(time.time_to/60)}}:{{('0'+(time.time_to%60).toString()).slice(-2)}}</span>
-                              <button v-if="array[count-1][0].setHours(0,0,0,0) >= new Date().setHours(0,0,0,0)" @click="deleteTime(time.time_id,time.time_from,time.time_to)" v-bind:class="{dark: time.type_of_time == 'break' || time.type_of_time == 'lecture'}">X</button>
+                              <img class="edit_time" v-if="array[count-1][0].setHours(0,0,0,0) >= new Date().setHours(0,0,0,0)" title="Redaguoti" src="../assets/edit_time_light.svg" alt="Edit" @click="editTime(time,array[count-1][0])" v-bind:class="{dark_edit: time.type_of_time == 'break' || time.type_of_time == 'lecture'}">
+                              <button v-if="array[count-1][0].setHours(0,0,0,0) >= new Date().setHours(0,0,0,0)" title="Trinti" @click="deleteTime(time.time_id,time.time_from,time.time_to)" v-bind:class="{dark: time.type_of_time == 'break' || time.type_of_time == 'lecture'}">X</button>
                               </span>
                               <div class="time_data" v-if="time.time_from <= halfTime[index] && time.time_to > halfTime[index]"
                                 v-bind:class="{
@@ -91,7 +94,8 @@
                               v-bind:class="{single: (time.time_to - time.time_from) <= 30,
                               dark: time.type_of_time == 'break' || time.type_of_time == 'lecture'}">
                               <span>{{Math.floor(time.time_from/60)}}:{{('0'+(time.time_from%60).toString()).slice(-2)}} - {{Math.floor(time.time_to/60)}}:{{('0'+(time.time_to%60).toString()).slice(-2)}}</span>
-                              <button v-if="array[count-1][0].setHours(0,0,0,0) >= new Date().setHours(0,0,0,0)" @click="deleteTime(time.time_id,time.time_from,time.time_to)" v-bind:class="{dark: time.type_of_time == 'break' || time.type_of_time == 'lecture'}">X</button>
+                              <img class="edit_time" v-if="array[count-1][0].setHours(0,0,0,0) >= new Date().setHours(0,0,0,0)" title="Redaguoti" src="../assets/edit_time_light.svg" alt="Edit" @click="editTime(time,array[count-1][0])" v-bind:class="{dark_edit: time.type_of_time == 'break' || time.type_of_time == 'lecture'}">
+                              <button v-if="array[count-1][0].setHours(0,0,0,0) >= new Date().setHours(0,0,0,0)" title="Trinti" @click="deleteTime(time.time_id,time.time_from,time.time_to)" v-bind:class="{dark: time.type_of_time == 'break' || time.type_of_time == 'lecture'}">X</button>
                               </span>
                               <div class="time_data" v-if="time.time_from <= (halfTime[index]+15) && time.time_to > (halfTime[index]+15)"
                                 v-bind:class="{
@@ -129,6 +133,9 @@ props: ['array','selectedDate','id','scheduleID'],
             let itemids = [this.scheduleID,time_id];
             this.$root.$emit('Alert', 'timeDelete', this.id, itemids, 'AR TIKRAI NORITE PAŠALINTI LAIKĄ',
             Math.floor(time_from/60)+':'+('0'+(time_from%60).toString()).slice(-2) + ' - ' + Math.floor(time_to/60)+':'+('0'+(time_to%60).toString()).slice(-2))
+        },
+        editTime(time,date){
+            this.$root.$emit('TimeEdit',time,date);
         }
     }
 }
@@ -200,8 +207,8 @@ props: ['array','selectedDate','id','scheduleID'],
                     transform: translate(-50%, 25%);
                 }
                 .last{
-                    -ms-transform: translate(-50%, -35%);
-                    transform: translate(-50%, -35%);
+                    -ms-transform: translate(-50%, -25%);
+                    transform: translate(-50%, -25%);
                 }
             }
             .single{
@@ -223,7 +230,7 @@ props: ['array','selectedDate','id','scheduleID'],
                 }
                 .single.last{
                     -ms-transform: translate(-50%, -20%);
-                    transform: translate(-50%, -20%);
+                    transform: translate(-50%, -15%);
                 }
             }
             .first.last{
@@ -254,6 +261,7 @@ props: ['array','selectedDate','id','scheduleID'],
                     position: absolute;
                     color: #ffffff;
                     font-family: 'Open Sans';
+                    font-size: 0.95rem;
                     font-weight: 600;
                     background: none;
                     outline: none;
@@ -265,6 +273,22 @@ props: ['array','selectedDate','id','scheduleID'],
                 button:hover{
                     color: #FF7B7B!important;
                 }
+                .edit_time{
+                    position: absolute;
+                    left: 13px;
+                    top: 6px;
+                    width: 17px;
+                    cursor: pointer;
+                }
+                .edit_time:hover{
+                    content:url("../assets/edit_time_light_active.svg");
+                }
+            }
+            .dark_edit{
+                content:url("../assets/edit_time_dark.svg");
+            }
+            .dark_edit:hover{
+                content:url("../assets/edit_time_dark_active.svg")!important;
             }
             .dark{
                 color: #5f5f5f!important;
@@ -277,6 +301,9 @@ props: ['array','selectedDate','id','scheduleID'],
                 }
                 button{
                     top: 3%;
+                }
+                .edit_time{
+                        top: 12%;
                 }
             }
             .intern{
@@ -387,6 +414,9 @@ props: ['array','selectedDate','id','scheduleID'],
                     }
                     button{
                         top: 10%;
+                    }
+                    .edit_time{
+                        top: 32%;
                     }
                 }
                 }

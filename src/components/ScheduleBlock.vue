@@ -39,26 +39,26 @@
                   </div>
           </div>
           <div>
-          <FunctionalCalendar ref="Calendar" v-model="calendarData" v-on:changedMonth="handleMonth" v-on:choseDay="handleDay" :configs="calendarConfigs" v-bind:class="{ error: dateError || dateBeforeError }"></FunctionalCalendar>
-          <span class="input_error_message" v-if="dateError">Pasirinkite norimą datą</span>
-          <span class="input_error_message" v-if="dateBeforeError">Įvedimas atgaline data negalimas</span>
+          <FunctionalCalendar ref="Calendar" v-model="calendarData" v-on:changedMonth="handleMonth" v-on:choseDay="handleDay" :configs="calendarConfigs" v-bind:class="{ error: dateError || dateBeforeError, edit_disable: timeEdit }"></FunctionalCalendar>
           </div>
               <div class="lower_input_column">
+                  <span class="input_error_message" v-if="dateError">Pasirinkite norimą datą</span>
+                  <span class="input_error_message" v-if="dateBeforeError">Įvedimas atgaline data negalimas</span>
                   <span class="input_error_message top" v-if="unavailableError">Šis laikas yra užimtas</span>
                   <span class="input_error_message top" v-if="timeError">Įvestas netinkamas laikas</span>
                   <span class="input_error_message top" v-if="timeSpanError">Įvesta veikla trumpesnė nei 30 min.</span>
                   <div class="data_date_row">
                   <div class="date_input_wrap">
                   <label for="student_time_from">Laikas nuo</label>
-                  <VueTimepicker name="student_time_from" :hour-range="[8, 9, 10, 11, 12, 13, 14, 15, 16, 17]" :minute-interval="5" hide-disabled-hours v-model="timeFrom" v-bind:class="{ error: fromError }"></VueTimepicker>
+                  <VueTimepicker name="student_time_from" :hour-range="[8, 9, 10, 11, 12, 13, 14, 15, 16, 17]" :minute-interval="5" hide-disabled-hours v-model="timeFrom" v-bind:class="{ error: fromError || timeError, edit: timeEdit }"></VueTimepicker>
                   </div>
                   <div class="date_input_wrap">
                   <label for="student_time_till">Laikas iki</label>
-                  <VueTimepicker name="student_time_till" :hour-range="[8, 9, 10, 11, 12, 13, 14, 15, 16, 17]" :minute-interval="5" hide-disabled-hours v-model="timeTill" v-bind:class="{ error: tillError }"></VueTimepicker>
+                  <VueTimepicker name="student_time_till" :hour-range="[8, 9, 10, 11, 12, 13, 14, 15, 16, 17]" :minute-interval="5" hide-disabled-hours v-model="timeTill" v-bind:class="{ error: tillError || timeError || timeSpanError, edit: timeEdit }"></VueTimepicker>
                   </div>
                   </div>
                   <label for="student_type">Tipas</label>
-                  <select class="student_type" type="time" v-model="timeType" v-bind:class="{ error: typeError }">
+                  <select class="student_type" type="time" v-model="timeType" v-bind:class="{ error: typeError, edit: timeEdit }">
                   <option value="default" selected hidden>Pasirinkti tipą</option>
                   <option value="intern">Praktika</option>
                   <option value="lecture">Paskaita</option>
@@ -66,7 +66,11 @@
                   <option value="break">Pertrauka</option>
               </select>
               </div>
-              <input class="schedule_data_input" type="submit" value="ĮRAŠYTI">
+              <input v-if="!timeEdit" class="schedule_data_input" type="submit" value="ĮRAŠYTI">
+              <div class="edit_button_wrap">
+              <input v-if="timeEdit" class="schedule_data_input" type="submit" value="REDAGUOTI">
+              <input v-if="timeEdit" class="schedule_data_input" type="button" value="ATŠAUKTI" @click="cancelEditTime()">
+              </div>
             </form>
           </div>
       </div>
@@ -76,11 +80,13 @@
             <h1>SUKURKITE {{traineeFname}} TVARKARAŠTĮ</h1>
             <form @submit.prevent="scheduleCreate()">
                 <label for="start">Praktika nuo</label>
-                <input id="start" type="date" v-model="internFrom">
+                <input id="start" type="date" v-model="internFrom" required>
                 <label for="end">Praktika iki</label>
-                <input id="end" type="date" v-model="internTill">
+                <input id="end" type="date" v-model="internTill" required>
+                <span class="input_error_message" v-if="scheduleBeforeError">Įvedimas atgaline data negalimas!</span>
+                <span class="input_error_message" v-if="scheduleEndError">Praktikos pabaiga ankstesnė už pradžią!</span>
                 <input class="option_submit" type="submit" value="SUKURTI">
-                <button class="option_submit" v-if="scheduleData.trainee[0].schedules.length > 0" @click="createSchedule=false; getMonth();">ATŠAUKTI</button>
+                <input class="option_submit" type="button" value="ATŠAUKTI" v-if="scheduleData.trainee[0].schedules.length > 0" @click="scheduleCreateCancel()">
             </form>
           </div>
           <div class="option_wrap" v-if="selectSchedule" @submit.prevent="scheduleSelect()">
@@ -97,7 +103,7 @@
       <div class="schedule_container" v-if="month.length">
           <div class="shcedule_control_container">
               <div class="schedule_controls">
-                <div class="schedule_date_push" v-bind:class="{ disabled: monthState }">
+                <div class="schedule_date_push" v-bind:class="{ disabled: monthState || timeEdit }">
                     <button class="date_push_button unselectable" v-bind:class="{push_disabled: currentWeek == 0}" :disabled="monthState || (currentWeek == 0)" @click="pushWeek(-1)">&lt;</button>
                     <span class="selected_date unselectable">{{month[currentWeek][0][0].getMonth()+1}}<span class="date_dash unselectable">/</span>{{month[currentWeek][0][0].getDate()}} - {{month[currentWeek][4][0].getMonth()+1}}<span class="date_dash unselectable">/</span>{{month[currentWeek][4][0].getDate()}}</span>
                     <button class="date_push_button unselectable" v-bind:class="{push_disabled: currentWeek == month.length-1}" :disabled="monthState" @click="pushWeek(1)">&gt;</button>
@@ -167,6 +173,8 @@ export default {
                 isDateRange: false
         },
         createSchedule: false,
+        scheduleBeforeError: false,
+        scheduleEndError: false,
         selectSchedule: false,
         tableReload: false,
         scheduleID: 0,
@@ -191,6 +199,8 @@ export default {
         timeTill: "",
         internFrom: "",
         internTill: "",
+        timeEdit: false,
+        editID: undefined,
         dateError: false,
         dateBeforeError: false,
         typeError: false,
@@ -221,6 +231,9 @@ export default {
             this.month = [];
             this.loadData();
         });
+        this.$root.$on('TimeEdit', (item,date) => {
+            this.editTime(item,date);
+        })
     },
     watch: {
     timeFrom: function() {
@@ -254,6 +267,17 @@ export default {
     timeType: function() {
         if(this.timeType != "default"){
               this.typeError = false;
+        }
+    },
+    internFrom: function() {
+        if(this.scheduleBeforeError || this.scheduleEndError){
+            this.scheduleBeforeError = false;
+            this.scheduleEndError = false;
+        }
+    },
+    internTill: function() {
+        if(this.scheduleEndError){
+            this.scheduleEndError = false;
         }
     },
     scheduleID: function() {
@@ -296,6 +320,9 @@ export default {
                         this.createSchedule=false;
                  } else if(this.tableReload){
                      this.tableReload = false;
+                     this.weekHours = Math.floor(this.scheduleData.trainee[0].schedules[this.scheduleID].works_hours.week_hours/60);
+                     this.monthHours = Math.floor(this.scheduleData.trainee[0].schedules[this.scheduleID].works_hours.month_hours/60);
+                     this.totalHours = Math.floor(this.scheduleData.trainee[0].schedules[this.scheduleID].works_hours.total_hours/60);
                      this.getMonth();
                  }
             })
@@ -329,11 +356,17 @@ export default {
                         }
                     });
                 } else {
-                    console.log('end sooner than start error');
+                    this.scheduleEndError = true;
                 }
             }else {
-                console.log('from before error');
+                this.scheduleBeforeError = true;
             }
+        },
+        scheduleCreateCancel(){
+            this.createSchedule=false;
+            this.getMonth();
+            this.internFrom = this.scheduleData.trainee[0].schedules[this.scheduleID].start_date;
+            this.internTill = this.scheduleData.trainee[0].schedules[this.scheduleID].end_date;
         },
         scheduleSelect(){
             this.selectSchedule = false;
@@ -505,7 +538,7 @@ export default {
             if (fromInput >= tillInput && this.timeFrom != "" && this.timeTill != ""){
                 this.timeError = true;
             }
-            if (tillInput - fromInput < 30){
+            if (tillInput - fromInput < 30 && !this.timeError){
                 this.timeSpanError = true;
             }
             if(!this.dateError && !this.fromError && !this.tillError && !this.typeError && !this.timeError && !this.timeSpanError && !this.dateBeforeError){
@@ -522,35 +555,70 @@ export default {
                         if(this.month[i][j][0].toLocaleDateString('el-GR') === this.calendarData.selectedDate){
                             if(this.month[i][j].length > 1){
                                 for(let k = 1; k < this.month[i][j].length; k++){
-                                    if((this.month[i][j][k].time_from >= tillInput) || (this.month[i][j][k].time_to <= fromInput)){
+                                    if((this.month[i][j][k].time_from > tillInput) || (this.month[i][j][k].time_to < fromInput)){
                                         timeAvailable = true;
                                     }
                                     else {
+                                        if(this.month[i][j][k].time_id != this.editID){
                                         this.unavailableError = true;
                                         timeAvailable = false;
                                         break;
+                                        } else {
+                                            timeAvailable = true;
+                                        }
                                     }
                                 }
                             } else {timeAvailable = true;}
                             if(timeAvailable){
+                                
                                 this.unavailableError = false;
                                 this.timeError = false;
                                 this.timeSpanError = false;
-                                axios.post('http://127.0.0.1:8000/api/time/'+this.id+'/'+this.scheduleData.trainee[0].schedules[this.scheduleID].id, timeData, config)
-                                .then(data => {
-                                    this.tableReload = true;
-                                    this.loadData();
-                                })
-                                .catch(error => {
-                                    if(error.response.data.message == "Route [login] not defined."){
-                                        router.push({name: 'Prisijungimas'});
-                                    }
-                                });                                
+                                if(!this.timeEdit){
+                                    axios.post('http://127.0.0.1:8000/api/time/'+this.id+'/'+this.scheduleData.trainee[0].schedules[this.scheduleID].id, timeData, config)
+                                    .then(data => {
+                                        this.tableReload = true;
+                                        this.loadData();
+                                    })
+                                    .catch(error => {
+                                        if(error.response.data.message == "Route [login] not defined."){
+                                            router.push({name: 'Prisijungimas'});
+                                        }
+                                    });  
+                                }else if(this.timeEdit){
+                                    axios.put('http://127.0.0.1:8000/api/time/'+this.id+'/'+this.scheduleData.trainee[0].schedules[this.scheduleID].id+'/'+this.editID, timeData, config)
+                                    .then(data => {
+                                        this.editID = undefined;
+                                        this.timeEdit = false;
+                                        this.tableReload = true;
+                                        this.loadData();
+                                    })
+                                    .catch(error => {
+                                        if(error.response.data.message == "Route [login] not defined."){
+                                            router.push({name: 'Prisijungimas'});
+                                        }
+                                    });  
+                                }                         
                             }
                         }
                     }
                 }
             }
+        },
+        editTime(item,date){
+            this.timeEdit = true;
+            this.calendarData.selectedDate = date.toLocaleDateString('el-GR');
+            this.timeFrom = ('0'+Math.floor(item.time_from/60).toString()).slice(-2)+':'+('0'+(item.time_from%60).toString()).slice(-2);
+            this.timeTill = ('0'+Math.floor(item.time_to/60).toString()).slice(-2)+':'+('0'+(item.time_to%60).toString()).slice(-2);
+            this.timeType = item.type_of_time;
+            this.editID = item.time_id;
+        },
+        cancelEditTime(){
+            this.timeEdit = false;
+            this.fromError = false;
+            this.tillError = false;
+            this.timeError = false;
+            this.timeSpanError = false;
         }
     }
 }
@@ -562,7 +630,7 @@ export default {
     padding: 1% 0;
     height: 150px;
     min-width: 1300px;
-    margin: 0 4rem 1.2rem 22rem;
+    margin: 0 4rem 0rem 22rem;
     justify-content: space-between;
     .data_text{
       margin-right: 1rem;
@@ -573,18 +641,33 @@ export default {
     }
   }
 .block_container{
+     position: relative;
      display: flex;
      background-color: #ffffff;
-     margin: 0 4rem 1% 22rem;
+     margin: 0 4rem 1rem 22rem;
      width: calc(100vw - 420px);
-     height: calc(100vh - 200px);
+     height: calc(100vh - 170px);
      min-width: 1300px;
-     min-height: 700px;
+     min-height: 770px;
      border-radius: 15px;
 
     .error{
-        border: solid 2px #F2A268 !important;
+        box-shadow: 0px 0px 4px 4px rgba(242,162,104,0.6) !important;
         border-radius: 5px !important;
+    }
+
+    .edit{
+        box-shadow: 0px 0px 4px 4px rgba(0,84,166, 0.3)!important;
+        border-radius: 5px !important;
+    }
+
+    .edit.error{
+        box-shadow: 0px 0px 4px 4px rgba(242,162,104,0.6) !important;
+    }
+
+    .edit_disable{
+        pointer-events: none;
+        filter: opacity(50%);
     }
 
     .unselectable{
@@ -600,13 +683,16 @@ export default {
     }
 
     .input_error_message{
-        color: #F2A268;
+        position: absolute;
+        color: #f3996fe5;
         font-family: 'Open Sans';
         font-size: 0.8rem;
         font-weight: 600;
         display: block;
         text-align: center;
-        margin-top: 0.3rem;
+        top:0;
+        left: 50%;
+        transform: translateX(-50%);
         white-space: nowrap;
     }
 
@@ -615,11 +701,14 @@ export default {
     }
 
     .schedule_back{
+        top: 10px;
+        position: absolute;
         font-family: 'Open Sans';
         font-size: 0.9rem;
         height: max-content;
-        margin: 1rem 0 1rem 2rem;
+        margin-left: 2rem;
         cursor: pointer;
+        white-space: nowrap;
     }
     .schedule_back:hover{
         color: #0054a6;
@@ -645,6 +734,7 @@ export default {
     }
 
     .input_container{
+        position: relative;
         display: flex;
         flex-direction: column;
         justify-content: center;
@@ -682,7 +772,7 @@ export default {
             font-family: 'Open Sans';
 
             label{
-                margin-bottom: 0.25rem;
+                margin-bottom: 0.35rem;
                 margin-left: 0.5rem;
                 font-size: 0.8rem;
             }
@@ -700,7 +790,7 @@ export default {
                 color: #C4C4C4;
             }
             .schedule_select_wrap{
-                margin-bottom: 1rem;
+                margin: 0.5rem 0;
                 select{
                     margin-top: 0.25rem;
                 }
@@ -734,10 +824,12 @@ export default {
             .intern_span{
                 margin-bottom: 5%;
             }
-
             .lower_input_column{
+                position: relative;
                 display: flex;
                 flex-direction: column;
+                margin-top: 0.5rem;
+                padding-top: 1.5rem;
             }
             .schedule_data_input{
                 display: block;
@@ -745,11 +837,18 @@ export default {
                 background-color:#0054a6;
                 color: #f2f2f2;
                 font-size: 0.9rem;
-                margin: 1rem auto;
+                margin: 1.5rem auto 0.5rem auto;
                 padding: 0.3rem 1.5rem;
                 border: none;
                 border-radius: 5px;
                 cursor: pointer;
+            }
+            .edit_button_wrap{
+                display: flex;
+                justify-content: center;
+                input{
+                    margin: 1.5rem 0.5rem 0.5rem 0.5rem;
+                }
             }
         }
     }
