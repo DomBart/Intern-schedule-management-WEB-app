@@ -61,13 +61,13 @@
                           <span class="pupup_label unselectable">EL. PAŠTO ADRESAS</span>
                           <span class="pupup_text">{{item.email}}</span>
                       </div>
-                      <img class="student_icon unselectable" title="Kontaktai" src="../assets/student.svg" :class="{top:item.id == selected, alert: (studentTimeData[offset+index].total_hours-studentTimeData[offset+index].attended_hours) < 30 && studentTimeData[offset+index].total_hours > 0}" @click="togglePopup(item.id)" alt="Student icon">
+                      <img class="student_icon unselectable" title="Kontaktai" src="../assets/student.svg" :class="{top:item.id == selected, alert: (item.timeData.total_hours-item.timeData.attended_hours) < 30 && item.timeData.total_hours > 0}" @click="togglePopup(item.id)" alt="Student icon">
                   </td>
                   <td class="student_name" @click="routeSchedule(item.id)">{{item.firstname}} {{item.lastname}}</td>
                   <td class="center">{{item.position}}</td>
-                  <td class="center">{{studentTimeData[offset+index].attended_hours}}/{{studentTimeData[offset+index].total_hours}} val.</td>
-                  <td class="center">{{studentTimeData[offset+index].start_date}}</td>
-                  <td class="center">{{studentTimeData[offset+index].end_date}}</td>
+                  <td class="center">{{item.timeData.attended_hours}}/{{item.timeData.total_hours}} val.</td>
+                  <td class="center">{{item.timeData.start_date}}</td>
+                  <td class="center">{{item.timeData.end_date}}</td>
                   <td>
                       <img class="edit_icon unselectable" title="Redaguoti" src="../assets/edit.svg" alt="Edit" @click="triggerModal(item)">
                       <img class="delete_icon unselectable" title="Trinti" src="../assets/delete.svg" alt="Delete" @click="deleteStudent(item.id, item.firstname)">
@@ -106,7 +106,6 @@ export default {
         page: 0,
         filterState: false,
         studentList: [],
-        studentTimeData: [],
         monthHours: 0,
         weekHours: 0,
         pageCount: 0,
@@ -239,7 +238,6 @@ export default {
         countListData(){
             let attended, total;
             let startDate='', endDate='';
-            this.studentTimeData = [];
             for(let i = 0; i < this.studentList.length; i++){
                 attended = 0;
                 total = 0;
@@ -256,11 +254,13 @@ export default {
                         endDate = this.studentList[i].schedules[j].end_date;
                     }
                 }
-                this.studentTimeData.push({
+                this.studentList[i]['timeData'] =
+                {
                     attended_hours: attended,
                     total_hours: total,
                     start_date: startDate,
-                    end_date: endDate});
+                    end_date: endDate
+                }
             }
         },
         countData(){
@@ -285,10 +285,30 @@ export default {
                 this.currentSort = "";
                 this.getStudents();
             }
-            if(this.currentSort === "name"){
+            if(this.currentSort == "name"){
                 this.studentList.sort((a,b) => (a.firstname > b.firstname) ? modifier : -1);
-            } else if (this.currentSort === "position"){
+            } else if (this.currentSort == "position"){
                 this.studentList.sort((a,b) => (a.position > b.position) ? modifier : -1);
+            } else if (this.currentSort == "hours"){
+                this.studentList.sort((a,b) => {
+                    if(a.timeData.total_hours == 0) return  1;
+                    if(b.timeData.total_hours == 0) return -1;
+                    return a.timeData.attended_hours < b.timeData.attended_hours ? modifier : -1;
+                });
+            } else if (this.currentSort == "startDate"){
+                this.studentList.sort((a,b) => {
+                    if(a.timeData.start_date === "—") return  1;
+                    if(b.timeData.start_date === "—") return -1;
+                    if(a.timeData.start_date === b.timeData.start_date) return 0;
+                    return a.timeData.start_date < b.timeData.start_date ? modifier : -1;
+                });
+            } else if (this.currentSort == "endDate"){
+                this.studentList.sort((a,b) => {
+                    if(a.timeData.end_date === "—") return  1;
+                    if(b.timeData.end_date === "—") return -1;
+                    if(a.timeData.end_date === b.timeData.end_date) return 0;
+                    return a.timeData.end_date < b.timeData.end_date ? modifier : -1;
+                });
             }
         }
  }
