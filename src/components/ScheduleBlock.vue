@@ -102,6 +102,7 @@
           </div>
       <div class="schedule_container" v-if="month.length">
           <div class="shcedule_control_container">
+              <img class="schedule_download" src="../assets/download.svg" title="Atsisiųsti tvarkaraštį" alt="Download" @click="downloadSchedule()">
               <div class="schedule_controls">
                 <div class="schedule_date_push" v-bind:class="{ disabled: monthState || timeEdit }">
                     <button class="date_push_button unselectable" v-bind:class="{push_disabled: currentWeek == 0}" :disabled="monthState || (currentWeek == 0)" @click="pushWeek(-1)">&lt;</button>
@@ -619,6 +620,33 @@ export default {
             this.tillError = false;
             this.timeError = false;
             this.timeSpanError = false;
+        },
+        downloadSchedule(){
+            let config= {
+                params: {
+                firstname: this.traineeFname,
+                lastname: this.traineeLname
+                },
+                headers: { Authorization: `Bearer ${localStorage.token}` },
+                responseType: 'blob'
+            };
+            let getID = this.scheduleData.trainee[0].schedules[this.scheduleID].id;
+            console.log('http://127.0.0.1:8000/api/document/'+ this.id + '/' + getID);
+            axios.get('http://127.0.0.1:8000/api/document/'+ this.id + '/' + getID,config)
+            .then((response) => {
+                var fileURL = window.URL.createObjectURL(new Blob([response.data]));
+                var fileLink = document.createElement('a');
+                fileLink.href = fileURL;
+                fileLink.setAttribute('download', this.traineeFname + ' ' +  this.traineeLname + ' tvarkaraštis.docx');
+                document.body.appendChild(fileLink);
+                fileLink.click();
+            })
+            .catch(error => {
+                console.log(error.response.data.message);
+                if(error.response.data.message == "Route [login] not defined."){
+                    router.push({name: 'Prisijungimas'});
+                }
+            }); 
         }
     }
 }
@@ -912,11 +940,19 @@ export default {
             height: 15%;
             font-family: 'Open Sans';
 
+            .schedule_download{
+                width: 4rem;
+                margin: 1.5rem 0 0 4%;
+                cursor: pointer;
+            }
+            .schedule_download:hover{
+                content: url("../assets/download_active.svg");
+            }
             .schedule_controls{
                 display: flex;
                 flex-direction: column;
                 justify-content: center;
-                width: 85%;
+                width: 75%;
 
                 .schedule_date_push{
                     margin: 1.5rem auto;
