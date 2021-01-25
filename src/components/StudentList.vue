@@ -128,6 +128,8 @@ export default {
     mounted(){
         this.getStudents();
         this.$root.$on('Submited', () => {
+             this.currentSort = "";
+             this.currentSortDir = "";
              this.getStudents();
         });
     },

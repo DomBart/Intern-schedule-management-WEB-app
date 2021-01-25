@@ -41,7 +41,6 @@ export default {
        axios.delete('http://127.0.0.1:8000/api/trainee/'+ this.id,config)
              .then(data => {
                  this.$root.$emit('Submited');
-                 console.log('deleted');
              })
              .catch(error => {
                 if(error.response.data.message == "Route [login] not defined."){
