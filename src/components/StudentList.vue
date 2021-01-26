@@ -29,6 +29,7 @@
       <div class="table_container">
           <h1 class="list_empty" v-if="empty">PRAKTIKANTŲ SĄRAŠAS TUŠČIAS</h1>
           <h1 class="list_empty" v-if="searchEmpty">PAIEŠKOS REZULTATAI TUŠTI</h1>
+          <h1 class="list_empty" v-if="filterEmpty">FILTRAVIMO REZULTATAI TUŠTI</h1>
           <table v-if="studentList.length > 0" class="student_table">
               <tr class="student_table_header">
                   <th class="icon_column" ></th>
@@ -121,7 +122,8 @@ export default {
         search: "",
         selected: undefined,
         empty: false,
-        searchEmpty: false
+        searchEmpty: false,
+        filterEmpty: false
       }
     },
     created() {
@@ -177,10 +179,8 @@ export default {
             }
         },
         enableFilter(){
-            if(this.startDate != "" || this.endDate != ""){
-                console.log(parseInt(this.startDate));
-                this.filterActive = true;
-            }
+            this.filterActive = true;
+            this.getStudents();
         },
         clearFilter(){
             if(this.filterActive)
@@ -188,6 +188,7 @@ export default {
             this.startDate = "";
             this.endDate = "";
             this.filterActive = false;
+            this.filterEmpty = false;
             this.getStudents();
             }
         },
@@ -217,6 +218,28 @@ export default {
                         this.countPagination();
                         this.countListData();
                         this.countData();
+                        if(this.filterActive){
+                        this.filterEmpty = false;
+                        if(this.startDate != ""){
+                            for(let i=0; i < this.studentList.length; i++){
+                                if(this.studentList[i].timeData.start_date < this.startDate || this.studentList[i].timeData.start_date == '—'){
+                                    this.studentList.splice(i,1);
+                                    i--;
+                                } 
+                            }
+                        }
+                        if(this.endDate != ""){
+                            for(let j=0; j < this.studentList.length; j++){
+                                if(this.studentList[j].timeData.end_date > this.endDate || this.studentList[j].timeData.end_date == '—'){
+                                    this.studentList.splice(j,1);
+                                    j--;
+                                } 
+                            }
+                        }
+                        if(this.studentList.length == 0){
+                            this.filterEmpty = true;
+                        }
+                    }                    
                     }
                 })
                 .catch(error => {
@@ -236,6 +259,28 @@ export default {
                     this.countPagination();
                     this.countListData();
                     this.countData();
+                    if(this.filterActive){
+                        this.filterEmpty = false;
+                        if(this.startDate != ""){
+                            for(let i=0; i < this.studentList.length; i++){
+                                if(this.studentList[i].timeData.start_date < this.startDate || this.studentList[i].timeData.start_date == '—'){
+                                    this.studentList.splice(i,1);
+                                    i--;
+                                } 
+                            }
+                        }
+                        if(this.endDate != ""){
+                            for(let j=0; j < this.studentList.length; j++){
+                                if(this.studentList[j].timeData.end_date > this.endDate || this.studentList[j].timeData.end_date == '—'){
+                                    this.studentList.splice(j,1);
+                                    j--;
+                                } 
+                            }
+                        }
+                        if(this.studentList.length == 0){
+                            this.filterEmpty = true;
+                        }
+                    }                    
                 })
                 .catch(error => {
                     if(error.response.data.message == "Route [login] not defined."){
