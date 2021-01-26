@@ -696,8 +696,8 @@ export default {
 <style scoped lang="scss">
 .generaldata_container{
     display: flex;
-    padding: 1% 0;
-    height: 150px;
+    padding: 1rem 0;
+    height: 8rem;
     min-width: 1300px;
     margin: 0 4rem 0rem 22rem;
     justify-content: space-between;
@@ -715,7 +715,7 @@ export default {
      background-color: #ffffff;
      margin: 0 4rem 1rem 22rem;
      width: calc(100vw - 420px);
-     height: calc(100vh - 170px);
+     height: calc(100vh - 9rem);
      min-width: 1300px;
      min-height: 770px;
      border-radius: 15px;

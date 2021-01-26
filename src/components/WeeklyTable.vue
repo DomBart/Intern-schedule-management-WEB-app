@@ -216,12 +216,18 @@ props: ['array','selectedDate','id','scheduleID'],
                 min-height: 0.7rem!important;
             }
             .single.first{
-                -ms-transform: translate(-50%, 5%);
-                transform: translate(-50%, 5%);
+                -ms-transform: translate(-50%, 10%);
+                transform: translate(-50%, 10%);
             }
             .single.last{
-                -ms-transform: translate(-50%, -15%);
-                transform: translate(-50%, -15%);
+                -ms-transform: translate(-50%, -30%);
+                transform: translate(-50%, -30%);
+            }
+            .quarter_cell{
+                .single.last{
+                    -ms-transform: translate(-50%, -5%);
+                    transform: translate(-50%, -5%);
+                }
             }
             .half_cell{
                 .single.first{
@@ -230,7 +236,7 @@ props: ['array','selectedDate','id','scheduleID'],
                 }
                 .single.last{
                     -ms-transform: translate(-50%, -20%);
-                    transform: translate(-50%, -15%);
+                    transform: translate(-50%, -20%);
                 }
             }
             .first.last{
@@ -335,7 +341,7 @@ props: ['array','selectedDate','id','scheduleID'],
             .row_wrap{
                 display: table-row-group;
                 td{
-                    height: 1.3vh;
+                    height: 1.4vh;
                 }
             }
             .title_row{

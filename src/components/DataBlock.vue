@@ -31,6 +31,7 @@ export default {
         vertical-align: middle;
         display: table-cell;
         padding: 0.5rem 2.5rem;
+        white-space: nowrap;
     }
     .data_count{
         padding-left: 3rem;
