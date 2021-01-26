@@ -206,39 +206,43 @@ export default {
             this.monthHours = 0;
             this.weekHours = 0;
             this.searchEmpty = false;
-            axios.get('http://127.0.0.1:8000/api/trainee',config)
-            .then((resp) => {
-                if(resp.data.trainees.length == 0){
-                    this.empty = true;
-                } else {
-                    this.empty = false;
-                }
-                 if(this.search != ""){
-                    for(let i = 0; i < resp.data.trainees.length; i++)
-                    {
-                        let name = (resp.data.trainees[i].firstname).toLowerCase();
-                        let last_name = (resp.data.trainees[i].lastname).toLowerCase();
-                        if(name.includes(this.search.toLowerCase()) || last_name.includes(this.search.toLowerCase()))
-                        { }
-                        else {
-                            resp.data.trainees.splice(i,1);
-                            i--;
-                        }
-                    }
+            this.studentList = [];
+            if(this.search != ""){
+                axios.post('http://127.0.0.1:8000/api/trainee/search',{value: this.search},config)
+                .then((resp) => {
                     if(resp.data.trainees.length == 0){
                         this.searchEmpty = true;
+                    } else {
+                        this.studentList = resp.data.trainees;
+                        this.countPagination();
+                        this.countListData();
+                        this.countData();
                     }
-                 }
-                  this.studentList = resp.data.trainees;
-                  this.countPagination();
-                this.countListData();
-                this.countData();
-            })
-            .catch(error => {
+                })
+                .catch(error => {
                 if(error.response.data.message == "Route [login] not defined."){
                     router.push({name: 'Prisijungimas'});
                 }
             });
+            } else {
+                axios.get('http://127.0.0.1:8000/api/trainee',config)
+                .then((resp) => {
+                    if(resp.data.trainees.length == 0){
+                        this.empty = true;
+                    } else {
+                        this.empty = false;
+                    }
+                    this.studentList = resp.data.trainees;
+                    this.countPagination();
+                    this.countListData();
+                    this.countData();
+                })
+                .catch(error => {
+                    if(error.response.data.message == "Route [login] not defined."){
+                        router.push({name: 'Prisijungimas'});
+                    }
+                });
+            }
         },
         deleteStudent(id,name){
             this.$root.$emit('Alert', 'delete', id, '', 'AR TIKRAI NORITE PAŠALINTI', name);
