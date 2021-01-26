@@ -7,7 +7,7 @@
   </div>
   <div class="block_container" v-bind:class="{middle: !scheduleState}">
       <div class="input_container" v-if="month.length">
-          <a class="schedule_back" @click="$router.go({name: 'Tvarkarastis'})">&#60; STUDENTŲ SĄRAŠAS</a>
+          <a class="schedule_back" @click="$router.go({name: 'Tvarkarastis'})">&#60; PRAKTIKANTŲ SĄRAŠAS</a>
           <div class="student_data_row">
             <button class="schedule_add" title="Pridėti tvarkaraštį" @click="newSchedule()"
             @mouseover="addIcon = require('../assets/add_active.svg')"
@@ -75,7 +75,7 @@
             </form>
           </div>
       </div>
-          <a class="schedule_back" v-if="createSchedule || selectSchedule" @click="$router.go({name: 'Tvarkarastis'})">&#60; STUDENTŲ SĄRAŠAS</a>
+          <a class="schedule_back" v-if="createSchedule || selectSchedule" @click="$router.go({name: 'Tvarkarastis'})">&#60; PRAKTIKANTŲ SĄRAŠAS</a>
           <div class="option_wrap" v-if="createSchedule">
             <img class="student_icon" src="../assets/student.svg" alt="Student icon">
             <h1>SUKURKITE {{traineeFname}} TVARKARAŠTĮ</h1>
@@ -568,7 +568,7 @@ export default {
             else{
                 let inputDate = this.calendarData.selectedDate.split('/');
                 let timeData = {
-                    date: inputDate[2]+'-'+inputDate[1]+'-'+inputDate[0],
+                    date: inputDate[2]+'-'+('0'+inputDate[1]).slice(-2) +'-'+inputDate[0],
                     time_from: fromInput,
                     time_to: tillInput,
                     type: this.timeType
@@ -601,6 +601,7 @@ export default {
                                 if(!this.timeEdit){
                                     axios.post('http://127.0.0.1:8000/api/time/'+this.id+'/'+this.scheduleData.trainee[0].schedules[this.scheduleID].id, timeData, config)
                                     .then(data => {
+                                        console.log(data.data.message);
                                         this.tableReload = true;
                                         this.loadData();
                                     })
@@ -612,6 +613,7 @@ export default {
                                 }else if(this.timeEdit){
                                     axios.put('http://127.0.0.1:8000/api/time/'+this.id+'/'+this.scheduleData.trainee[0].schedules[this.scheduleID].id+'/'+this.editID, timeData, config)
                                     .then(data => {
+                                        console.log(data.data.message);
                                         this.editID = undefined;
                                         this.timeEdit = false;
                                         this.tableReload = true;
