@@ -203,7 +203,7 @@ methods:{
                      transform: translate(-50%, 10%);
             }
             .single.last{
-                     transform: translate(-50%, -15%);
+                     transform: translate(-50%, -30%);
             }
             .first.last{
                 transform: translate(-50%, 15%);
@@ -212,10 +212,10 @@ methods:{
             }
             .quarter_cell{
                 .first{
-                    transform: translate(-50%, 20%);
+                    transform: translate(-50%, 35%);
                 }
                 .last{
-                    transform: translate(-50%, -10%);
+                    transform: translate(-50%, -5%);
                 }
             }
             .half_cell{

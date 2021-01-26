@@ -103,7 +103,7 @@
           </div>
       <div class="schedule_container" v-if="month.length">
           <div class="shcedule_control_container">
-              <img class="schedule_download" src="../assets/download.svg" title="Atsisiųsti tvarkaraštį" alt="Download" @click="downloadSchedule()">
+              <img class="schedule_download" src="../assets/download.svg" title="Atsisiųsti tvarkaraštį" alt="Download" @click="triggerModal()">
               <div class="schedule_controls">
                 <div class="schedule_date_push" v-bind:class="{ disabled: monthState || timeEdit }">
                     <button class="date_push_button unselectable" v-bind:class="{push_disabled: currentWeek == 0}" :disabled="monthState || (currentWeek == 0)" @click="pushWeek(-1)">&lt;</button>
@@ -126,6 +126,7 @@
           <MonthTable v-if="monthState && scheduleData.trainee[0].schedules.length > 0" v-bind:array="month" v-bind:month="calendarData.currentDate.getMonth()"></MonthTable>
       </div>
   </div>
+  <DownloadDialog></DownloadDialog>
 </div>
 </template>
 
@@ -133,6 +134,7 @@
 import Vue from 'vue';
 import axios from 'axios';
 import Generaldata from './DataBlock.vue'
+import DownloadDialog from './DownloadDialog.vue'
 import WeekTable from './WeeklyTable.vue';
 import MonthTable from './MonthlyTable.vue';
 import FunctionalCalendar from 'vue-functional-calendar';
@@ -147,7 +149,7 @@ Vue.use(FunctionalCalendar, {
 });
 export default {
     props: ['id'],
-    components: {Generaldata, WeekTable, MonthTable, VueTimepicker},
+    components: {Generaldata, DownloadDialog, WeekTable, MonthTable, VueTimepicker},
     data () {
       return {
         timespanState: false,
@@ -233,7 +235,10 @@ export default {
             this.tableReload = true;
             this.month = [];
             this.loadData();
+            let placeholder = this.calendarData.selectedDate;
             this.handleMonth();
+            this.calendarData.selectedDate = placeholder;
+            this.handleDay();
         });
         this.$root.$on('TimeEdit', (item,date) => {
             this.editTime(item,date);
@@ -663,31 +668,8 @@ export default {
                 });                 
             }
         },
-        downloadSchedule(){
-            let config= {
-                params: {
-                firstname: this.traineeFname,
-                lastname: this.traineeLname
-                },
-                headers: { Authorization: `Bearer ${localStorage.token}` },
-                responseType: 'blob'
-            };
-            let getID = this.scheduleData.trainee[0].schedules[this.scheduleID].id;
-            axios.get('http://127.0.0.1:8000/api/document/'+ this.id + '/' + getID,config)
-            .then((response) => {
-                var fileURL = window.URL.createObjectURL(new Blob([response.data]));
-                var fileLink = document.createElement('a');
-                fileLink.href = fileURL;
-                fileLink.setAttribute('download', this.traineeFname + ' ' +  this.traineeLname + ' tvarkaraštis.docx');
-                document.body.appendChild(fileLink);
-                fileLink.click();
-            })
-            .catch(error => {
-                console.log(error.response.data.message);
-                if(error.response.data.message == "Route [login] not defined."){
-                    router.push({name: 'Prisijungimas'});
-                }
-            }); 
+        triggerModal(){
+            this.$root.$emit('DownloadModal', this.traineeFname,this.traineeLname,this.id,this.scheduleData.trainee[0].schedules[this.scheduleID].id);
         }
     }
 }
