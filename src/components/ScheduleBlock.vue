@@ -138,7 +138,6 @@ import WeekTable from './WeeklyTable.vue';
 import MonthTable from './MonthlyTable.vue';
 import FunctionalCalendar from 'vue-functional-calendar';
 import VueTimepicker from 'vue2-timepicker'
-import router from '../router/index'
 import 'vue2-timepicker/dist/VueTimepicker.css'
 
 Vue.use(FunctionalCalendar, {
@@ -344,10 +343,13 @@ export default {
                      this.totalHours = Math.floor(this.scheduleData.trainee[0].schedules[this.scheduleID].works_hours.total_hours/60);
                      this.getMonth();
                  }
+                 this.refreshToken();
             })
             .catch(error => {
                 if(error.response.data.message == "Route [login] not defined."){
-                    router.push({name: 'Prisijungimas'});
+                    if(this.$route.name != 'Prisijungimas'){
+                            this.$router.push({name: 'Prisijungimas'});
+                    }
                 }
             });
         },
@@ -374,7 +376,9 @@ export default {
                             this.createScheduleSpanError = true;
                         }
                         else if(error.response.data.message == "Route [login] not defined."){
-                            router.push({name: 'Prisijungimas'});
+                            if(this.$route.name != 'Prisijungimas'){
+                                this.$router.push({name: 'Prisijungimas'});
+                            }
                         }
                     });
                 } else {
@@ -612,7 +616,9 @@ export default {
                                     })
                                     .catch(error => {
                                         if(error.response.data.message == "Route [login] not defined."){
-                                            router.push({name: 'Prisijungimas'});
+                                            if(this.$route.name != 'Prisijungimas'){
+                                                this.$router.push({name: 'Prisijungimas'});
+                                            }
                                         }
                                     });  
                                 }else if(this.timeEdit){
@@ -626,7 +632,9 @@ export default {
                                     })
                                     .catch(error => {
                                         if(error.response.data.message == "Route [login] not defined."){
-                                            router.push({name: 'Prisijungimas'});
+                                            if(this.$route.name != 'Prisijungimas'){
+                                                this.$router.push({name: 'Prisijungimas'});
+                                            }   
                                         }
                                     });  
                                 }                         
@@ -669,13 +677,32 @@ export default {
                 })
                 .catch(error => {
                     if(error.response.data.message == "Route [login] not defined."){
-                        router.push({name: 'Prisijungimas'});
+                        if(this.$route.name != 'Prisijungimas'){
+                            this.$router.push({name: 'Prisijungimas'});
+                        }
                     }
                 });                 
             }
         },
         triggerModal(){
             this.$root.$emit('DownloadModal', this.traineeFname,this.traineeLname,this.id,this.scheduleData.trainee[0].schedules[this.scheduleID].id);
+        },
+        refreshToken(){
+            let config= {
+                headers: { Authorization: `Bearer ${localStorage.token}` }
+            };
+            axios.post('http://127.0.0.1:8000/api/auth/refresh','',config)
+            .then((resp) => {
+                console.log('refresh');
+                localStorage.token = resp.data.access_token;
+            })
+            .catch(error => {
+                if(error.response.data.message == "Route [login] not defined."){
+                    if(this.$route.name != 'Prisijungimas'){
+                        this.$router.push({name: 'Prisijungimas'});
+                    }
+                }
+            });
         }
     }
 }

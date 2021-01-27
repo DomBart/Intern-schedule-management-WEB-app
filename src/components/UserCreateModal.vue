@@ -30,7 +30,6 @@
 
 <script>
 import axios from 'axios'
-import router from '../router/index'
 export default {
   data() {
     return {
@@ -104,7 +103,9 @@ export default {
         .catch(error => {
               console.log(error.response.data);
                 if(error.response.data.message == "Route [login] not defined."){
-                    router.push({name: 'Prisijungimas'});
+                    if(this.$route.name != 'Prisijungimas'){
+                        this.$router.push({name: 'Prisijungimas'});
+                    }
                 }
         });
       } else if (this.mode === "edit"){
@@ -117,7 +118,9 @@ export default {
         .catch(error => {
                 console.log(error.response.data);
                 if(error.response.data.message == "Route [login] not defined."){
-                    router.push({name: 'Prisijungimas'});
+                    if(this.$route.name != 'Prisijungimas'){
+                        this.$router.push({name: 'Prisijungimas'});
+                    }
                 }
         });
       }

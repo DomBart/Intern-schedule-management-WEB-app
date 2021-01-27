@@ -52,7 +52,9 @@ export default {
                 })
                 .catch(error => {
                     if(error.response.data.message == "Route [login] not defined."){
-                        router.push({name: 'Prisijungimas'});
+                        if(this.$route.name != 'Prisijungimas'){
+                        this.$router.push({name: 'Prisijungimas'});
+                        }
                     }
                 });
         },

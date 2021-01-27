@@ -21,7 +21,6 @@
 
 <script>
 import axios from 'axios';
-import router from '../router/index'
 import Navi from '../components/Navigation.vue'
 import Scheduleblock from '../components/ScheduleBlock.vue'
 import Confirmdialog from '../components/ConfirmDialog.vue'
@@ -46,7 +45,6 @@ export default {
       }else{
         this.traineeID = this.id;
       }
-      this.refreshToken();
     },
     beforeDestroy(){
       clearInterval(this.interval);
@@ -56,10 +54,13 @@ export default {
             axios.get('http://127.0.0.1:8000/api/trainee',this.config)
             .then((resp) => {
               this.studentList = resp.data.trainees;
+              this.refreshToken();
             })
             .catch(error => {
                 if(error.response.data.message == "Route [login] not defined."){
-                    router.push({name: 'Prisijungimas'});
+                    if(this.$route.name != 'Prisijungimas'){
+                        this.$router.push({name: 'Prisijungimas'});
+                    }
                 }
             });
       },
@@ -74,9 +75,8 @@ export default {
         else if(dir < 0){
           this.$refs.studentTable.scrollTop = this.$refs.studentTable.scrollTop-35;
         }
-      }
-    },
-    refreshToken(){
+      },
+      refreshToken(){
             let config= {
                 headers: { Authorization: `Bearer ${localStorage.token}` }
             };
@@ -87,10 +87,13 @@ export default {
             })
             .catch(error => {
                 if(error.response.data.message == "Route [login] not defined."){
-                    router.push({name: 'Prisijungimas'});
+                    if(this.$route.name != 'Prisijungimas'){
+                        this.$router.push({name: 'Prisijungimas'});
+                    }
                 }
             });
     }
+    },
 }
 </script>
 

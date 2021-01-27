@@ -99,7 +99,6 @@
  import axios from 'axios'
  import Generaldata from './DataBlock.vue'
  import Paginate from 'vuejs-paginate'
- import router from '../router/index'
  Vue.component('paginate', Paginate)
  Vue.component('generaldata', Generaldata)
 export default {
@@ -132,7 +131,6 @@ export default {
     },
     mounted(){
         this.getStudents();
-        this.refreshToken();
         this.$root.$on('Submited', () => {
              this.currentSort = "";
              this.currentSortDir = "";
@@ -203,7 +201,7 @@ export default {
             this.clickCallback(this.page);
         },
         routeSchedule(id){
-            router.push({name: 'Tvarkarastis', params: {id: id}});
+            this.$router.push({name: 'Tvarkarastis', params: {id: id}});
         },
         getStudents(){
             let config= {
@@ -246,10 +244,13 @@ export default {
                         }
                     }                    
                     }
+                    this.refreshToken();
                 })
                 .catch(error => {
                 if(error.response.data.message == "Route [login] not defined."){
-                    router.push({name: 'Prisijungimas'});
+                    if(this.$route.name != 'Prisijungimas'){
+                        this.$router.push({name: 'Prisijungimas'});
+                    }
                 }
             });
             } else {
@@ -285,11 +286,14 @@ export default {
                         if(this.studentList.length == 0){
                             this.filterEmpty = true;
                         }
-                    }                    
+                    }
+                    this.refreshToken();            
                 })
                 .catch(error => {
                     if(error.response.data.message == "Route [login] not defined."){
-                        router.push({name: 'Prisijungimas'});
+                        if(this.$route.name != 'Prisijungimas'){
+                            this.$router.push({name: 'Prisijungimas'});
+                        }
                     }
                 });
             }
@@ -384,7 +388,9 @@ export default {
             })
             .catch(error => {
                 if(error.response.data.message == "Route [login] not defined."){
-                    router.push({name: 'Prisijungimas'});
+                    if(this.$route.name != 'Prisijungimas'){
+                            this.$router.push({name: 'Prisijungimas'});
+                    }
                 }
             });
         }

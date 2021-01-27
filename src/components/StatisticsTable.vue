@@ -78,6 +78,9 @@ export default {
         days: [],
         month: [],
         studentList: [],
+        config: {
+            headers: { Authorization: `Bearer ${localStorage.token}` }
+        }
         }
     },
     created() {
@@ -88,7 +91,6 @@ export default {
         this.inputMonth = date.getFullYear() + '-' + (date.getMonth()+1);
         this.getMonth();
         this.getStudents();
-        this.refreshToken();
     },
     beforeDestroy(){
             clearInterval(this.interval);
@@ -108,8 +110,6 @@ export default {
             this.days=[];
             this.month=[];
             let input = this.inputMonth.split('-');
-            console.log(input[0]);
-            console.log(input[1]);
             let year = input[0];
             let month = input[1]-1;
             var date = new Date(year, month, 1);
@@ -133,8 +133,18 @@ export default {
             }
         },
          getStudents(){
-            console.log("students loading");
-            //API GET
+            axios.get('http://127.0.0.1:8000/api/trainee',this.config)
+                .then((resp) => {
+                    this.studentList = resp.data.trainees;
+                    this.refreshToken();
+                })
+                .catch(error => {
+                    if(error.response.data.message == "Route [login] not defined."){
+                        if(this.$route.name != 'Prisijungimas'){
+                        this.$router.push({name: 'Prisijungimas'});
+                        }
+                    }
+                });
         },
         refreshToken(){
             let config= {

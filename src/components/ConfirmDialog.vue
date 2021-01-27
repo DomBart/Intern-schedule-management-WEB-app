@@ -10,7 +10,6 @@
 
 <script>
 import axios from 'axios'
-import router from '../router/index'
 export default {
   data() {
     return {
@@ -44,7 +43,9 @@ export default {
              })
              .catch(error => {
                 if(error.response.data.message == "Route [login] not defined."){
-                    router.push({name: 'Prisijungimas'});
+                    if(this.$route.name != 'Prisijungimas'){
+                            this.$router.push({name: 'Prisijungimas'});
+                    }
                 }
             });
       this.alertState = false;
@@ -57,7 +58,9 @@ export default {
             })
             .catch(error => {
               if(error.response.data.message == "Route [login] not defined."){
-                router.push({name: 'Prisijungimas'});
+                if(this.$route.name != 'Prisijungimas'){
+                            this.$router.push({name: 'Prisijungimas'});
+                }
               }
             });  
       } else if(this.mode == 'timeDelete'){
@@ -68,17 +71,23 @@ export default {
             })
             .catch(error => {
               if(error.response.data.message == "Route [login] not defined."){
-                router.push({name: 'Prisijungimas'});
+                if(this.$route.name != 'Prisijungimas'){
+                    this.$router.push({name: 'Prisijungimas'});
+                }
               }
             });  
       }else if (this.mode == 'logout'){
         axios.post('http://127.0.0.1:8000/api/auth/logout','',config)
             .then((resp) => {
-                router.push({ name: 'Prisijungimas' });
+                if(this.$route.name != 'Prisijungimas'){
+                            this.$router.push({name: 'Prisijungimas'});
+                }
             })
             .catch(error => {
                 if(error.response.data.message == "Route [login] not defined."){
-                    router.push({ name: 'Prisijungimas' });
+                  if(this.$route.name != 'Prisijungimas'){
+                      this.$router.push({name: 'Prisijungimas'});
+                  }
                 }
             });
         this.alertState = false;

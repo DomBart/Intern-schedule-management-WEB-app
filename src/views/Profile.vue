@@ -60,7 +60,6 @@ created() {
 },
 mounted(){
     this.getUserData();
-    this.refreshToken();
     this.$root.$on('Close', () => {
         this.getUserData();
         this.edit = false;
@@ -82,10 +81,13 @@ methods:{
                 this.editSurname = resp.data.lastname;
                 this.editEmail = resp.data.email;
                 this.editPosition = resp.data.position;
+                this.refreshToken();
             })
             .catch(error => {
                 if(error.response.data.message == "Route [login] not defined."){
-                    this.$router.push({name: 'Prisijungimas'});
+                    if(this.$route.name != 'Prisijungimas'){
+                        this.$router.push({name: 'Prisijungimas'});
+                    }
                 }
             });
     },
@@ -106,7 +108,9 @@ methods:{
         .catch(error => {
             console.log(error.response.data);
             if(error.response.data.message == "Route [login] not defined."){
-                this.$router.push({name: 'Prisijungimas'});
+                if(this.$route.name != 'Prisijungimas'){
+                    this.$router.push({name: 'Prisijungimas'});
+                }
             }
         });
     },
@@ -121,7 +125,9 @@ methods:{
             })
             .catch(error => {
                 if(error.response.data.message == "Route [login] not defined."){
-                    router.push({name: 'Prisijungimas'});
+                    if(this.$route.name != 'Prisijungimas'){
+                        this.$router.push({name: 'Prisijungimas'});
+                    }
                 }
             });
     }
