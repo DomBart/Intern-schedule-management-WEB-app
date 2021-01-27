@@ -10,7 +10,7 @@
             <img class="navi_trigger" v-show="currentIntern.length > 0" src="../assets/tick.svg" alt="" :class="{'active': listActive,}"></a>
             <div class="navi_students" :class="{'list_active': listActive}">
                 <ul v-for="(item, index) in currentIntern" :key="index">
-                  <li @click="routeSchedule(item.id)">{{item.name}}<span class="separator"> | </span>{{item.time}}</li>
+                  <li @click="routeSchedule(item.id)"><span class="list_name">{{item.name}}</span><span class="separator"> | </span>{{item.time}}</li>
                   <hr v-if="index + 1 != currentIntern.length">
                 </ul>
             </div>
@@ -180,6 +180,9 @@ export default {
             width: 95%;
             padding: 0.5rem 0 0.5rem 0;
             cursor: pointer;
+            }
+            .list_name{
+                width: 55%;
             }
             li:hover{
                 color:#0054A6;
