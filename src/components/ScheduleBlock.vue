@@ -20,7 +20,7 @@
           </div>
           <div class="data_input_block">
             <form class="data_input_form" @submit.prevent="timeInput()">
-                <div class="schedule_select_wrap">
+                <div class="schedule_select_wrap" v-bind:class="{ one: scheduleData.trainee[0].schedules.length == 1}">
                 <label v-if="scheduleData.trainee[0].schedules.length > 1" for="schedule_select">Tvarkaraštis</label>
                 <select v-if="scheduleData.trainee[0].schedules.length > 1" class="schedule_select" v-model="scheduleID">
                   <option value="default" selected hidden>Pasirinkti tvarkaraštį</option>
@@ -37,10 +37,8 @@
                       <label for="student_date_till">Praktika iki</label>
                       <input class="student_date_till" type="date" v-model="internTill" v-bind:class="{error: scheduleSpanError}">
                   </div>
-          </div>
-          <div>
-          <FunctionalCalendar ref="Calendar" v-model="calendarData" v-on:changedMonth="handleMonth" v-on:choseDay="handleDay" :configs="calendarConfigs" v-bind:class="{ error: dateError || dateBeforeError || scheduleSpanError, edit_disable: timeEdit }"></FunctionalCalendar>
-          </div>
+              </div>
+              <FunctionalCalendar ref="Calendar" v-model="calendarData" v-on:changedMonth="handleMonth" v-on:choseDay="handleDay" :configs="calendarConfigs" v-bind:class="{ error: dateError || dateBeforeError || scheduleSpanError, edit_disable: timeEdit }"></FunctionalCalendar>
               <div class="lower_input_column">
                   <span class="input_error_message" v-if="dateError">Pasirinkite norimą datą</span>
                   <span class="input_error_message" v-if="dateBeforeError">Įvedimas atgaline data negalimas</span>
@@ -86,6 +84,7 @@
                 <input id="end" type="date" v-model="internTill" required>
                 <span class="input_error_message static" v-if="scheduleBeforeError">Įvedimas atgaline data negalimas!</span>
                 <span class="input_error_message static" v-if="scheduleEndError">Praktikos pabaiga ankstesnė už pradžią!</span>
+                <span class="input_error_message static" v-if="createScheduleSpanError">Praktikos laikotarpis užimtas!</span>
                 <input class="option_submit" type="submit" value="SUKURTI">
                 <input class="option_submit" type="button" value="ATŠAUKTI" v-if="scheduleData.trainee[0].schedules.length > 0" @click="scheduleCreateCancel()">
             </form>
@@ -213,6 +212,7 @@ export default {
         tillError: false,
         timeSpanError: false,
         scheduleSpanError: false,
+        createScheduleSpanError: false,
         unavailableError: false
         }
     },
@@ -242,7 +242,7 @@ export default {
         });
         this.$root.$on('TimeEdit', (item,date) => {
             this.editTime(item,date);
-        })
+        });
     },
     watch: {
     timeFrom: function() {
@@ -279,19 +279,21 @@ export default {
         }
     },
     internFrom: function() {
-        if(this.scheduleBeforeError || this.scheduleEndError || this.scheduleSpanError){
+        if(this.scheduleBeforeError || this.scheduleEndError || this.scheduleSpanError || this.createScheduleSpanError){
             this.scheduleBeforeError = false;
             this.scheduleEndError = false;
             this.scheduleSpanError = false;
+            this.createScheduleSpanError = false;
         }
         if(!this.createSchedule){
             this.updateScheduleDates();
         }
     },
     internTill: function() {
-        if(this.scheduleEndError || this.scheduleSpanError){
+        if(this.scheduleEndError || this.scheduleSpanError || this.createScheduleSpanError){
             this.scheduleEndError = false;
             this.scheduleSpanError = false;
+            this.createScheduleSpanError = false;
         }
         if(!this.createSchedule){
             this.updateScheduleDates();
@@ -368,7 +370,10 @@ export default {
                         this.loadData();
                     })
                     .catch(error => {
-                        if(error.response.data.message == "Route [login] not defined."){
+                        if(error.response.data.message == "Schedule already exists!"){
+                            this.createScheduleSpanError = true;
+                        }
+                        else if(error.response.data.message == "Route [login] not defined."){
                             router.push({name: 'Prisijungimas'});
                         }
                     });
@@ -663,7 +668,6 @@ export default {
                     this.loadData();
                 })
                 .catch(error => {
-                    console.log(error.response.data.message);
                     if(error.response.data.message == "Route [login] not defined."){
                         router.push({name: 'Prisijungimas'});
                     }
@@ -856,6 +860,10 @@ export default {
                     width: 85%;
                 }
             }
+            .schedule_select_wrap.one{
+                text-align: center;
+                margin-bottom: 1rem;
+            }
             .delete_icon{
                 margin: 0 0 -0.35rem 0.8rem;
                 width: 1.3rem;
@@ -866,6 +874,7 @@ export default {
             }
             .delete_icon.one{
                 width: 1.7rem;
+                margin-right: 0.5rem;
             }
             .data_date_row{
                 display: flex;
