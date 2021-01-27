@@ -46,6 +46,7 @@ export default {
       }else{
         this.traineeID = this.id;
       }
+      this.refreshToken();
     },
     beforeDestroy(){
       clearInterval(this.interval);

@@ -60,6 +60,7 @@ created() {
 },
 mounted(){
     this.getUserData();
+    this.refreshToken();
     this.$root.$on('Close', () => {
         this.getUserData();
         this.edit = false;

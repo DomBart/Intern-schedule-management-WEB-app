@@ -88,6 +88,7 @@ export default {
         this.inputMonth = date.getFullYear() + '-' + (date.getMonth()+1);
         this.getMonth();
         this.getStudents();
+        this.refreshToken();
     },
     beforeDestroy(){
             clearInterval(this.interval);

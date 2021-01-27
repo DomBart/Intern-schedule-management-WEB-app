@@ -132,6 +132,7 @@ export default {
     },
     mounted(){
         this.getStudents();
+        this.refreshToken();
         this.$root.$on('Submited', () => {
              this.currentSort = "";
              this.currentSortDir = "";
