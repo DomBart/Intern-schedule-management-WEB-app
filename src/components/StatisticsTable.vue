@@ -80,6 +80,9 @@ export default {
         studentList: [],
         }
     },
+    created() {
+        this.interval = setInterval(() => this.refreshToken(), 300000);
+    },
     mounted() {
         let date = new Date();
         this.inputMonth = date.getFullYear() + '-' + (date.getMonth()+1);
@@ -128,6 +131,21 @@ export default {
          getStudents(){
             console.log("students loading");
             //API GET
+        },
+        refreshToken(){
+            let config= {
+                headers: { Authorization: `Bearer ${localStorage.token}` }
+            };
+            axios.post('http://127.0.0.1:8000/api/auth/refresh','',config)
+            .then((resp) => {
+                console.log('refresh');
+                localStorage.token = resp.data.access_token;
+            })
+            .catch(error => {
+                if(error.response.data.message == "Route [login] not defined."){
+                    this.$router.push({name: 'Prisijungimas'});
+                }
+            });
         }
     }
 }

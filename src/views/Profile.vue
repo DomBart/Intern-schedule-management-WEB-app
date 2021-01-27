@@ -55,6 +55,9 @@ data () {
         passed: false
     }
 },
+created() {
+        this.interval = setInterval(() => this.refreshToken(), 300000);
+},
 mounted(){
     this.getUserData();
     this.$root.$on('Close', () => {
@@ -102,6 +105,21 @@ methods:{
                 this.$router.push({name: 'Prisijungimas'});
             }
         });
+    },
+    refreshToken(){
+            let config= {
+                headers: { Authorization: `Bearer ${localStorage.token}` }
+            };
+            axios.post('http://127.0.0.1:8000/api/auth/refresh','',config)
+            .then((resp) => {
+                console.log('refresh');
+                localStorage.token = resp.data.access_token;
+            })
+            .catch(error => {
+                if(error.response.data.message == "Route [login] not defined."){
+                    router.push({name: 'Prisijungimas'});
+                }
+            });
     }
 }
 }

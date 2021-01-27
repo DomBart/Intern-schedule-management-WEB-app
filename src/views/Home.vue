@@ -15,11 +15,6 @@ import Confirmdialog from '../components/ConfirmDialog.vue'
 export default {
   name: 'Pagrindinis',
   components: {Navi, Studentlist,  Usermodal, Confirmdialog},
-  data () {
-    return {
-      
-    }
-  }
 }
 </script>
 

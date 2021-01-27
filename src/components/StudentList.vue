@@ -128,6 +128,7 @@ export default {
     },
     created() {
         window.addEventListener("resize", this.countPagination);
+        this.interval = setInterval(() => this.refreshToken(), 300000);
     },
     mounted(){
         this.getStudents();
@@ -367,6 +368,21 @@ export default {
                     return a.timeData.end_date < b.timeData.end_date ? modifier : -1;
                 });
             }
+        },
+        refreshToken(){
+            let config= {
+                headers: { Authorization: `Bearer ${localStorage.token}` }
+            };
+            axios.post('http://127.0.0.1:8000/api/auth/refresh','',config)
+            .then((resp) => {
+                console.log('refresh');
+                localStorage.token = resp.data.access_token;
+            })
+            .catch(error => {
+                if(error.response.data.message == "Route [login] not defined."){
+                    router.push({name: 'Prisijungimas'});
+                }
+            });
         }
  }
 }
