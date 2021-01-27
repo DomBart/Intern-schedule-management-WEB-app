@@ -861,7 +861,7 @@ export default {
                 }
             }
             .schedule_select_wrap.one{
-                text-align: center;
+                text-align: right;
                 margin-bottom: 1rem;
             }
             .delete_icon{
