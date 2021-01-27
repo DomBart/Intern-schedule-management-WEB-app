@@ -89,6 +89,9 @@ export default {
         this.getMonth();
         this.getStudents();
     },
+    beforeDestroy(){
+            clearInterval(this.interval);
+    },
     methods: {
         triggerFilter(){
             if(this.filterState)

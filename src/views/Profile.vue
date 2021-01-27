@@ -66,6 +66,9 @@ mounted(){
         this.passed = false;
     });
 },
+beforeDestroy(){
+    clearInterval(this.interval);
+},
 methods:{
     getUserData(){
         let config= {

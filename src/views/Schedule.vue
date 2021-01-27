@@ -47,6 +47,9 @@ export default {
         this.traineeID = this.id;
       }
     },
+    beforeDestroy(){
+      clearInterval(this.interval);
+    },
     methods: {
       getStudents(){
             axios.get('http://127.0.0.1:8000/api/trainee',this.config)

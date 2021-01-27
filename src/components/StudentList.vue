@@ -138,6 +138,9 @@ export default {
              this.getStudents();
         });
     },
+    beforeDestroy(){
+            clearInterval(this.interval);
+    },
     methods: {
         clickCallback(pageNum){
             this.pageItems = Math.floor(this.$refs["mainContainer"].offsetHeight/85);
