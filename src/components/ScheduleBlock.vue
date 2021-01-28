@@ -325,6 +325,7 @@ export default {
                  this.monthHours = Math.floor(this.scheduleData.trainee[0].schedules[this.scheduleID].works_hours.month_hours/60);
                  this.totalHours = Math.floor(this.scheduleData.trainee[0].schedules[this.scheduleID].works_hours.total_hours/60);
                  this.getMonth();
+                 this.refreshToken();
                  }else if(this.scheduleData.trainee[0].schedules.length > 1 && !this.createSchedule && !this.tableReload){
                      this.selectSchedule = true;
                  }else if(this.createSchedule){
@@ -343,7 +344,6 @@ export default {
                      this.totalHours = Math.floor(this.scheduleData.trainee[0].schedules[this.scheduleID].works_hours.total_hours/60);
                      this.getMonth();
                  }
-                 this.refreshToken();
             })
             .catch(error => {
                 if(error.response.data.message == "Route [login] not defined."){
@@ -402,6 +402,7 @@ export default {
             this.monthHours = Math.floor(this.scheduleData.trainee[0].schedules[this.scheduleID].works_hours.month_hours/60);
             this.totalHours = Math.floor(this.scheduleData.trainee[0].schedules[this.scheduleID].works_hours.total_hours/60);
             this.scheduleState = true;
+            this.refreshToken();
             this.getMonth();
         },
         newSchedule(){
@@ -615,6 +616,7 @@ export default {
                                         this.loadData();
                                     })
                                     .catch(error => {
+                                        console.log(error.response.data.message);
                                         if(error.response.data.message == "Route [login] not defined."){
                                             if(this.$route.name != 'Prisijungimas'){
                                                 this.$router.push({name: 'Prisijungimas'});
@@ -631,6 +633,7 @@ export default {
                                         this.loadData();
                                     })
                                     .catch(error => {
+                                        console.log(error.response.data.message);
                                         if(error.response.data.message == "Route [login] not defined."){
                                             if(this.$route.name != 'Prisijungimas'){
                                                 this.$router.push({name: 'Prisijungimas'});
@@ -874,7 +877,9 @@ export default {
                 padding: 0.3rem 0.5rem;
                 color: #5C5C5C;
             }
-
+            select{
+                cursor: pointer;
+            }
             input::placeholder{
                 color: #C4C4C4;
             }
@@ -913,6 +918,9 @@ export default {
                 flex-direction: column;
                 width: 45%;
                 margin-bottom: 0.8rem;
+                input{
+                    cursor: text;
+                }
             }
 
             .intern_span{
@@ -951,6 +959,10 @@ export default {
         flex-direction: column;
         align-self: center;
         margin: auto;
+        .student_icon{
+            width: 5rem;
+            margin: auto;
+        }
         h1{
             color: #5C5C5C;
             text-align: center;
@@ -977,6 +989,12 @@ export default {
                 padding: 0.5rem 0.8rem;
                 margin-bottom: 1.5rem;
             }
+            select{
+                cursor: pointer;
+            }
+            input:hover{
+                cursor: text;
+            }
             label{
                 color: #5C5C5C;
                 margin: 0 0 0.5rem 0.5rem;
@@ -992,7 +1010,7 @@ export default {
                 padding: 0.3rem 1.5rem;
                 border: none;
                 border-radius: 5px;
-                cursor: pointer;
+                cursor: pointer!important;
             }
         }
     }
