@@ -658,6 +658,7 @@ export default {
         },
         cancelEditTime(){
             this.timeEdit = false;
+            this.editID = undefined;
             this.fromError = false;
             this.tillError = false;
             this.timeError = false;
