@@ -369,6 +369,8 @@ export default {
                     axios.post('http://127.0.0.1:8000/api/schedule/'+this.id,internSpan,config)
                     .then(resp => {
                         this.scheduleState = true;
+                        this.month = [];
+                        this.inputMonth = new Date().getFullYear() + '-' + (new Date().getMonth()+1);
                         this.loadData();
                     })
                     .catch(error => {
@@ -402,7 +404,6 @@ export default {
             this.monthHours = Math.floor(this.scheduleData.trainee[0].schedules[this.scheduleID].works_hours.month_hours/60);
             this.totalHours = Math.floor(this.scheduleData.trainee[0].schedules[this.scheduleID].works_hours.total_hours/60);
             this.scheduleState = true;
-            this.refreshToken();
             this.getMonth();
         },
         newSchedule(){

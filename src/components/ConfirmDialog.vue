@@ -50,7 +50,6 @@ export default {
             });
       this.alertState = false;
       } else if(this.mode == 'scheduleDelete'){
-          console.log(this.itemid);
           axios.delete('http://127.0.0.1:8000/api/schedule/'+this.id+'/'+this.itemid,config)
             .then(resp => {
               this.$root.$emit('ScheduleDeleted');
