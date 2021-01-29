@@ -81,7 +81,6 @@ methods:{
                 this.editSurname = resp.data.lastname;
                 this.editEmail = resp.data.email;
                 this.editPosition = resp.data.position;
-                this.refreshToken();
             })
             .catch(error => {
                 if(error.response.data.message == "Route [login] not defined."){

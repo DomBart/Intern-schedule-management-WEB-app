@@ -136,7 +136,6 @@ export default {
             axios.get('http://127.0.0.1:8000/api/trainee',this.config)
                 .then((resp) => {
                     this.studentList = resp.data.trainees;
-                    this.refreshToken();
                 })
                 .catch(error => {
                     if(error.response.data.message == "Route [login] not defined."){

@@ -325,7 +325,7 @@ export default {
                  this.monthHours = Math.floor(this.scheduleData.trainee[0].schedules[this.scheduleID].works_hours.month_hours/60);
                  this.totalHours = Math.floor(this.scheduleData.trainee[0].schedules[this.scheduleID].works_hours.total_hours/60);
                  this.getMonth();
-                 this.refreshToken();
+                //  this.refreshToken();
                  }else if(this.scheduleData.trainee[0].schedules.length > 1 && !this.createSchedule && !this.tableReload){
                      this.selectSchedule = true;
                  }else if(this.createSchedule){

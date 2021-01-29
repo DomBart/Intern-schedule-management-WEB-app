@@ -244,7 +244,6 @@ export default {
                         }
                     }                    
                     }
-                    this.refreshToken();
                 })
                 .catch(error => {
                 if(error.response.data.message == "Route [login] not defined."){
@@ -286,8 +285,7 @@ export default {
                         if(this.studentList.length == 0){
                             this.filterEmpty = true;
                         }
-                    }
-                    this.refreshToken();            
+                    }           
                 })
                 .catch(error => {
                     if(error.response.data.message == "Route [login] not defined."){
