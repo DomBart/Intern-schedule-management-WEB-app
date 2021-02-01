@@ -31,13 +31,14 @@
               <div class="data_date_row intern_span">
                   <div class="date_input_wrap">
                       <label for="student_date_from">Praktika nuo</label>
-                      <input class="student_date_from" type="date" v-model="internFrom" v-bind:class="{error: scheduleSpanError}">
+                      <input class="student_date_from" type="date" v-model="internFrom" v-bind:class="{error: scheduleSpanError || scheduleEditError}">
                   </div>
                   <div class="date_input_wrap">
                       <label for="student_date_till">Praktika iki</label>
-                      <input class="student_date_till" type="date" v-model="internTill" v-bind:class="{error: scheduleSpanError}">
+                      <input class="student_date_till" type="date" v-model="internTill" v-bind:class="{error: scheduleSpanError || scheduleEditError}">
                   </div>
               </div>
+              <span class="input_error_message" style="position: relative; top: -2%;" v-if="scheduleEditError">Praktikos laikotarpis užimtas</span>
               <FunctionalCalendar ref="Calendar" v-model="calendarData" v-on:changedMonth="handleMonth" v-on:choseDay="handleDay" :configs="calendarConfigs" v-bind:class="{ error: dateError || dateBeforeError || scheduleSpanError, edit_disable: timeEdit }"></FunctionalCalendar>
               <div class="lower_input_column">
                   <span class="input_error_message" v-if="dateError">Pasirinkite norimą datą</span>
@@ -79,7 +80,7 @@
             <h1>SUKURKITE {{traineeFname}} TVARKARAŠTĮ</h1>
             <form @submit.prevent="scheduleCreate()">
                 <label for="start">Praktika nuo</label>
-                <input id="start" type="date" v-model="internFrom" required>
+                <input id="start" type="date" v-model="internFrom" required max="2020-02-01">
                 <label for="end">Praktika iki</label>
                 <input id="end" type="date" v-model="internTill" required>
                 <span class="input_error_message static" v-if="scheduleBeforeError">Įvedimas atgaline data negalimas!</span>
@@ -212,6 +213,7 @@ export default {
         timeSpanError: false,
         scheduleSpanError: false,
         createScheduleSpanError: false,
+        scheduleEditError: false,
         unavailableError: false
         }
     },
@@ -283,6 +285,7 @@ export default {
             this.scheduleEndError = false;
             this.scheduleSpanError = false;
             this.createScheduleSpanError = false;
+            this.scheduleEditError = false
         }
         if(!this.createSchedule){
             this.updateScheduleDates();
@@ -309,7 +312,7 @@ export default {
         let config= {
                 headers: { Authorization: `Bearer ${localStorage.token}` }
         };
-        axios.get('http://127.0.0.1:8000/api/trainee/schedule/'+this.id,config)
+        axios.get('http://127.0.0.1:8000/api/schedule/'+this.id,config)
             .then((resp) => {
                  this.scheduleData = resp.data;
                  this.traineeFname = this.scheduleData.trainee[0].firstname;
@@ -325,7 +328,6 @@ export default {
                  this.monthHours = Math.floor(this.scheduleData.trainee[0].schedules[this.scheduleID].works_hours.month_hours/60);
                  this.totalHours = Math.floor(this.scheduleData.trainee[0].schedules[this.scheduleID].works_hours.total_hours/60);
                  this.getMonth();
-                //  this.refreshToken();
                  }else if(this.scheduleData.trainee[0].schedules.length > 1 && !this.createSchedule && !this.tableReload){
                      this.selectSchedule = true;
                  }else if(this.createSchedule){
@@ -677,10 +679,18 @@ export default {
                 };
                 axios.put('http://127.0.0.1:8000/api/schedule/'+this.id+'/'+this.scheduleData.trainee[0].schedules[this.scheduleID].id, data, config)
                 .then(data => {
+                    if(this.scheduleEditError){
+                    this.scheduleEditError = false;
+                    }
                     this.tableReload = true;
                     this.loadData();
                 })
                 .catch(error => {
+                    if(error.response.data.message == "Schedule already exists!"){
+                        this.internFrom = oldFrom;
+                        this.internTill = oldTill;
+                        this.scheduleEditError = true;
+                    }
                     if(error.response.data.message == "Route [login] not defined."){
                         if(this.$route.name != 'Prisijungimas'){
                             this.$router.push({name: 'Prisijungimas'});
