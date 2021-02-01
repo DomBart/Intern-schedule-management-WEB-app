@@ -31,13 +31,47 @@
               <div class="data_date_row intern_span">
                   <div class="date_input_wrap">
                       <label for="student_date_from">Praktika nuo</label>
-                      <input class="student_date_from" type="date" v-model="internFrom" v-bind:class="{error: scheduleSpanError || scheduleEditError}">
+                      <VueCtkDateTimePicker 
+                      v-model="internFrom"
+                    :formatted="'YYYY-MM-DD'" 
+                    :no-header="true" 
+                    :output-format="'YYYY-MM-DD'" 
+                    :locale="'lt'" 
+                    :format="'YYYY-MM-DD'" 
+                    :no-button="true" 
+                    :input-size="'sm'" 
+                    :noClearButton="true" 
+                    :only-date="true" 
+                    :no-weekends-days="true" 
+                    :no-label="true"
+                    :auto-close="true"
+                    :first-day-of-week="1" 
+                    :color="'#0054A6'" 
+                    v-bind:class="{error: scheduleSpanError || scheduleEditError || scheduleBadDates}"/>
                   </div>
                   <div class="date_input_wrap">
                       <label for="student_date_till">Praktika iki</label>
-                      <input class="student_date_till" type="date" v-model="internTill" v-bind:class="{error: scheduleSpanError || scheduleEditError}">
+                      <VueCtkDateTimePicker 
+                      v-model="internTill" 
+                      :formatted="'YYYY-MM-DD'" 
+                      :no-header="true" 
+                      :format="'YYYY-MM-DD'" 
+                      :locale="'lt'" 
+                      :output-format="'YYYY-MM-DD'"
+                      :no-button="true" 
+                      :input-size="'sm'" 
+                      :noClearButton="true" 
+                      :only-date="true" 
+                      :no-weekends-days="true" 
+                      :no-label="true" 
+                      :first-day-of-week="1"
+                      :right="true"
+                      :auto-close="true"
+                      :color="'#0054A6'" 
+                      v-bind:class="{error: scheduleSpanError || scheduleEditError || scheduleBadDates}"/>
                   </div>
               </div>
+              <span class="input_error_message" style="position: relative; top: -2%;" v-if="scheduleBadDates">Praktikos laikotarpio pradžia velesnė už pabaigą</span>
               <span class="input_error_message" style="position: relative; top: -2%;" v-if="scheduleEditError">Praktikos laikotarpis užimtas</span>
               <FunctionalCalendar ref="Calendar" v-model="calendarData" v-on:changedMonth="handleMonth" v-on:choseDay="handleDay" :configs="calendarConfigs" v-bind:class="{ error: dateError || dateBeforeError || scheduleSpanError, edit_disable: timeEdit }"></FunctionalCalendar>
               <div class="lower_input_column">
@@ -80,14 +114,55 @@
             <h1>SUKURKITE {{traineeFname}} TVARKARAŠTĮ</h1>
             <form @submit.prevent="scheduleCreate()">
                 <label for="start">Praktika nuo</label>
-                <input id="start" type="date" v-model="internFrom" required max="2020-02-01">
+                <VueCtkDateTimePicker 
+                    v-model="internFrom"
+                    :label="'Pasirinkite pradžios datą'"
+                    :formatted="'YYYY-MM-DD'" 
+                    :no-header="true" 
+                    :output-format="'YYYY-MM-DD'" 
+                    :locale="'lt'" 
+                    :format="'YYYY-MM-DD'" 
+                    :no-button="true" 
+                    :input-size="'lg'" 
+                    :noClearButton="true" 
+                    :only-date="true" 
+                    :no-weekends-days="true" 
+                    :no-label="true" 
+                    :first-day-of-week="1" 
+                    :color="'#0054A6'"
+                    :auto-close="true"
+                    style="margin-bottom: 1rem;"
+                    v-bind:class="{error: scheduleFromError}"
+                    required/>
                 <label for="end">Praktika iki</label>
-                <input id="end" type="date" v-model="internTill" required>
+                <VueCtkDateTimePicker 
+                    v-model="internTill"
+                    :label="'Pasirinkite pabaigos datą'"
+                    :formatted="'YYYY-MM-DD'" 
+                    :no-header="true" 
+                    :output-format="'YYYY-MM-DD'" 
+                    :locale="'lt'" 
+                    :format="'YYYY-MM-DD'" 
+                    :no-button="true" 
+                    :input-size="'lg'" 
+                    :noClearButton="true" 
+                    :only-date="true" 
+                    :no-weekends-days="true" 
+                    :no-label="true" 
+                    :first-day-of-week="1"
+                    :auto-close="true"
+                    :color="'#0054A6'"
+                    style="margin-bottom: 1rem;"
+                    v-bind:class="{error: scheduleTillError}"
+                    required/>
+                <span class="input_error_message static" v-if="scheduleFromError || scheduleTillError">Įveskite praktikos laikotarpio datas!</span>
                 <span class="input_error_message static" v-if="scheduleBeforeError">Įvedimas atgaline data negalimas!</span>
                 <span class="input_error_message static" v-if="scheduleEndError">Praktikos pabaiga ankstesnė už pradžią!</span>
                 <span class="input_error_message static" v-if="createScheduleSpanError">Praktikos laikotarpis užimtas!</span>
+                <div class="create_schedule_input_wrap">
                 <input class="option_submit" type="submit" value="SUKURTI">
                 <input class="option_submit" type="button" value="ATŠAUKTI" v-if="scheduleData.trainee[0].schedules.length > 0" @click="scheduleCreateCancel()">
+                </div>
             </form>
           </div>
           <div class="option_wrap" v-if="selectSchedule" @submit.prevent="scheduleSelect()">
@@ -138,6 +213,8 @@ import DownloadDialog from './DownloadDialog.vue'
 import WeekTable from './WeeklyTable.vue';
 import MonthTable from './MonthlyTable.vue';
 import FunctionalCalendar from 'vue-functional-calendar';
+import VueCtkDateTimePicker from 'vue-ctk-date-time-picker';
+import 'vue-ctk-date-time-picker/dist/vue-ctk-date-time-picker.css';
 import VueTimepicker from 'vue2-timepicker'
 import 'vue2-timepicker/dist/VueTimepicker.css'
 
@@ -148,7 +225,7 @@ Vue.use(FunctionalCalendar, {
 });
 export default {
     props: ['id'],
-    components: {Generaldata, DownloadDialog, WeekTable, MonthTable, VueTimepicker},
+    components: {Generaldata, DownloadDialog, WeekTable, MonthTable, VueTimepicker, VueCtkDateTimePicker},
     data () {
       return {
         timespanState: false,
@@ -212,6 +289,9 @@ export default {
         tillError: false,
         timeSpanError: false,
         scheduleSpanError: false,
+        scheduleFromError: false,
+        scheduleTillError: false,
+        scheduleBadDates: false,
         createScheduleSpanError: false,
         scheduleEditError: false,
         unavailableError: false
@@ -289,6 +369,8 @@ export default {
         }
         if(!this.createSchedule){
             this.updateScheduleDates();
+        }else if(this.scheduleFromError){
+            this.scheduleFromError = false;
         }
     },
     internTill: function() {
@@ -299,6 +381,8 @@ export default {
         }
         if(!this.createSchedule){
             this.updateScheduleDates();
+        } else if(this.scheduleTillError){
+            this.scheduleTillError = false;
         }
     },
     scheduleID: function() {
@@ -362,6 +446,7 @@ export default {
             var today = new Date();
             var internFrom = new Date(this.internFrom);
             var internTill = new Date(this.internTill);
+            if(this.internFrom != "" && this.internTill != ""){
             if(internFrom >= today){
                 if(internFrom < internTill){
                     let internSpan = {
@@ -390,6 +475,11 @@ export default {
                 }
             }else {
                 this.scheduleBeforeError = true;
+            }
+            } else if (this.internFrom == ""){
+                this.scheduleFromError = true;
+            } else if (this.internTill == ""){
+                this.scheduleTillError = true;
             }
         },
         scheduleCreateCancel(){
@@ -679,8 +769,9 @@ export default {
                 };
                 axios.put('http://127.0.0.1:8000/api/schedule/'+this.id+'/'+this.scheduleData.trainee[0].schedules[this.scheduleID].id, data, config)
                 .then(data => {
-                    if(this.scheduleEditError){
+                    if(this.scheduleEditError || this.scheduleBadDates){
                     this.scheduleEditError = false;
+                    this.scheduleBadDates = false;
                     }
                     this.tableReload = true;
                     this.loadData();
@@ -690,6 +781,8 @@ export default {
                         this.internFrom = oldFrom;
                         this.internTill = oldTill;
                         this.scheduleEditError = true;
+                    } else if (error.response.data.message == "Bad dates!"){
+                        this.scheduleBadDates = true;
                     }
                     if(error.response.data.message == "Route [login] not defined."){
                         if(this.$route.name != 'Prisijungimas'){
@@ -1023,6 +1116,9 @@ export default {
                 border: none;
                 border-radius: 5px;
                 cursor: pointer!important;
+            }
+            .create_schedule_input_wrap{
+            display: flex;
             }
         }
     }
