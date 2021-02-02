@@ -181,9 +181,9 @@
               <img class="schedule_download" src="../assets/download.svg" title="Atsisiųsti tvarkaraštį" alt="Download" @click="triggerModal()">
               <div class="schedule_controls">
                 <div class="schedule_date_push" v-bind:class="{ disabled: monthState || timeEdit }">
-                    <button class="date_push_button unselectable" v-bind:class="{push_disabled: currentWeek == 0}" :disabled="monthState || (currentWeek == 0)" @click="pushWeek(-1)">&lt;</button>
+                    <button class="date_push_button unselectable" :disabled="monthState" @click="pushWeek(-1)">&lt;</button>
                     <span class="selected_date unselectable">{{month[currentWeek][0][0].getMonth()+1}}<span class="date_dash unselectable">/</span>{{month[currentWeek][0][0].getDate()}} - {{month[currentWeek][4][0].getMonth()+1}}<span class="date_dash unselectable">/</span>{{month[currentWeek][4][0].getDate()}}</span>
-                    <button class="date_push_button unselectable" v-bind:class="{push_disabled: currentWeek == month.length-1}" :disabled="monthState" @click="pushWeek(1)">&gt;</button>
+                    <button class="date_push_button unselectable" :disabled="monthState" @click="pushWeek(1)">&gt;</button>
                 </div>
                 <div class="schedule_span_select">
                     <button class="schedule_span_button unselectable" v-bind:class="{ selected: weekState }" @click="monthState=false; weekState=true">Savaitė</button>
@@ -620,6 +620,16 @@ export default {
             }
             else if(direction > 0 && this.currentWeek < this.month.length-1){
                 this.currentWeek++;
+                this.calendarData.selectedDate = this.month[this.currentWeek][0][0].toLocaleDateString('el-GR');
+            } else if(direction < 0 && this.currentWeek == 0){
+                this.$refs.Calendar.PreMonth();
+                this.handleMonth();
+                this.currentWeek = this.month.length-1;
+                this.calendarData.selectedDate = this.month[this.currentWeek][0][0].toLocaleDateString('el-GR');
+            } else if(direction > 0 && this.currentWeek == this.month.length-1){
+                this.$refs.Calendar.NextMonth();
+                this.handleMonth();
+                this.currentWeek = 0;
                 this.calendarData.selectedDate = this.month[this.currentWeek][0][0].toLocaleDateString('el-GR');
             }
         },
@@ -1205,12 +1215,6 @@ export default {
                     button{
                         border-color: #efefef !important;
                     }
-                }
-
-                .push_disabled{
-                    color: #efefef !important;
-                    border-color: #efefef !important;
-                    cursor: default !important;
                 }
 
                 .schedule_span_select{
