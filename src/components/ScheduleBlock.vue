@@ -73,7 +73,7 @@
               </div>
               <span class="input_error_message" style="position: relative; top: -2%;" v-if="scheduleBadDates">Praktikos laikotarpio pradžia velesnė už pabaigą</span>
               <span class="input_error_message" style="position: relative; top: -2%;" v-if="scheduleEditError">Praktikos laikotarpis užimtas</span>
-              <FunctionalCalendar ref="Calendar" v-model="calendarData" v-on:changedMonth="handleMonth" v-on:choseDay="handleDay" :configs="calendarConfigs" v-bind:class="{ error: dateError || dateBeforeError || scheduleSpanError, edit_disable: timeEdit }"></FunctionalCalendar>
+              <FunctionalCalendar ref="Calendar" v-model="calendarData" v-on:changedMonth="handleMonth" @hook:mounted="setCalendarMonth" v-on:choseDay="handleDay" :configs="calendarConfigs" v-bind:class="{ error: dateError || dateBeforeError || scheduleSpanError, edit_disable: timeEdit }"></FunctionalCalendar>
               <div class="lower_input_column">
                   <span class="input_error_message" v-if="dateError">Pasirinkite norimą datą</span>
                   <span class="input_error_message" v-if="dateBeforeError">Įvedimas atgaline data negalimas</span>
@@ -408,9 +408,6 @@ export default {
                  this.scheduleState = true;
                  this.internFrom = this.scheduleData.trainee[0].schedules[0].start_date;
                  this.internTill = this.scheduleData.trainee[0].schedules[0].end_date;
-                 this.weekHours = Math.floor(this.scheduleData.trainee[0].schedules[this.scheduleID].works_hours.week_hours/60);
-                 this.monthHours = Math.floor(this.scheduleData.trainee[0].schedules[this.scheduleID].works_hours.month_hours/60);
-                 this.totalHours = Math.floor(this.scheduleData.trainee[0].schedules[this.scheduleID].works_hours.total_hours/60);
                  this.getMonth();
                  }else if(this.scheduleData.trainee[0].schedules.length > 1 && !this.createSchedule && !this.tableReload){
                      this.selectSchedule = true;
@@ -418,16 +415,10 @@ export default {
                         this.scheduleID = (this.scheduleData.trainee[0].schedules.length)-1;
                         this.internFrom = this.scheduleData.trainee[0].schedules[this.scheduleID].start_date;
                         this.internTill = this.scheduleData.trainee[0].schedules[this.scheduleID].end_date;
-                        this.weekHours = Math.floor(this.scheduleData.trainee[0].schedules[this.scheduleID].works_hours.week_hours/60);
-                        this.monthHours = Math.floor(this.scheduleData.trainee[0].schedules[this.scheduleID].works_hours.month_hours/60);
-                        this.totalHours = Math.floor(this.scheduleData.trainee[0].schedules[this.scheduleID].works_hours.total_hours/60);
                         this.getMonth();
                         this.createSchedule=false;
                  } else if(this.tableReload){
                      this.tableReload = false;
-                     this.weekHours = Math.floor(this.scheduleData.trainee[0].schedules[this.scheduleID].works_hours.week_hours/60);
-                     this.monthHours = Math.floor(this.scheduleData.trainee[0].schedules[this.scheduleID].works_hours.month_hours/60);
-                     this.totalHours = Math.floor(this.scheduleData.trainee[0].schedules[this.scheduleID].works_hours.total_hours/60);
                      this.getMonth();
                  }
             })
@@ -482,6 +473,10 @@ export default {
                 this.scheduleTillError = true;
             }
         },
+        setCalendarMonth(){
+            this.$refs.Calendar.ChooseDate(this.calendarData.selectedDate);
+            this.handleMonth();
+        },
         scheduleCreateCancel(){
             this.createSchedule=false;
             this.getMonth();
@@ -492,11 +487,11 @@ export default {
             this.selectSchedule = false;
             this.internFrom = this.scheduleData.trainee[0].schedules[this.scheduleID].start_date;
             this.internTill = this.scheduleData.trainee[0].schedules[this.scheduleID].end_date;
-            this.weekHours = Math.floor(this.scheduleData.trainee[0].schedules[this.scheduleID].works_hours.week_hours/60);
-            this.monthHours = Math.floor(this.scheduleData.trainee[0].schedules[this.scheduleID].works_hours.month_hours/60);
-            this.totalHours = Math.floor(this.scheduleData.trainee[0].schedules[this.scheduleID].works_hours.total_hours/60);
             this.scheduleState = true;
             this.getMonth();
+            this.calendarData.selectedDate = new Date(this.internFrom).toLocaleDateString('el-GR');
+            this.calculateHours(this.internFrom);
+            this.setCalendarMonth();
         },
         newSchedule(){
             this.internFrom = '';
@@ -594,10 +589,29 @@ export default {
                 this.days.splice(0,2);
             }
             if(!this.calendarData.selectedDate){
-            this.calendarData.selectedDate = this.month[this.currentWeek][0][0].toLocaleDateString('el-GR');
-            //this.calendarData.selectedDate = new Date(this.internFrom).toLocaleDateString('el-GR');
-            //this.handleDay();
+            this.calendarData.selectedDate = new Date(this.internFrom).toLocaleDateString('el-GR');
+            this.calculateHours(this.internFrom);
             }
+        },
+        calculateHours(date){
+            let setDate = new Date(date);
+            let config= {
+                params: { date: setDate.toLocaleDateString('lt-LT')},
+                headers: { Authorization: `Bearer ${localStorage.token}` }
+            };
+        axios.get('http://127.0.0.1:8000/api/schedule/'+this.id+'/'+this.scheduleData.trainee[0].schedules[this.scheduleID].id,config)
+            .then((resp) => {
+                this.weekHours = Math.round(resp.data.works_hours_by_date.week_hours/60);
+                this.monthHours = Math.round(resp.data.works_hours_by_date.month_hours/60);
+                this.totalHours = Math.round(resp.data.works_hours_by_date.total_hours/60);
+            })
+            .catch(error => {
+                if(error.response.data.message == "Route [login] not defined."){
+                    if(this.$route.name != 'Prisijungimas'){
+                            this.$router.push({name: 'Prisijungimas'});
+                    }
+                }
+            });
         },
         pushWeek(direction){
             if(direction < 0 && this.currentWeek > 0){
@@ -616,14 +630,21 @@ export default {
             this.currentWeek = 0;
             this.inputMonth = this.calendarData.currentDate.getFullYear() + '-' + (this.calendarData.currentDate.getMonth()+1);
             this.getMonth();
+            if(new Date(this.internFrom).getMonth() != this.month[this.currentWeek][1][0].getMonth()){
             this.calendarData.selectedDate = this.month[this.currentWeek][0][0].toLocaleDateString('el-GR');
+            } else {
+            this.calendarData.selectedDate = new Date(this.internFrom).toLocaleDateString('el-GR');
+            }
+            this.calculateHours(this.month[this.currentWeek][0][0].toLocaleDateString('lt-LT'));
         },
         handleDay(){
             this.dateError = false;
             this.dateBeforeError = false;
             this.scheduleSpanError = false;
+
             let selected = this.calendarData.selectedDate.split('/');
             let dateSelected = new Date(selected[2],selected[1]-1,selected[0]);
+            this.calculateHours(dateSelected.toLocaleDateString('lt-LT'));
             if(dateSelected < this.month[this.currentWeek][0][0]){
                 this.currentWeek--;
                 if(dateSelected < this.month[this.currentWeek][0][0]){
@@ -682,7 +703,10 @@ export default {
                         if(this.month[i][j][0].toLocaleDateString('el-GR') === this.calendarData.selectedDate){
                             if(this.month[i][j].length > 1){
                                 for(let k = 1; k < this.month[i][j].length; k++){
-                                    if((this.month[i][j][k].time_from > tillInput) || (this.month[i][j][k].time_to < fromInput)){
+                                    if(((this.month[i][j][k].time_from > tillInput) || (this.month[i][j][k].time_to <= fromInput)) && this.timeType != 'off-time'){
+                                        timeAvailable = true;
+                                    }
+                                    else if(this.timeType == 'off-time' && this.month[i][j][k].time_from <= tillInput && this.month[i][j][k].time_to >= fromInput){
                                         timeAvailable = true;
                                     }
                                     else {
@@ -1263,6 +1287,11 @@ export default {
 </style>
 
 <style lang="scss">
+.vue__time-picker .dropdown ul li:not([disabled]).active,
+.vue__time-picker .dropdown ul li:not([disabled]).active:hover,
+.vue__time-picker .dropdown ul li:not([disabled]).active:focus {
+  background:#0054A6!important;
+}
 .vfc-main-container{
             box-shadow: none !important;
             padding: 0 0.3rem;
