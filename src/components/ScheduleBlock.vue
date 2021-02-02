@@ -533,7 +533,8 @@ export default {
                 }
                 date.setDate(date.getDate() + 1);
             }
-            if (this.days[0][0].getDay() > 1)
+            console.log(this.days[0][0].getDay());
+            if (this.days[0][0].getDay() != 1)
             {
                 let add = new Date(year, month, 0);
                 while(this.days[0][0].getDay() != 1)
@@ -551,6 +552,7 @@ export default {
                                     time_id: this.scheduleData.trainee[0].schedules[this.scheduleID].months[f].days[j].times[k].id
                                 };
                                 this.days[0].push(timeData);
+                                console.log(timeData);
                              }
                          }
                      }
@@ -640,9 +642,10 @@ export default {
             this.currentWeek = 0;
             this.inputMonth = this.calendarData.currentDate.getFullYear() + '-' + (this.calendarData.currentDate.getMonth()+1);
             this.getMonth();
-            if(new Date(this.internFrom).getMonth() != this.month[this.currentWeek][1][0].getMonth()){
+            if(new Date(this.internFrom).getMonth() != this.month[1][0][0].getMonth()){
             this.calendarData.selectedDate = this.month[this.currentWeek][0][0].toLocaleDateString('el-GR');
             } else {
+            console.log('same');
             this.calendarData.selectedDate = new Date(this.internFrom).toLocaleDateString('el-GR');
             }
             this.calculateHours(this.month[this.currentWeek][0][0].toLocaleDateString('lt-LT'));
