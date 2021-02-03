@@ -374,6 +374,9 @@ export default {
         if(this.timeType != "default"){
               this.typeError = false;
         }
+        if(this.offtimeError && this.timeType != "off-time"){
+            this.offtimeError = false;
+        }
     },
     internFrom: function() {
         if(this.scheduleBeforeError || this.scheduleEndError || this.scheduleSpanError || this.createScheduleSpanError){
