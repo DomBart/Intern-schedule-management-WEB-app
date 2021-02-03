@@ -76,19 +76,19 @@
                   </td>
               </tr>
           </table>
-      </div>
-      <div v-if="studentList.length > 0" class="pagination_container">
-        <paginate
-          v-model="page"
-          :page-count="pageCount"
-          :click-handler="clickCallback"
-          :prev-text="'Prev'"
-          :next-text="'Next'"
-          :next-class="'next_item'"
-          :prev-class="'prev_item'"
-          :container-class="'pagination'"
-          :page-class="'page_item'">
-        </paginate>
+          <div v-if="studentList.length > 0" class="pagination_container">
+            <paginate
+                v-model="page"
+                :page-count="pageCount"
+                :click-handler="clickCallback"
+                :prev-text="'<'"
+                :next-text="'>'"
+                :next-class="'next_item'"
+                :prev-class="'prev_item'"
+                :container-class="'pagination'"
+                :page-class="'page_item'">
+            </paginate>
+          </div>
       </div>
   </div>
 </div>
@@ -547,7 +547,7 @@ export default {
      }
      .table_container{
          width: 85%;
-         height: 76%;
+         height: 80%;
          margin: auto;        
      }
 

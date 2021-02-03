@@ -409,7 +409,8 @@ export default {
                  this.internFrom = this.scheduleData.trainee[0].schedules[0].start_date;
                  this.internTill = this.scheduleData.trainee[0].schedules[0].end_date;
                  this.getMonth();
-                 }else if(this.scheduleData.trainee[0].schedules.length > 1 && !this.createSchedule && !this.tableReload){
+                 }else if(this.scheduleData.trainee[0].schedules.length > 1 && !this.createSchedule && !this.tableReload && !this.selectSchedule){
+                     console.log('active');
                      this.selectSchedule = true;
                  }else if(this.createSchedule){
                         this.scheduleID = (this.scheduleData.trainee[0].schedules.length)-1;
@@ -533,7 +534,6 @@ export default {
                 }
                 date.setDate(date.getDate() + 1);
             }
-            console.log(this.days[0][0].getDay());
             if (this.days[0][0].getDay() != 1)
             {
                 let add = new Date(year, month, 0);
@@ -592,8 +592,9 @@ export default {
             }
             if(!this.calendarData.selectedDate){
             this.calendarData.selectedDate = new Date(this.internFrom).toLocaleDateString('el-GR');
-            this.calculateHours(this.internFrom);
             }
+            let calcDate = this.calendarData.selectedDate.split('/');
+            this.calculateHours(new Date(calcDate[2],calcDate[1]-1, calcDate[0]).toLocaleDateString('lt-LT'));
         },
         calculateHours(date){
             let setDate = new Date(date);
@@ -601,6 +602,7 @@ export default {
                 params: { date: setDate.toLocaleDateString('lt-LT')},
                 headers: { Authorization: `Bearer ${localStorage.token}` }
             };
+            console.log(config);
         axios.get('http://127.0.0.1:8000/api/schedule/'+this.id+'/'+this.scheduleData.trainee[0].schedules[this.scheduleID].id,config)
             .then((resp) => {
                 this.weekHours = Math.round(resp.data.works_hours_by_date.week_hours/60);
@@ -619,20 +621,24 @@ export default {
             if(direction < 0 && this.currentWeek > 0){
                 this.currentWeek--;
                 this.calendarData.selectedDate = this.month[this.currentWeek][0][0].toLocaleDateString('el-GR');
+                this.calculateHours(this.month[this.currentWeek][0][0].toLocaleDateString('lt-LT'))
             }
             else if(direction > 0 && this.currentWeek < this.month.length-1){
                 this.currentWeek++;
                 this.calendarData.selectedDate = this.month[this.currentWeek][0][0].toLocaleDateString('el-GR');
+                this.calculateHours(this.month[this.currentWeek][0][0].toLocaleDateString('lt-LT'))
             } else if(direction < 0 && this.currentWeek == 0){
                 this.$refs.Calendar.PreMonth();
                 this.handleMonth();
                 this.currentWeek = this.month.length-1;
                 this.calendarData.selectedDate = this.month[this.currentWeek][0][0].toLocaleDateString('el-GR');
+                this.calculateHours(this.month[this.currentWeek][0][0].toLocaleDateString('lt-LT'))
             } else if(direction > 0 && this.currentWeek == this.month.length-1){
                 this.$refs.Calendar.NextMonth();
                 this.handleMonth();
                 this.currentWeek = 0;
                 this.calendarData.selectedDate = this.month[this.currentWeek][0][0].toLocaleDateString('el-GR');
+                this.calculateHours(this.month[this.currentWeek][0][0].toLocaleDateString('lt-LT'))
             }
         },
         handleMonth(){
@@ -645,7 +651,6 @@ export default {
             if(new Date(this.internFrom).getMonth() != this.month[1][0][0].getMonth()){
             this.calendarData.selectedDate = this.month[this.currentWeek][0][0].toLocaleDateString('el-GR');
             } else {
-            console.log('same');
             this.calendarData.selectedDate = new Date(this.internFrom).toLocaleDateString('el-GR');
             }
             this.calculateHours(this.month[this.currentWeek][0][0].toLocaleDateString('lt-LT'));
