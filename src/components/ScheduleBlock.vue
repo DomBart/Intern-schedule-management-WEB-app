@@ -672,7 +672,11 @@ export default {
             this.calendarData.selectedDate = this.month[this.currentWeek][0][0].toLocaleDateString('el-GR');
             } else {
             this.calendarData.selectedDate = new Date(this.internFrom).toLocaleDateString('el-GR');
+            if(this.month[0][4][0].getMonth() != this.month[1][0][0].getMonth()){
+                this.currentWeek = Math.round(new Date(this.internFrom).getDate()/7)+1;
+            } else{
             this.currentWeek = Math.round(new Date(this.internFrom).getDate()/7);
+            }
             }
             this.calculateHours(this.month[this.currentWeek][0][0].toLocaleDateString('lt-LT'));
         },
