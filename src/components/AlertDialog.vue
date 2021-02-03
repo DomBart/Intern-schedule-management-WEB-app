@@ -56,12 +56,18 @@ export default {
 }
 .alert_container button{
     margin: auto;
+    color: #0054A6;
+    background-color: transparent;
+    font-size: 1rem;
+    font-weight: 600;
+    padding: 0.8rem 2rem;
+    border: solid  2px #0054A6;
+    border-radius: 6px;
+    outline: none;
+    cursor: pointer;
+}
+.alert_container button:hover{
     color: #f2f2f2;
     background-color: #0054A6;
-    font-size: 0.9rem;
-    padding: 0.8rem 2rem;
-    border: solid black 1px;
-    border-radius: 4px;
-    cursor: pointer;
 }
 </style>

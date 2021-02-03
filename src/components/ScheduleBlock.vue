@@ -85,11 +85,11 @@
                   <div class="data_date_row">
                   <div class="date_input_wrap">
                   <label for="student_time_from">Laikas nuo</label>
-                  <VueTimepicker name="student_time_from" :hour-range="[8, 9, 10, 11, 12, 13, 14, 15, 16, 17]" :minute-interval="5" hide-disabled-hours v-model="timeFrom" v-bind:class="{ error: fromError || timeError || offtimeError, edit: timeEdit }"></VueTimepicker>
+                  <VueTimepicker name="student_time_from" :hour-range="[8, 9, 10, 11, 12, 13, 14, 15, 16, 17]" :minute-interval="5" hide-disabled-hours v-model="timeFrom" v-bind:class="{ error: fromError || timeError || offtimeError || unavailableError, edit: timeEdit }"></VueTimepicker>
                   </div>
                   <div class="date_input_wrap">
                   <label for="student_time_till">Laikas iki</label>
-                  <VueTimepicker name="student_time_till" :hour-range="[8, 9, 10, 11, 12, 13, 14, 15, 16, 17]" :minute-interval="5" hide-disabled-hours v-model="timeTill" v-bind:class="{ error: tillError || timeError || timeSpanError || offtimeError, edit: timeEdit }"></VueTimepicker>
+                  <VueTimepicker name="student_time_till" :hour-range="[8, 9, 10, 11, 12, 13, 14, 15, 16, 17]" :minute-interval="5" hide-disabled-hours v-model="timeTill" v-bind:class="{ error: tillError || timeError || timeSpanError || offtimeError || unavailableError, edit: timeEdit }"></VueTimepicker>
                   </div>
                   </div>
                   <label for="student_type">Tipas</label>
@@ -1102,17 +1102,22 @@ export default {
             .schedule_data_input{
                 display: block;
                 font-family: "Oswald";
-                background-color:#0054a6;
-                color: #f2f2f2;
+                background-color:transparent;
+                color:#0054a6;
                 font-size: 0.9rem;
                 margin: 1.5rem auto 0.5rem auto;
                 padding: 0.3rem 1.5rem;
-                border: none;
+                border: solid 2px #0054a6;
                 border-radius: 5px;
                 cursor: pointer;
             }
+            .schedule_data_input:hover{
+                background-color:#0054a6;
+                color:#f2f2f2;
+            }
             .input_disabled{
-                 background-color:#c4c4c4;
+                 color:#c4c4c4;
+                 border-color: #c4c4c4;
                  cursor: default;
                  pointer-events: none;
             }
@@ -1174,14 +1179,18 @@ export default {
             .option_submit{
                 display: block;
                 font-family: "Oswald";
-                background-color:#0054a6;
-                color: #f2f2f2;
+                background-color:transparent;
+                color: #0054a6;
                 font-size: 1.2rem;
                 margin: 1.2rem auto;
-                padding: 0.3rem 1.5rem;
-                border: none;
+                padding: 0.4rem 1.5rem;
+                border: solid 2px #0054a6;
                 border-radius: 5px;
                 cursor: pointer!important;
+            }
+            .option_submit:hover{
+                background-color: #0054a6;
+                color: #f2f2f2;
             }
             .create_schedule_input_wrap{
             display: flex;

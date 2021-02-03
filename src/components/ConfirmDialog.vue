@@ -126,18 +126,19 @@ export default {
       
       button{
         font-family: "Oswald";
-        color: #f2f2f2;
-        background-color:#c4c4c4;
+        color: #0054a6;
+        background-color:transparent;
+        border: 3px solid #0054a6;
         font-size: 1.3rem;
         margin: 0.8rem auto 8% auto;
         padding: 0.6rem 0;
-        border: none;
         border-radius: 5px;
         cursor: pointer;
         width: 30%;
       }
       button:hover{
         background-color:#0054a6;
+        color: #f2f2f2;
       }
       .alert_accept{
         margin-right: 1rem;
