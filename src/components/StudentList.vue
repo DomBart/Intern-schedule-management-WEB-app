@@ -45,6 +45,10 @@
                       <img class="sort_trigger" src="../assets/sort.svg"
                       v-bind:class="{ sort_dsc: currentSortDir==='dsc' && currentSort==='hours', sort_asc: currentSortDir==='asc' && currentSort==='hours'}" alt=""> 
                       VALANDOS</th>
+                  <th class="begin_column unselectable center" @click="sort('status')" v-bind:class="{ sort_active: currentSort==='status' }">
+                      <img class="sort_trigger" src="../assets/sort.svg"
+                      v-bind:class="{ sort_dsc: currentSortDir==='dsc' && currentSort==='status', sort_asc: currentSortDir==='asc' && currentSort==='status'}" alt=""> 
+                      BŪSENA</th>
                   <th class="begin_column unselectable center" @click="sort('startDate')" v-bind:class="{ sort_active: currentSort==='startDate' }">
                       <img class="sort_trigger" src="../assets/sort.svg"
                       v-bind:class="{ sort_dsc: currentSortDir==='dsc' && currentSort==='startDate', sort_asc: currentSortDir==='asc' && currentSort==='startDate'}" alt=""> 
@@ -68,6 +72,7 @@
                   <td class="student_name" @click="routeSchedule(item.id)">{{item.firstname}} {{item.lastname}}</td>
                   <td class="center">{{item.position}}</td>
                   <td class="center">{{item.timeData.attended_hours}}/{{item.timeData.total_hours}} val.</td>
+                  <td class="center">{{item.status == 1 ? 'Artėjanti': item.status == 2 ? 'Aktyvi' : item.status == 3 ? 'Pasibaigus' : 'Neaktyvi'}}</td>
                   <td class="center">{{item.timeData.start_date}}</td>
                   <td class="center">{{item.timeData.end_date}}</td>
                   <td>
@@ -317,6 +322,10 @@ export default {
                         startDate = this.studentList[i].schedules[j].start_date;
                         endDate = this.studentList[i].schedules[j].end_date;
                     }
+                    else if(this.studentList[i].schedules[j].start_date <= new Date().toLocaleDateString('lt-LT') && this.studentList[i].schedules[j].end_date >= new Date().toLocaleDateString('lt-LT')){
+                        startDate = this.studentList[i].schedules[j].start_date;
+                        endDate = this.studentList[i].schedules[j].end_date;
+                    }
                 }
                 this.studentList[i]['timeData'] =
                 {
@@ -353,7 +362,9 @@ export default {
                 this.studentList.sort((a,b) => (a.firstname > b.firstname) ? modifier : -1);
             } else if (this.currentSort == "position"){
                 this.studentList.sort((a,b) => (a.position > b.position) ? modifier : -1);
-            } else if (this.currentSort == "hours"){
+            } else if (this.currentSort == "status"){
+                this.studentList.sort((a,b) => (a.status < b.status) ? modifier : -1);
+            }else if (this.currentSort == "hours"){
                 this.studentList.sort((a,b) => {
                     if(a.timeData.total_hours == 0) return  1;
                     if(b.timeData.total_hours == 0) return -1;
@@ -419,7 +430,7 @@ export default {
      margin: 0 4rem 1rem 22rem;
      height: calc(97vh - 8.5rem);
      border-radius: 15px;
-     min-width: 1000px;
+     min-width: 1300px;
      min-height: 715px;
      .list_control{
          display: flex;
@@ -546,7 +557,7 @@ export default {
         }
      }
      .table_container{
-         width: 85%;
+         width: 90%;
          height: 80%;
          margin: auto;        
      }
@@ -565,13 +576,14 @@ export default {
          justify-content: space-evenly;
          font-family: 'Open Sans';
 
-         tr th:nth-child(1) { width: 4.5%; padding-left: 2%; }
-         tr th:nth-child(2) { width: 13%; }
+         tr th:nth-child(1) { width: 35px; padding-left: 4.5%; }
+         tr th:nth-child(2) { width: 12%; }
          tr th:nth-child(3) { width: 16%; }
          tr th:nth-child(4) { width: 10%; }
          tr th:nth-child(5) { width: 10%; }
-         tr th:nth-child(6) { width: 15%;}
-         tr th:nth-child(7) { width: 9%; padding-right: 2.5%; }
+         tr th:nth-child(6) { width: 12%;}
+         tr th:nth-child(7) { width: 15%;}
+         tr th:nth-child(8) { width: 8%; margin-right: 0.25%}
 
          tr{
                 border-bottom: 2px solid #c4c4c4;
@@ -589,7 +601,6 @@ export default {
          padding-bottom: 0.8rem;
          font-size: 1rem;
          text-align: center;
-
          th{
             flex-basis: auto;
             white-space: nowrap;
@@ -638,8 +649,9 @@ export default {
             td:nth-child(3) { width: 16%; }
             td:nth-child(4) { width: 10%; }
             td:nth-child(5) { width: 10%; }
-            td:nth-child(6) { width: 15%;}
-            td:nth-child(7) { width: 7%; padding-right: 2.5%; }
+            td:nth-child(6) { width: 12%;}
+            td:nth-child(7) { width: 15%;}
+            td:nth-child(8) { width: 7%; padding-right: 2.5%; }
 
             .student_icon{
                  width: 35px;

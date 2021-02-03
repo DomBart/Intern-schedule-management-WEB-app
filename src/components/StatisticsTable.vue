@@ -49,8 +49,8 @@
                 <th class="table_top month">MĖN</th>
                 </div>
               </tr>
-              <tr v-for="index in 10" :key="index">
-                <th class="table_student">Vardenis Pavardenis</th>
+              <tr v-for="index in 10" :key="index" @mouseover="hover=index" @mouseleave="hover=false">
+                <th class="table_student" v-bind:class="{blue: hover==index}">Vardenis Pavardenis</th>
                 <div class="table_week_wrap">
                 <div v-for="(week, index) in month" :key="index" :class="'table_week ' + index">
                   <td v-for="day in week" :key="day.getDate()" :class="'table_cell ' + day.getDate()">0</td>
@@ -78,6 +78,7 @@ export default {
         days: [],
         month: [],
         studentList: [],
+        hover: false,
         config: {
             headers: { Authorization: `Bearer ${localStorage.token}` }
         }
@@ -166,12 +167,19 @@ export default {
 
 <style scoped lang="scss">
 .main_container{
-    height: 70%;
-    width: 78%;
+    height: calc(100% - 10.5rem);
+    min-width: 1300px;
+    min-height: 770px;
     font-family: 'Open Sans';
-    margin: 0 4rem 1% 22rem;
+    margin: 0 1% 1% 22rem;
     background-color: #ffffff;
     border-radius: 15px;
+
+    .blue{
+        color: #0054A6;
+        font-weight: 600!important;
+    }
+
     .table_controls{
         display: flex;
         height: 20%;
@@ -279,6 +287,7 @@ export default {
             display: flex;
             flex-direction: column;
             height: 3.5rem;
+            margin: auto 0;
         }
         .filter{
             display: inline-block;
@@ -348,18 +357,24 @@ export default {
             color: #5c5c5c;
             font-size: 0.9rem;
             border-collapse: collapse;
+            width: 90%;
             tr{
                 display: flex;
+                width: 100%;
                 white-space: nowrap;
+                justify-content: row;
             }
             th, td{
                 font-weight: 600;
-                width: 2vw;
-                min-width: 2rem;
+                width: 2.2vw;
+                min-width: 2.5rem;
                 text-align: center;
                 border-right: solid 3px #efefef;
                 border-bottom: solid 1px #c4c4c4;
                 vertical-align: middle;
+            }
+            th:first-child,td:first-child{
+               flex-grow: 1; 
             }
             .table_sum{
                 color: #0054A6;
@@ -390,16 +405,21 @@ export default {
                 position: relative;
             }
             .table_week_wrap:hover{
-                border-bottom: #0054A6 solid 3px;
-                border-top: #0054A6 solid 3px;
-                left: -3px;
+                // border-bottom: #0054A6 solid 2px;
+                // box-shadow: 0px -3px 0px #0054A6 inset, 0px 3px 0px #0054A6 inset;
+                background-color: #0054A6;
+                color: #ffffff;
+                // border-top: #0054A6 solid 2px;
+                // left: -3px;
             }
-            .table_week_wrap:hover .table_week:first-child{
-                border-left:#0054A6 solid 3px;
-            }
-            .table_week_wrap:hover .table_week:last-child td{
-                border-right:#0054A6 solid 3px;
-            }
+            // .table_week_wrap:hover .table_week:first-child{
+            //     // border-left:#0054A6 solid 2px;
+            //     // box-shadow: 3px 0px 0px #0054A6 inset;
+            // }
+            // .table_week_wrap:hover .table_week:last-child td{
+            //     // border-right:#0054A6 solid 2px;
+            //     // box-shadow: 0px 0px 3px #0054A6 inset;
+            // }
             .table_student{
                 white-space: nowrap;
                 padding: 0.2rem 0.5rem;

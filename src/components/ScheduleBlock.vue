@@ -102,7 +102,7 @@
                   <option value="over-time">Viršvalandžiai</option>
               </select>
               </div>
-              <input v-if="!timeEdit" class="schedule_data_input" type="submit" value="ĮRAŠYTI">
+              <input v-if="!timeEdit" class="schedule_data_input" type="submit" v-bind:class="{ input_disabled: dateError || dateBeforeError || scheduleSpanError || unavailableError || timeError || timeSpanError || offtimeError}" value="ĮRAŠYTI">
               <div class="edit_button_wrap">
               <input v-if="timeEdit" class="schedule_data_input" type="submit" value="REDAGUOTI">
               <input v-if="timeEdit" class="schedule_data_input" type="button" value="ATŠAUKTI" @click="cancelEditTime()">
@@ -444,11 +444,11 @@ export default {
             let config= {
                 headers: { Authorization: `Bearer ${localStorage.token}` }
             };
-            var today = new Date();
-            var internFrom = new Date(this.internFrom);
-            var internTill = new Date(this.internTill);
+            var today = new Date().setHours(0,0,0,0);;
+            var internFrom = new Date(this.internFrom).setHours(0,0,0,0);;
+            var internTill = new Date(this.internTill).setHours(0,0,0,0);;
             if(this.internFrom != "" && this.internTill != ""){
-            if(internFrom >= today){
+            if(internFrom > today){
                 if(internFrom < internTill){
                     let internSpan = {
                         start_date : this.internFrom,
@@ -1102,6 +1102,11 @@ export default {
                 border-radius: 5px;
                 cursor: pointer;
             }
+            .input_disabled{
+                 background-color:#c4c4c4;
+                 cursor: default;
+                 pointer-events: none;
+            }
             .edit_button_wrap{
                 display: flex;
                 justify-content: center;
@@ -1313,6 +1318,10 @@ export default {
 <style lang="scss">
 .field.sm .field-input{
     font-size: 0.85rem!important;
+    color: #5c5c5c;
+    border: none;
+    box-shadow: 0px 0px 4px 1px  rgba(0, 0, 0, 0.20);
+    border-radius: 6px;
 }
 .vue__time-picker .dropdown ul li:not([disabled]).active,
 .vue__time-picker .dropdown ul li:not([disabled]).active:hover,

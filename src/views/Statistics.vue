@@ -4,6 +4,7 @@
     <div class="generaldata_container">
         <generaldata class="data_text">PRAKTIKANTŲ ŠĮ MĖNESĮ</generaldata>
         <generaldata class="data_text">PRAKTIKOS VALANDŲ ŠĮ MĖNESĮ</generaldata>
+        <generaldata class="data_text">ATLIKTŲ PRAKTIKOS VALANDŲ ŠĮ MĖNESĮ</generaldata>
         <generaldata class="data_text">LAISVŲ VALANDŲ ŠĮ MĖNESĮ</generaldata>
     </div>
     <statisticstable></statisticstable>
@@ -33,8 +34,9 @@ html, body{
 .generaldata_container{
   display: flex;
   padding: 1.5rem 0;
-  height: 25%;
-  margin: 0 4rem 1% 22rem;
+  min-width: 1300px;
+  height: 9rem;
+  margin: 0 1% 0 22rem;
   justify-content: space-between;
 }
 </style>
