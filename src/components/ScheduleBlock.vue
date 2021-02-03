@@ -102,9 +102,13 @@
                   <option value="over-time">Viršvalandžiai</option>
               </select>
               </div>
-              <input v-if="!timeEdit" class="schedule_data_input" type="submit" v-bind:class="{ input_disabled: dateError || dateBeforeError || scheduleSpanError || unavailableError || timeError || timeSpanError || offtimeError}" value="ĮRAŠYTI">
+              <input v-if="!timeEdit" class="schedule_data_input" type="submit"
+               v-bind:class="{ input_disabled: dateError || dateBeforeError || scheduleSpanError || unavailableError || timeError || timeSpanError || offtimeError}"
+                value="ĮRAŠYTI">
               <div class="edit_button_wrap">
-              <input v-if="timeEdit" class="schedule_data_input" type="submit" value="REDAGUOTI">
+              <input v-if="timeEdit" class="schedule_data_input" type="submit"
+              v-bind:class="{ input_disabled: dateError || dateBeforeError || scheduleSpanError || unavailableError || timeError || timeSpanError || offtimeError}"
+               value="REDAGUOTI">
               <input v-if="timeEdit" class="schedule_data_input" type="button" value="ATŠAUKTI" @click="cancelEditTime()">
               </div>
             </form>
@@ -255,6 +259,7 @@ export default {
                 isDatePicker: true,
                 isDateRange: false
         },
+        calendarMount: false,
         createSchedule: false,
         scheduleBeforeError: false,
         scheduleEndError: false,
@@ -484,8 +489,12 @@ export default {
             }
         },
         setCalendarMonth(){
+            if(!this.calendarMount){
+                this.calendarMount = true;
+            } else {
             this.$refs.Calendar.ChooseDate(this.calendarData.selectedDate);
             this.handleMonth();
+            }
         },
         scheduleCreateCancel(){
             this.createSchedule=false;
