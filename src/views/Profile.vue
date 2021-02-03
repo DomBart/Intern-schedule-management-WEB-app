@@ -4,6 +4,7 @@
   <navi></navi>
   <div class="select_trainee_container">
     <h1>VARTOTOJO PROFILIS</h1>
+    <img class="user_photo" src="../assets/student.svg" alt="User photo">
     <ul v-if="!edit" class="user_data">
         <label for="Name">Vardas Pavardė</label>
         <li id="Name">{{userData.firstname}} {{userData.lastname}}</li>
@@ -154,6 +155,10 @@ methods:{
       color: #5c5c5c;
       margin: 2rem 0;
   }
+  .user_photo{
+      width: 6rem;
+      margin: 0 auto 1.5rem auto;
+  }
   .select_trainee_container{
     display: flex;
     flex-direction: column;
@@ -184,10 +189,10 @@ methods:{
         font-weight: 600;
         text-transform: uppercase;
         margin-top: 0.5rem;
+        font-size: 0.9rem;
     }
     li{
         color: #5c5c5c;
-        margin-left: 0.5rem;
         font-size: 1.5rem;
     }
     input{
@@ -203,15 +208,19 @@ methods:{
     button,.edit_submit{
         display: block;
         font-family: "Oswald";
-        background-color:#0054a6;
-        color: #f2f2f2;
+        background-color: transparent;
+        color:#0054a6;
         font-size: 1rem;
         padding: 0.6rem 0;
-        border: none;
+        border: 2px solid #0054a6;
         border-radius: 5px;
         cursor: pointer;
         margin: 7rem auto 3rem auto;
         width: 7rem;
+    }
+    button:hover,.edit_submit:hover{
+        background-color:#0054a6;
+        color: #f2f2f2;
     }
     .button_wrap{
         display: flex;
