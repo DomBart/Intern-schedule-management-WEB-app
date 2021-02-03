@@ -418,7 +418,6 @@ export default {
                  this.internTill = this.scheduleData.trainee[0].schedules[0].end_date;
                  this.getMonth();
                  }else if(this.scheduleData.trainee[0].schedules.length > 1 && !this.createSchedule && !this.tableReload && !this.selectSchedule){
-                     console.log('active');
                      this.selectSchedule = true;
                  }else if(this.createSchedule){
                         this.scheduleID = (this.scheduleData.trainee[0].schedules.length)-1;
@@ -560,7 +559,6 @@ export default {
                                     time_id: this.scheduleData.trainee[0].schedules[this.scheduleID].months[f].days[j].times[k].id
                                 };
                                 this.days[0].push(timeData);
-                                console.log(timeData);
                              }
                          }
                      }
@@ -610,10 +608,8 @@ export default {
                 params: { date: setDate.toLocaleDateString('lt-LT')},
                 headers: { Authorization: `Bearer ${localStorage.token}` }
             };
-            console.log(config);
         axios.get('http://127.0.0.1:8000/api/schedule/'+this.id+'/'+this.scheduleData.trainee[0].schedules[this.scheduleID].id,config)
             .then((resp) => {
-                console.log(resp.data);
                 this.weekHours = Math.round(resp.data.works_hours_by_date.week_hours/60);
                 this.monthHours = Math.round(resp.data.works_hours_by_date.month_hours/60);
                 this.totalHours = Math.round(resp.data.works_hours_by_date.total_hours/60);
@@ -1079,7 +1075,6 @@ export default {
                 margin-bottom: 0.8rem;
                 input{
                     cursor: text;
-                    font-size: 2rem!important;
                 }
             }
 
@@ -1268,7 +1263,7 @@ export default {
                 flex-direction: column;
                 justify-content: center;
                 text-align: right;
-                font-size: 0.7rem;
+                font-size: 0.8rem;
                 color: #5C5C5C;
                 height: max-content;
                 padding: 3% 4% 3% 0;
@@ -1312,6 +1307,9 @@ export default {
 </style>
 
 <style lang="scss">
+.field.sm .field-input{
+    font-size: 0.85rem!important;
+}
 .vue__time-picker .dropdown ul li:not([disabled]).active,
 .vue__time-picker .dropdown ul li:not([disabled]).active:hover,
 .vue__time-picker .dropdown ul li:not([disabled]).active:focus {
