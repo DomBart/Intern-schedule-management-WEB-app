@@ -19,7 +19,7 @@
                       <td v-for="count in 5" v-bind:key="count">
                           <div v-if="array[count-1]">
                           <div class="time_data_wrap" v-for="(time, ind) in array[count-1].slice(1)" v-bind:key="ind">
-                              <span class="time_data_text"  v-if="(item - time.time_from < 15 && time.time_from <= item && time.time_from - item >= 0)"
+                              <span class="time_data_text"  v-if="(item - time.time_from < 15 && time.time_from <= item && time.time_from - item >= 0 && time.time_from != time.time_to)"
                               v-bind:class="{single: (time.time_to - time.time_from <= 30),
                               dark: time.type_of_time == 'break' || time.type_of_time == 'lecture' || time.type_of_time == 'over-time'}">
                                <span>{{Math.floor(time.time_from/60)}}:{{('0'+(time.time_from%60).toString()).slice(-2)}} - {{Math.floor(time.time_to/60)}}:{{('0'+(time.time_to%60).toString()).slice(-2)}}</span>
@@ -42,7 +42,7 @@
                         <td v-for="count in 5" v-bind:key="count">
                           <div v-if="array[count-1]">
                           <div class="time_data_wrap" v-for="(time, indh) in array[count-1].slice(1)" v-bind:key="indh">
-                              <span class="time_data_text" v-if="((halfTime[index]-15) - time.time_from) < 15 && (time.time_from <= (halfTime[index]-15))"
+                              <span class="time_data_text" v-if="((halfTime[index]-15) - time.time_from) < 15 && (time.time_from <= (halfTime[index]-15)) && time.time_from != time.time_to"
                               v-bind:class="{single: (time.time_to - time.time_from <= 30),
                               dark: time.type_of_time == 'break' || time.type_of_time == 'lecture' || time.type_of_time == 'over-time'}">
                                <span>{{Math.floor(time.time_from/60)}}:{{('0'+(time.time_from%60).toString()).slice(-2)}} - {{Math.floor(time.time_to/60)}}:{{('0'+(time.time_to%60).toString()).slice(-2)}}</span>
@@ -66,7 +66,7 @@
                         <td v-for="count in 5" v-bind:key="count">
                           <div v-if="array[count-1]">
                           <div class="time_data_wrap" v-for="(time, indh) in array[count-1].slice(1)" v-bind:key="indh">
-                              <span class="time_data_text" v-if="(halfTime[index] - time.time_from) < 15 && (time.time_from <= halfTime[index])"
+                              <span class="time_data_text" v-if="(halfTime[index] - time.time_from) < 15 && (time.time_from <= halfTime[index]) && time.time_from != time.time_to"
                               v-bind:class="{single: ((time.time_to - time.time_from) <= 30),
                               dark: time.type_of_time == 'break' || time.type_of_time == 'lecture' || time.type_of_time == 'over-time'}">
                               <span>{{Math.floor(time.time_from/60)}}:{{('0'+(time.time_from%60).toString()).slice(-2)}} - {{Math.floor(time.time_to/60)}}:{{('0'+(time.time_to%60).toString()).slice(-2)}}</span>
@@ -90,7 +90,7 @@
                         <td v-for="count in 5" v-bind:key="count">
                           <div v-if="array[count-1]">
                           <div class="time_data_wrap" v-for="(time, indh) in array[count-1].slice(1)" v-bind:key="indh">
-                              <span class="time_data_text" v-if="((halfTime[index]+30) - time.time_from) < 30 && time.time_from < (halfTime[index]+30) && (((halfTime[index]+30) - time.time_from) > 0)"
+                              <span class="time_data_text" v-if="((halfTime[index]+30) - time.time_from) < 30 && time.time_from < (halfTime[index]+30) && (((halfTime[index]+30) - time.time_from) > 0) && time.time_from != time.time_to"
                               v-bind:class="{single: (time.time_to - time.time_from) <= 30,
                               dark: time.type_of_time == 'break' || time.type_of_time == 'lecture' || time.type_of_time == 'over-time'}">
                               <span>{{Math.floor(time.time_from/60)}}:{{('0'+(time.time_from%60).toString()).slice(-2)}} - {{Math.floor(time.time_to/60)}}:{{('0'+(time.time_to%60).toString()).slice(-2)}}</span>
