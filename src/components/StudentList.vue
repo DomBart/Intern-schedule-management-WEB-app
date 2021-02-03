@@ -62,10 +62,16 @@
               <tr class="student_table_row" v-bind="studentList.id" v-for="(item, index) in studentList.slice(offset, pageItems)" :key="index">
                   <td>
                       <div class="student_popup" :class="{popup_active:item.id == selected}">
-                          <span class="pupup_label unselectable">TELEFONO NUMERIS</span>
-                          <span class="pupup_text">{{item.phone_number}}</span>
-                          <span class="pupup_label unselectable">EL. PAŠTO ADRESAS</span>
-                          <span class="pupup_text">{{item.email}}</span>
+                          <span class="popup_label unselectable">TELEFONO NUMERIS</span>
+                          <span class="popup_text">{{item.phone_number}}</span>
+                          <span class="popup_label unselectable">EL. PAŠTO ADRESAS</span>
+                          <span class="popup_text">{{item.email}}</span>
+                          <span class="popup_label unselectable">UNIVERSITETAS</span>
+                          <span class="popup_text">{{item.university}}</span>
+                          <span class="popup_label unselectable">KURSAS</span>
+                          <span class="popup_text">{{item.course}}</span>
+                          <span class="popup_label unselectable">LYTIS</span>
+                          <span class="popup_text">{{item.gender}}</span>
                       </div>
                       <img class="student_icon unselectable" title="Kontaktai" src="../assets/student.svg" :class="{top:item.id == selected, alert: (item.timeData.total_hours-item.timeData.attended_hours) < 30 && item.timeData.total_hours > 0}" @click="togglePopup(item.id)" alt="Student icon">
                   </td>
@@ -683,13 +689,13 @@ export default {
                 justify-content: space-between;
                 text-align: center;
                 width: max-content;
-                height: 180px;
+                height: 280px;
                 background-color: #ffffff;
                 border-radius: 15px;
-                margin: 4.5px 0;
+                margin: 3px 0;
                 padding: 1rem;
-                padding-top: 65px;
-                transform: translateX(-37.5%);
+                padding-top: 55px;
+                transform: translateX(-43%);
                 box-shadow: 0px 0px 4px 3px rgba(0, 0, 0, 0.10);
                 z-index: 1;
 
@@ -698,12 +704,12 @@ export default {
                     width: 45px;
                 }
 
-                .pupup_label{
+                .popup_label{
                     color: #c4c4c4;
                     font-size: 0.8rem;
                     font-weight: 600;
                 }
-                .pupup_text{
+                .popup_text{
                     color: #5c5c5c;
                     font-size: 1rem;
                     font-weight: 600;

@@ -21,6 +21,20 @@
         <input class="input_telephone" type="tel" v-model='tel' required>
         <label for="input_position">Pozicija</label>
         <input class="input_position" type="text" v-model='position' required>
+        <label for="input_university">Universitetas</label>
+        <input class="input_university" type="text" v-model='university' required>
+        <label for="input_course">Kursas</label>
+        <select class="input_course" v-model='course' required>
+         <option value="1">I</option>
+         <option value="2">II</option>
+         <option value="3">III</option>
+         <option value="4">IV</option>
+        </select>
+        <label for="input_gender">Lytis</label>
+        <select class="input_gender" v-model='gender' required>
+         <option value="Vyras">Vyras</option>
+         <option value="Moteris">Moteris</option>
+        </select>
       </div>
       <input class="add_user_submit" type="submit" value="ĮRAŠYTI">
       </form>
@@ -40,6 +54,9 @@ export default {
       email: "",
       tel: "",
       position: "",
+      university: "",
+      course: "",
+      gender: "",
       id: '',
       modalState: false,
     }
@@ -68,13 +85,14 @@ export default {
   },
   methods: {
     clear(){
-
       this.first_name = '';
       this.last_name = '';
       this.email = '';
       this.tel = '';
       this.position = '';
-
+      this.university = '';
+      this.gender = '';
+      this.course = '';
     },
     modalClose(){
       this.modalState = false;
@@ -90,7 +108,10 @@ export default {
         lastname : this.last_name,
         email : this.email,
         phone_number : this.tel,
-        position : this.position
+        position : this.position,
+        university : this.university,
+        course: this.course,
+        gender : this.gender
       }
 
       if(this.mode === "add"){
@@ -101,7 +122,7 @@ export default {
           this.$root.$emit('Submited');
         })
         .catch(error => {
-              console.log(error.response.data);
+              console.log(error.response.message);
                 if(error.response.data.message == "Route [login] not defined."){
                     if(this.$route.name != 'Prisijungimas'){
                         this.$router.push({name: 'Prisijungimas'});
@@ -151,13 +172,15 @@ export default {
     .adduser_modal{
       width: 600px;
       height: max-content;
+      max-height: 92vh;
       margin: auto;
       padding-bottom: 1rem;
       background: #ffffff;
       border-radius: 15px;
       box-shadow: 0px 0px 4px 3px rgba(0, 0, 0, 0.10);
+      overflow-y: auto;
 
-        input{
+        input,select{
             width: 100%;
             color: #5c5c5c;
             font-size: 1.2rem;
@@ -224,22 +247,26 @@ export default {
         flex-direction: column;
         padding: 0 10%;
 
-        input{
-          margin-bottom: 1.5rem;
+        input,select{
+          margin-bottom: 1rem;
         }
       }
       .add_user_submit{
         display: block;
         font-family: "Oswald";
-        background-color:#0054a6;
-        color: #f2f2f2;
+        background-color:transparent;
+        color: #0054a6;
+        border: 2px solid #0054a6;
         font-size: 1.3rem;
         margin: 0.8rem auto;
         padding: 0.6rem 0;
-        border: none;
-        border-radius: 5px;
+        border-radius: 8px;
         cursor: pointer;
-        width: 30%;
+        width: 25%;
+      }
+      .add_user_submit:hover{
+        background-color:#0054a6;
+        color: #f2f2f2;
       }
     }
 }
