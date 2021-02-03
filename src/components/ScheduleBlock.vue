@@ -97,8 +97,9 @@
                   <option value="default" selected hidden>Pasirinkti tipą</option>
                   <option value="intern">Praktika</option>
                   <option value="lecture">Paskaita</option>
-                  <option value="off-time">Laisvos</option>
                   <option value="break">Pertrauka</option>
+                  <option value="off-time">Laisvos</option>
+                  <option value="over-time">Viršvalandžiai</option>
               </select>
               </div>
               <input v-if="!timeEdit" class="schedule_data_input" type="submit" value="ĮRAŠYTI">
@@ -196,6 +197,7 @@
                   <span>Laisvos <div class="color_cube free"></div></span>
                   <span>Paskaita <div class="color_cube lecture"></div></span>
                   <span>Pertrauka <div class="color_cube break"></div></span>
+                  <span>Viršvalandžiai <div class="color_cube over-time"></div></span>
               </div>
           </div>
           <WeekTable v-if="weekState && scheduleData.trainee[0].schedules.length > 0" v-bind:array="month[currentWeek]" v-bind:selectedDate="calendarData.selectedDate" v-bind:id="id" v-bind:scheduleID="scheduleData.trainee[0].schedules[scheduleID].id"></WeekTable>
@@ -1266,7 +1268,7 @@ export default {
                 font-size: 0.8rem;
                 color: #5C5C5C;
                 height: max-content;
-                padding: 3% 4% 3% 0;
+                padding: 1.5% 4% 1.5% 0;
                 margin: auto 0 auto auto;
 
                 span{
@@ -1293,7 +1295,9 @@ export default {
                     .break{
                         background-color: #efefef;
                     }
-
+                    .over-time{
+                        background-color: #5fcfff;
+                    }
             }
         }
     }

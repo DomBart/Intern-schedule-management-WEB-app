@@ -19,7 +19,7 @@
                                  single: (time.time_to - time.time_from) <= 30,
                                  first: (item - time.time_from) < 15,
                                  last:  (time.time_to - item) <= 15,
-                                    intern: time.type_of_time == 'intern', free: time.type_of_time == 'off-time', lecture: time.type_of_time == 'lecture', break: time.type_of_time == 'break'
+                                    intern: time.type_of_time == 'intern', free: time.type_of_time == 'off-time', lecture: time.type_of_time == 'lecture', break: time.type_of_time == 'break', over: time.type_of_time == 'over-time'
                                     }">
                               </div>
                           </div>
@@ -33,7 +33,7 @@
                                  single: (time.time_to - time.time_from) <= 30, 
                                  first: ((halfTime[index]-15) - time.time_from) < 15,
                                  last:  (time.time_to - (halfTime[index]-15))  <= 15,
-                                 intern: time.type_of_time == 'intern', free: time.type_of_time == 'off-time', lecture: time.type_of_time == 'lecture', break: time.type_of_time == 'break'
+                                 intern: time.type_of_time == 'intern', free: time.type_of_time == 'off-time', lecture: time.type_of_time == 'lecture', break: time.type_of_time == 'break', over: time.type_of_time == 'over-time'
                                  }">
                                   
                               </div>
@@ -48,7 +48,7 @@
                                  single: (time.time_to - time.time_from) <= 30, 
                                  first: (halfTime[index] - time.time_from) < 15,
                                  last:  (time.time_to - halfTime[index])  <= 15,
-                                 intern: time.type_of_time == 'intern', free: time.type_of_time == 'off-time', lecture: time.type_of_time == 'lecture', break: time.type_of_time == 'break'
+                                 intern: time.type_of_time == 'intern', free: time.type_of_time == 'off-time', lecture: time.type_of_time == 'lecture', break: time.type_of_time == 'break', over: time.type_of_time == 'over-time'
                                  }">
                                   
                               </div>
@@ -63,7 +63,7 @@
                                  single: (time.time_to - time.time_from) <= 30, 
                                  first: ((halfTime[index]+15) - time.time_from) < 15,
                                  last:  (time.time_to - (halfTime[index]+15))  <= 15,
-                                 intern: time.type_of_time == 'intern', free: time.type_of_time == 'off-time', lecture: time.type_of_time == 'lecture', break: time.type_of_time == 'break'
+                                 intern: time.type_of_time == 'intern', free: time.type_of_time == 'off-time', lecture: time.type_of_time == 'lecture', break: time.type_of_time == 'break', over: time.type_of_time == 'over-time'
                                  }">
                               </div>
                           </div>
@@ -237,6 +237,9 @@ methods:{
             }
             .break{
                 background-color: #efefef;
+            }
+            .over{
+                background-color: #5fcfff;
             }
             td {
                 border-right: 3px solid #efefef;

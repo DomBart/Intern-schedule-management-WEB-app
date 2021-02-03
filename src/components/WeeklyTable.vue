@@ -21,17 +21,17 @@
                           <div class="time_data_wrap" v-for="(time, ind) in array[count-1].slice(1)" v-bind:key="ind">
                               <span class="time_data_text"  v-if="(item - time.time_from < 15 && time.time_from <= item && time.time_from - item >= 0)"
                               v-bind:class="{single: (time.time_to - time.time_from <= 30),
-                              dark: time.type_of_time == 'break' || time.type_of_time == 'lecture'}">
+                              dark: time.type_of_time == 'break' || time.type_of_time == 'lecture' || time.type_of_time == 'over-time'}">
                                <span>{{Math.floor(time.time_from/60)}}:{{('0'+(time.time_from%60).toString()).slice(-2)}} - {{Math.floor(time.time_to/60)}}:{{('0'+(time.time_to%60).toString()).slice(-2)}}</span>
-                               <img class="edit_time" v-if="array[count-1][0].setHours(0,0,0,0) >= new Date().setHours(0,0,0,0)" title="Redaguoti" src="../assets/edit_time_light.svg" alt="Edit" @click="editTime(time, array[count-1][0])" v-bind:class="{dark_edit: time.type_of_time == 'break' || time.type_of_time == 'lecture'}">
-                               <button v-if="array[count-1][0].setHours(0,0,0,0) >= new Date().setHours(0,0,0,0)" title="Trinti" @click="deleteTime(time.time_id,time.time_from,time.time_to)" v-bind:class="{dark: time.type_of_time == 'break' || time.type_of_time == 'lecture'}">X</button>
+                               <img class="edit_time" v-if="array[count-1][0].setHours(0,0,0,0) >= new Date().setHours(0,0,0,0)" title="Redaguoti" src="../assets/edit_time_light.svg" alt="Edit" @click="editTime(time, array[count-1][0])" v-bind:class="{dark_edit: time.type_of_time == 'break' || time.type_of_time == 'lecture' || time.type_of_time == 'over-time'}">
+                               <button v-if="array[count-1][0].setHours(0,0,0,0) >= new Date().setHours(0,0,0,0)" title="Trinti" @click="deleteTime(time.time_id,time.time_from,time.time_to)" v-bind:class="{dark: time.type_of_time == 'break' || time.type_of_time == 'lecture' || time.type_of_time == 'over-time'}">X</button>
                               </span>
                               <div class="time_data" v-if="time.time_from <= item && time.time_to > item"
                                  v-bind:class="{
                                  single: (time.time_to - time.time_from <= 30),
                                  first: (item - time.time_from) < 15 && (time.time_from - item) >= 0,
                                  last:  (time.time_to - item) <= 15,
-                                    intern: time.type_of_time == 'intern', free: time.type_of_time == 'off-time', lecture: time.type_of_time == 'lecture', break: time.type_of_time == 'break'
+                                    intern: time.type_of_time == 'intern', free: time.type_of_time == 'off-time', lecture: time.type_of_time == 'lecture', break: time.type_of_time == 'break', over: time.type_of_time == 'over-time'
                                     }">
                               </div>
                           </div>
@@ -44,17 +44,17 @@
                           <div class="time_data_wrap" v-for="(time, indh) in array[count-1].slice(1)" v-bind:key="indh">
                               <span class="time_data_text" v-if="((halfTime[index]-15) - time.time_from) < 15 && (time.time_from <= (halfTime[index]-15))"
                               v-bind:class="{single: (time.time_to - time.time_from <= 30),
-                              dark: time.type_of_time == 'break' || time.type_of_time == 'lecture'}">
+                              dark: time.type_of_time == 'break' || time.type_of_time == 'lecture' || time.type_of_time == 'over-time'}">
                                <span>{{Math.floor(time.time_from/60)}}:{{('0'+(time.time_from%60).toString()).slice(-2)}} - {{Math.floor(time.time_to/60)}}:{{('0'+(time.time_to%60).toString()).slice(-2)}}</span>
-                               <img class="edit_time" v-if="array[count-1][0].setHours(0,0,0,0) >= new Date().setHours(0,0,0,0)" title="Redaguoti" src="../assets/edit_time_light.svg" alt="Edit" @click="editTime(time,array[count-1][0])" v-bind:class="{dark_edit: time.type_of_time == 'break' || time.type_of_time == 'lecture'}">
-                               <button v-if="array[count-1][0].setHours(0,0,0,0) >= new Date().setHours(0,0,0,0)" title="Trinti" @click="deleteTime(time.time_id,time.time_from,time.time_to)" v-bind:class="{dark: time.type_of_time == 'break' || time.type_of_time == 'lecture'}">X</button>
+                               <img class="edit_time" v-if="array[count-1][0].setHours(0,0,0,0) >= new Date().setHours(0,0,0,0)" title="Redaguoti" src="../assets/edit_time_light.svg" alt="Edit" @click="editTime(time,array[count-1][0])" v-bind:class="{dark_edit: time.type_of_time == 'break' || time.type_of_time == 'lecture' || time.type_of_time == 'over-time'}">
+                               <button v-if="array[count-1][0].setHours(0,0,0,0) >= new Date().setHours(0,0,0,0)" title="Trinti" @click="deleteTime(time.time_id,time.time_from,time.time_to)" v-bind:class="{dark: time.type_of_time == 'break' || time.type_of_time == 'lecture' || time.type_of_time == 'over-time'}">X</button>
                               </span>
                               <div class="time_data" v-if="time.time_from <= halfTime[index]-15 && time.time_to > halfTime[index]-15"
                                 v-bind:class="{
                                  single: (time.time_to - time.time_from <= 30), 
                                  first: (halfTime[index]-15 - time.time_from) < 15,
                                  last:  (time.time_to - (halfTime[index]-15))  <= 15,
-                                 intern: time.type_of_time == 'intern', free: time.type_of_time == 'off-time', lecture: time.type_of_time == 'lecture', break: time.type_of_time == 'break'
+                                 intern: time.type_of_time == 'intern', free: time.type_of_time == 'off-time', lecture: time.type_of_time == 'lecture', break: time.type_of_time == 'break', over: time.type_of_time == 'over-time'
                                  }">
                                   
                               </div>
@@ -68,17 +68,17 @@
                           <div class="time_data_wrap" v-for="(time, indh) in array[count-1].slice(1)" v-bind:key="indh">
                               <span class="time_data_text" v-if="(halfTime[index] - time.time_from) < 15 && (time.time_from <= halfTime[index])"
                               v-bind:class="{single: ((time.time_to - time.time_from) <= 30),
-                              dark: time.type_of_time == 'break' || time.type_of_time == 'lecture'}">
+                              dark: time.type_of_time == 'break' || time.type_of_time == 'lecture' || time.type_of_time == 'over-time'}">
                               <span>{{Math.floor(time.time_from/60)}}:{{('0'+(time.time_from%60).toString()).slice(-2)}} - {{Math.floor(time.time_to/60)}}:{{('0'+(time.time_to%60).toString()).slice(-2)}}</span>
-                              <img class="edit_time" v-if="array[count-1][0].setHours(0,0,0,0) >= new Date().setHours(0,0,0,0)" title="Redaguoti" src="../assets/edit_time_light.svg" alt="Edit" @click="editTime(time,array[count-1][0])" v-bind:class="{dark_edit: time.type_of_time == 'break' || time.type_of_time == 'lecture'}">
-                              <button v-if="array[count-1][0].setHours(0,0,0,0) >= new Date().setHours(0,0,0,0)" title="Trinti" @click="deleteTime(time.time_id,time.time_from,time.time_to)" v-bind:class="{dark: time.type_of_time == 'break' || time.type_of_time == 'lecture'}">X</button>
+                              <img class="edit_time" v-if="array[count-1][0].setHours(0,0,0,0) >= new Date().setHours(0,0,0,0)" title="Redaguoti" src="../assets/edit_time_light.svg" alt="Edit" @click="editTime(time,array[count-1][0])" v-bind:class="{dark_edit: time.type_of_time == 'break' || time.type_of_time == 'lecture' || time.type_of_time == 'over-time'}">
+                              <button v-if="array[count-1][0].setHours(0,0,0,0) >= new Date().setHours(0,0,0,0)" title="Trinti" @click="deleteTime(time.time_id,time.time_from,time.time_to)" v-bind:class="{dark: time.type_of_time == 'break' || time.type_of_time == 'lecture'  || time.type_of_time == 'over-time'}">X</button>
                               </span>
                               <div class="time_data" v-if="time.time_from <= halfTime[index] && time.time_to > halfTime[index]"
                                 v-bind:class="{
                                  single: (time.time_to - time.time_from) <= 30, 
                                  first: (halfTime[index] - time.time_from) < 15,
                                  last:  (time.time_to - halfTime[index])  <= 15,
-                                 intern: time.type_of_time == 'intern', free: time.type_of_time == 'off-time', lecture: time.type_of_time == 'lecture', break: time.type_of_time == 'break'
+                                 intern: time.type_of_time == 'intern', free: time.type_of_time == 'off-time', lecture: time.type_of_time == 'lecture', break: time.type_of_time == 'break', over: time.type_of_time == 'over-time'
                                  }">
                                   
                               </div>
@@ -92,17 +92,17 @@
                           <div class="time_data_wrap" v-for="(time, indh) in array[count-1].slice(1)" v-bind:key="indh">
                               <span class="time_data_text" v-if="((halfTime[index]+30) - time.time_from) < 30 && time.time_from < (halfTime[index]+30) && (((halfTime[index]+30) - time.time_from) > 0)"
                               v-bind:class="{single: (time.time_to - time.time_from) <= 30,
-                              dark: time.type_of_time == 'break' || time.type_of_time == 'lecture'}">
+                              dark: time.type_of_time == 'break' || time.type_of_time == 'lecture' || time.type_of_time == 'over-time'}">
                               <span>{{Math.floor(time.time_from/60)}}:{{('0'+(time.time_from%60).toString()).slice(-2)}} - {{Math.floor(time.time_to/60)}}:{{('0'+(time.time_to%60).toString()).slice(-2)}}</span>
-                              <img class="edit_time" v-if="array[count-1][0].setHours(0,0,0,0) >= new Date().setHours(0,0,0,0)" title="Redaguoti" src="../assets/edit_time_light.svg" alt="Edit" @click="editTime(time,array[count-1][0])" v-bind:class="{dark_edit: time.type_of_time == 'break' || time.type_of_time == 'lecture'}">
-                              <button v-if="array[count-1][0].setHours(0,0,0,0) >= new Date().setHours(0,0,0,0)" title="Trinti" @click="deleteTime(time.time_id,time.time_from,time.time_to)" v-bind:class="{dark: time.type_of_time == 'break' || time.type_of_time == 'lecture'}">X</button>
+                              <img class="edit_time" v-if="array[count-1][0].setHours(0,0,0,0) >= new Date().setHours(0,0,0,0)" title="Redaguoti" src="../assets/edit_time_light.svg" alt="Edit" @click="editTime(time,array[count-1][0])" v-bind:class="{dark_edit: time.type_of_time == 'break' || time.type_of_time == 'lecture' || time.type_of_time == 'over-time'}">
+                              <button v-if="array[count-1][0].setHours(0,0,0,0) >= new Date().setHours(0,0,0,0)" title="Trinti" @click="deleteTime(time.time_id,time.time_from,time.time_to)" v-bind:class="{dark: time.type_of_time == 'break' || time.type_of_time == 'lecture' || time.type_of_time == 'over-time'}">X</button>
                               </span>
                               <div class="time_data" v-if="time.time_from < (halfTime[index]+30) && time.time_to > (halfTime[index]+15)"
                                 v-bind:class="{
                                  single: (time.time_to - time.time_from) <= 30, 
                                  first: ((halfTime[index]+30) - time.time_from) < 30,
                                  last:  (time.time_to - (halfTime[index]+15))  <= 15,
-                                 intern: time.type_of_time == 'intern', free: time.type_of_time == 'off-time', lecture: time.type_of_time == 'lecture', break: time.type_of_time == 'break'
+                                 intern: time.type_of_time == 'intern', free: time.type_of_time == 'off-time', lecture: time.type_of_time == 'lecture', break: time.type_of_time == 'break', over: time.type_of_time == 'over-time'
                                  }">
                               </div>
                           </div>
@@ -323,6 +323,9 @@ props: ['array','selectedDate','id','scheduleID'],
             }
             .break{
                 background-color: #efefef;
+            }
+            .over{
+                background-color: #5fcfff;
             }
 
             .label_row th{
