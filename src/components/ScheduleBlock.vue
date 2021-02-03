@@ -46,7 +46,7 @@
                     :no-label="true"
                     :auto-close="true"
                     :first-day-of-week="1" 
-                    :color="'#0054A6'" 
+                    :color="'#0054A6'"
                     v-bind:class="{error: scheduleSpanError || scheduleEditError || scheduleBadDates}"/>
                   </div>
                   <div class="date_input_wrap">
@@ -81,14 +81,15 @@
                   <span class="input_error_message top" v-if="unavailableError">Šis laikas yra užimtas</span>
                   <span class="input_error_message top" v-if="timeError">Įvestas netinkamas laikas</span>
                   <span class="input_error_message top" v-if="timeSpanError">Įvesta veikla trumpesnė nei 30 min.</span>
+                  <span class="input_error_message top" v-if="offtimeError">Laisvas laikas nepriklauso praktikos laikotarpiui</span>
                   <div class="data_date_row">
                   <div class="date_input_wrap">
                   <label for="student_time_from">Laikas nuo</label>
-                  <VueTimepicker name="student_time_from" :hour-range="[8, 9, 10, 11, 12, 13, 14, 15, 16, 17]" :minute-interval="5" hide-disabled-hours v-model="timeFrom" v-bind:class="{ error: fromError || timeError, edit: timeEdit }"></VueTimepicker>
+                  <VueTimepicker name="student_time_from" :hour-range="[8, 9, 10, 11, 12, 13, 14, 15, 16, 17]" :minute-interval="5" hide-disabled-hours v-model="timeFrom" v-bind:class="{ error: fromError || timeError || offtimeError, edit: timeEdit }"></VueTimepicker>
                   </div>
                   <div class="date_input_wrap">
                   <label for="student_time_till">Laikas iki</label>
-                  <VueTimepicker name="student_time_till" :hour-range="[8, 9, 10, 11, 12, 13, 14, 15, 16, 17]" :minute-interval="5" hide-disabled-hours v-model="timeTill" v-bind:class="{ error: tillError || timeError || timeSpanError, edit: timeEdit }"></VueTimepicker>
+                  <VueTimepicker name="student_time_till" :hour-range="[8, 9, 10, 11, 12, 13, 14, 15, 16, 17]" :minute-interval="5" hide-disabled-hours v-model="timeTill" v-bind:class="{ error: tillError || timeError || timeSpanError || offtimeError, edit: timeEdit }"></VueTimepicker>
                   </div>
                   </div>
                   <label for="student_type">Tipas</label>
@@ -287,6 +288,7 @@ export default {
         fromError: false,
         timeError: false,
         tillError: false,
+        offtimeError: false,
         timeSpanError: false,
         scheduleSpanError: false,
         scheduleFromError: false,
@@ -339,6 +341,9 @@ export default {
           if(this.timeError){
             this.timeError = false;
           }
+          if(this.offtimeError){
+              this.offtimeError = false;
+          }
         },
     timeTill: function() {
         if(this.timeTill != ""){
@@ -352,6 +357,9 @@ export default {
         }
         if(this.timeError){
             this.timeError = false;
+        }
+        if(this.offtimeError){
+            this.offtimeError = false;
         }
     },
     timeType: function() {
@@ -605,6 +613,7 @@ export default {
             console.log(config);
         axios.get('http://127.0.0.1:8000/api/schedule/'+this.id+'/'+this.scheduleData.trainee[0].schedules[this.scheduleID].id,config)
             .then((resp) => {
+                console.log(resp.data);
                 this.weekHours = Math.round(resp.data.works_hours_by_date.week_hours/60);
                 this.monthHours = Math.round(resp.data.works_hours_by_date.month_hours/60);
                 this.totalHours = Math.round(resp.data.works_hours_by_date.total_hours/60);
@@ -752,7 +761,10 @@ export default {
                                     })
                                     .catch(error => {
                                         console.log(error.response.data.message);
-                                        if(error.response.data.message == "Route [login] not defined."){
+                                        if(error.response.data.message == "Off time is not in intern time!"){
+                                            this.offtimeError = true;
+                                        }
+                                        else if(error.response.data.message == "Route [login] not defined."){
                                             if(this.$route.name != 'Prisijungimas'){
                                                 this.$router.push({name: 'Prisijungimas'});
                                             }
@@ -1067,6 +1079,7 @@ export default {
                 margin-bottom: 0.8rem;
                 input{
                     cursor: text;
+                    font-size: 2rem!important;
                 }
             }
 
