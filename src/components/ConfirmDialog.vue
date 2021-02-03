@@ -135,6 +135,7 @@ export default {
         border-radius: 5px;
         cursor: pointer;
         width: 30%;
+        max-width: 150px;
       }
       button:hover{
         background-color:#0054a6;

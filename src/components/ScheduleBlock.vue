@@ -47,7 +47,7 @@
                     :auto-close="true"
                     :first-day-of-week="1" 
                     :color="'#0054A6'"
-                    v-bind:class="{error: scheduleSpanError || scheduleEditError || scheduleBadDates}"/>
+                    v-bind:class="{error: scheduleSpanError || scheduleEditError || scheduleBadDates || scheduleBeforeError}"/>
                   </div>
                   <div class="date_input_wrap">
                       <label for="student_date_till">Praktika iki</label>
@@ -72,6 +72,7 @@
                   </div>
               </div>
               <span class="input_error_message" style="position: relative; top: -2%;" v-if="scheduleBadDates">Praktikos laikotarpio pradžia velesnė už pabaigą</span>
+              <span class="input_error_message" style="position: relative; top: -2%;" v-if="scheduleBeforeError">Įvedimas atgaline data negalimas!</span>
               <span class="input_error_message" style="position: relative; top: -2%;" v-if="scheduleEditError">Praktikos laikotarpis užimtas</span>
               <FunctionalCalendar ref="Calendar" v-model="calendarData" v-on:changedMonth="handleMonth" @hook:mounted="setCalendarMonth" v-on:choseDay="handleDay" :configs="calendarConfigs" v-bind:class="{ error: dateError || dateBeforeError || scheduleSpanError, edit_disable: timeEdit }"></FunctionalCalendar>
               <div class="lower_input_column">
@@ -382,8 +383,10 @@ export default {
             this.createScheduleSpanError = false;
             this.scheduleEditError = false
         }
-        if(!this.createSchedule){
+        if(!this.createSchedule && this.internFrom >= new Date().toLocaleDateString('lt-LT')){
             this.updateScheduleDates();
+        }else if(!this.createSchedule && this.internFrom < new Date().toLocaleDateString('lt-LT')){
+            this.scheduleBeforeError = true;
         }else if(this.scheduleFromError){
             this.scheduleFromError = false;
         }
