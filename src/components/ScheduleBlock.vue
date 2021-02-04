@@ -738,11 +738,12 @@ export default {
             else{
                 let inputDate = this.calendarData.selectedDate.split('/');
                 let timeData = {
-                    date: inputDate[2]+'-'+('0'+inputDate[1]).slice(-2) +'-'+inputDate[0],
+                    date: inputDate[2]+'-'+('0'+inputDate[1]).slice(-2) +'-'+('0'+inputDate[0]).slice(-2),
                     time_from: fromInput,
                     time_to: tillInput,
                     type: this.timeType
                 };
+                console.log(timeData);
                 let timeAvailable = false;
                 for(let i = 0; i < this.month.length; i++){
                     for(let j = 0; j < this.month[i].length; j++){
