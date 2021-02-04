@@ -1,8 +1,15 @@
 <template>
+<div>
+  <div class="generaldata_container">
+        <generaldata class="data_text" v-bind:data="studentList.length">PRAKTIKANTŲ</generaldata>
+        <generaldata class="data_text" v-bind:data="this.internSum">SUPLANUOTŲ PRAKTIKOS VALANDŲ</generaldata>
+        <generaldata class="data_text" v-bind:data="this.attendedSum">ATLIKTŲ PRAKTIKOS VALANDŲ</generaldata>
+        <generaldata class="data_text" v-bind:data="this.offSum">LAISVŲ VALANDŲ</generaldata>
+  </div>
   <div class="main_container">
       <div class="table_controls">
          <label class="switch">
-             <input type="checkbox">
+             <input type="checkbox" v-model="offMode">
              <span class="slider">
                  <span class="option1">PRAKTIKA</span>
                  <span class="option2">LAISVOS</span>
@@ -10,7 +17,7 @@
           </label>
           <div class="dropdown_wrap">
             <div class="filter timespan"  @click="triggerTimespan()">
-                    <h1>LAIKOTARPIS</h1><img class="filter_trigger" src="../assets/tick.svg" alt="">
+                    <h1>{{monthName[monthInd]}}</h1><img class="filter_trigger" src="../assets/tick.svg" alt="">
             </div>
             <div class="filter_input_wrap timespan" v-if="timespanState">
                 <label for="StartDate">Pasirinkti mėnesį:</label>
@@ -32,53 +39,72 @@
       </div>
       <div class="table_container">
           <table>
-              <tr class="table_header">
-                <th class="table_student"></th>
+              <!-- <tr class="table_header">
+                <th class="table_student">{{monthName[monthInd]}}</th>
                 <div v-for="(week, index) in month" :key="index" :class="'table_week ' + index">
-                      <th v-for="day in week" :key="day.getDate()" :class="'table_day_name ' + day.getDate()">{{dayName[day.getDay()]}}</th>
+                      <th v-for="day in week" :key="day.date.getDate()" :class="'table_day_name ' + day.date.getDate()">{{dayName[day.date.getDay()]}}</th>
                       <th class="column_sum"></th>
                 </div>
-              </tr>
+                <th class="table_top month"></th>
+              </tr> -->
               <tr>
                 <th class="table_student head">PRAKTIKANTAS</th>
                 <div v-for="(week, index) in month" :key="index" :class="'table_week ' + index">
-                    <th v-for="day in week" :key="day.getDate()" :class="'table_top ' + day.getDate()">{{day.getDate()}}</th>
+                    <th v-for="day in week" :key="day.date.getDate()" :class="'table_top ' + day.date.getDate()">{{day.date.getDate()}}</th>
                     <th class="table_top sum">SAV</th>
                 </div>
                 <div class="table_week">
                 <th class="table_top month">MĖN</th>
                 </div>
               </tr>
-              <tr v-for="index in 10" :key="index" @mouseover="hover=index" @mouseleave="hover=false">
-                <th class="table_student" v-bind:class="{blue: hover==index}">Vardenis Pavardenis</th>
+              <tr v-for="(student,index) in studentList" :key="index" @mouseover="hover=index" @mouseleave="hover='out'">
+                <th class="table_student" @click="routeSchedule(student.id)" v-bind:class="{blue: hover==index && hover!='out'}">{{student.firstname}} {{student.lastname}}</th>
                 <div class="table_week_wrap">
                 <div v-for="(week, index) in month" :key="index" :class="'table_week ' + index">
-                  <td v-for="day in week" :key="day.getDate()" :class="'table_cell ' + day.getDate()">0</td>
-                  <td class="table_sum"> </td>
+                  <td v-for="day in week" :key="day.date.getDate()" 
+                  :class="['table_cell ' + day.date.getDate(),{ grey : (!offMode && day.hours[student.id].intern_hours == 0) || (offMode && day.hours[student.id].off_hours == 0)}]">
+                  <span v-if="!offMode">{{day.hours[student.id].intern_hours}}</span><span v-if="offMode">{{day.hours[student.id].off_hours}}</span>
+                  </td>
+                  <td class="table_sum" v-bind:class="{grey: weekSum(week,student.id) == 0}">{{weekSum(week,student.id)}}</td>
                 </div>
                 <div class='table_week'>
-                <td class="table_cell month">100</td>
+                <td class="table_cell month">
+                    <span v-if="!offMode">{{monthInternSum[index]}}</span><span v-if="offMode">{{monthOffSum[index]}}</span>
+                </td>
                 </div>
                 </div>
               </tr>
           </table>
       </div>
   </div>
+</div>
 </template>
 
 <script>
+import Generaldata from '../components/StatisticsDataBlock.vue'
 import axios from 'axios'
 export default {
+    components: {Generaldata},
     data () {
       return {
         timespanState: false,
         filterState: false,
+        offMode: false,
+        internSum: 0,
+        attendedSum: 0,
+        offSum: 0,
+        overSum: 0,
         inputMonth: '',
+        monthInd: 0,
+        monthInternSum: [],
+        monthOffSum: [],
         dayName: ['Sk','Pr','An','Tr','Kt','Pn','Št'],
+        monthName: ['SAUSIS','VASARIS','KOVAS','BALANDIS','GEGUŽĖ','BIRŽELIS',
+                    'LIEPA','RUGPJŪTIS','RUGSĖJIS','SPALIS','LAPKRITIS','GRUODIS'],
         days: [],
         month: [],
         studentList: [],
-        hover: false,
+        hover: 'out',
         config: {
             headers: { Authorization: `Bearer ${localStorage.token}` }
         }
@@ -87,10 +113,14 @@ export default {
     created() {
         this.interval = setInterval(() => this.refreshToken(), 300000);
     },
+    watch:{
+        inputMonth: function() {
+            this.monthInd = new Date(this.inputMonth).getMonth();
+        }
+    },
     mounted() {
         let date = new Date();
         this.inputMonth = date.getFullYear() + '-' + (date.getMonth()+1);
-        this.getMonth();
         this.getStudents();
     },
     beforeDestroy(){
@@ -110,20 +140,64 @@ export default {
         getMonth(){
             this.days=[];
             this.month=[];
+            this.internSum = 0;
+            this.attendedSum = 0;
+            this.offSum = 0;
+            this.overSum = 0;
             let input = this.inputMonth.split('-');
             let year = input[0];
             let month = input[1]-1;
+            let hours = {};
+            let internHours = 0;
+            let offHours = 0;
+            let overHours = 0;
             var date = new Date(year, month, 1);
             var firstCut = 0;
             while (date.getMonth() === month) {
-                this.days.push(new Date(date));
+                for(let i = 0; i < this.studentList.length; i++){
+                    for(let j=0; j < this.studentList[i].schedules.length; j++){
+                        for(let n=0; n < this.studentList[i].schedules[j].months.length; n++){
+                            if(this.studentList[i].schedules[j].months[n].index == input[1]){
+                                for(let k=0; k < this.studentList[i].schedules[j].months[n].days.length; k++){
+                                    if(this.studentList[i].schedules[j].months[n].days[k].index == date.getDate()){
+                                    internHours = internHours + Math.round(this.studentList[i].schedules[j].months[n].days[k].statistics_hours.intern_hours/60);
+                                    this.internSum = this.internSum + internHours;
+                                    if(date.setHours(0,0,0) <= new Date().setHours(0,0,0)){
+                                        this.attendedSum = this.attendedSum + internHours;
+                                    }
+                                    offHours = offHours + Math.round(this.studentList[i].schedules[j].months[n].days[k].statistics_hours.off_time_hours/60);
+                                    this.offSum = this.offSum + offHours;
+                                    overHours = overHours + Math.round(this.studentList[i].schedules[j].months[n].days[k].statistics_hours.over_time_hours/60);
+                                    this.overSum = this.overSum + overHours;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    hours[this.studentList[i].id] = {intern_hours : internHours, off_hours : offHours, over_hours : overHours}
+                    if(this.monthInternSum[i]){
+                        this.monthInternSum[i] = this.monthInternSum[i] + internHours;
+                    } else {
+                        this.monthInternSum[i] = internHours
+                    }
+                    if(this.monthOffSum[i]){
+                        this.monthOffSum[i] = this.monthOffSum[i] + offHours;
+                    } else {
+                        this.monthOffSum[i] = offHours
+                    }
+                    internHours = 0;
+                    offHours = 0;
+                    overHours = 0;
+                }
+                this.days.push({date: new Date(date), hours});
                 date.setDate(date.getDate() + 1);
+                hours = {};
             }
-            if(this.days[firstCut].getDay() === 0)
+            if(this.days[firstCut].date.getDay() === 0)
             this.days.splice(0, 1);
-            else if (this.days[firstCut].getDay() === 6)
+            else if (this.days[firstCut].date.getDay() === 6)
             this.days.splice(0,2);
-            while(this.days[firstCut].getDay() != 6){
+            while(this.days[firstCut].date.getDay() != 6){
                 firstCut++;
             }
             this.month.push(this.days.splice(0, firstCut));
@@ -137,6 +211,7 @@ export default {
             axios.get('http://127.0.0.1:8000/api/trainee',this.config)
                 .then((resp) => {
                     this.studentList = resp.data.trainees;
+                    this.getMonth();
                 })
                 .catch(error => {
                     if(error.response.data.message == "Route [login] not defined."){
@@ -145,6 +220,20 @@ export default {
                         }
                     }
                 });
+        },
+        weekSum(week, id){
+            let sum = 0;
+            for(let i = 0; i < week.length; i++){
+                if(this.offMode){
+                    sum = sum + week[i].hours[id].off_hours;
+                } else {
+                    sum = sum + week[i].hours[id].intern_hours
+                }
+            }
+            return sum;
+        },
+        routeSchedule(id){
+            this.$router.push({name: 'Tvarkarastis', params: {id: id}});
         },
         refreshToken(){
             let config= {
@@ -166,12 +255,20 @@ export default {
 </script>
 
 <style scoped lang="scss">
+.generaldata_container{
+  display: flex;
+  padding: 1.5rem 0;
+  min-width: 1300px;
+  height: 9rem;
+  margin: 0 1% 0 20rem;
+  justify-content: space-between;
+}
 .main_container{
-    height: calc(100% - 10.5rem);
+    height: max-content;
     min-width: 1300px;
     min-height: 770px;
     font-family: 'Open Sans';
-    margin: 0 1% 1% 22rem;
+    margin: 0 1% 1% 20rem;
     background-color: #ffffff;
     border-radius: 15px;
 
@@ -180,12 +277,16 @@ export default {
         font-weight: 600!important;
     }
 
+    .grey{
+        color: #c4c4c4!important;
+   }
+
     .table_controls{
         display: flex;
         height: 20%;
         width: 100%;
         justify-content: space-between;
-        padding: 4rem 7%;
+        padding: 3rem 7% 1rem 7%;
 
     .switch {
         position: relative;
@@ -314,7 +415,7 @@ export default {
             } 
         }
        .timespan{
-            width: 18rem;
+            width: 15rem;
         }
         .data{
             width: 13.5rem;
@@ -357,7 +458,7 @@ export default {
             color: #5c5c5c;
             font-size: 0.9rem;
             border-collapse: collapse;
-            width: 90%;
+            width:90%;
             tr{
                 display: flex;
                 width: 100%;
@@ -372,9 +473,6 @@ export default {
                 border-right: solid 3px #efefef;
                 border-bottom: solid 1px #c4c4c4;
                 vertical-align: middle;
-            }
-            th:first-child,td:first-child{
-               flex-grow: 1; 
             }
             .table_sum{
                 color: #0054A6;
@@ -427,17 +525,30 @@ export default {
                 font-weight: 400;
                 border-bottom: none;
                 border-top: none;
+                flex-grow: 1;
+                cursor: pointer;
             }
             .head{
                 border-top: solid 3px #efefef;
                 border-bottom: solid 3px #efefef;
                 font-weight: 600;
+                cursor: default;
+            }
+            .table_header .month{
+                padding: 0 3px;
+                background-color: transparent;
+                flex: 0;
             }
             .table_header th, .table_header td{
                 font-weight: 400;
                 color: #c4c4c4;
                 border:none;
                 padding-bottom: 0.2rem;
+                width: 2.2vw;
+            }
+            .table_header .table_week{
+                padding-right: 3px;
+                flex: 10%;
             }
             .column_sum{
                 width: 2.1vw;

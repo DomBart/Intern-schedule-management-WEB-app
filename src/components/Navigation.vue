@@ -74,7 +74,7 @@ export default {
                                             let time_from = this.traineeData[i].schedules[j].months[k].days[m].times[n].time_from;
                                             let time_to = this.traineeData[i].schedules[j].months[k].days[m].times[n].time_to;
                                             let data = { id: this.traineeData[i].id,
-                                                         name: this.traineeData[i].firstname + ' ' + this.traineeData[i].lastname,
+                                                         name: this.traineeData[i].firstname.charAt(0) + '. ' + this.traineeData[i].lastname,
                                                          time: ('0'+Math.floor(time_from/60)).slice(-2)+':'+('0'+(time_from%60).toString()).slice(-2) +
                                                                 ' - ' + ('0'+Math.floor(time_to/60)).slice(-2)+':'+('0'+(time_to%60).toString()).slice(-2)
                                             };

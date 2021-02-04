@@ -9,9 +9,9 @@
 
 <script>
 export default {
+  props: ['data'],
   data () {
     return {
-      data: 12,
     }
   }
 }
