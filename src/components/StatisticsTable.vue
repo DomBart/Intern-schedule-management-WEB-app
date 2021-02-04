@@ -140,6 +140,8 @@ export default {
         getMonth(){
             this.days=[];
             this.month=[];
+            this.monthInternSum = [];
+            this.monthOffSum = [];
             this.internSum = 0;
             this.attendedSum = 0;
             this.offSum = 0;
