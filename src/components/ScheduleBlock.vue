@@ -388,7 +388,7 @@ export default {
         }
         if(!this.createSchedule && this.internFrom >= new Date().toLocaleDateString('lt-LT')){
             this.updateScheduleDates();
-        }else if(!this.createSchedule && this.internFrom < new Date().toLocaleDateString('lt-LT')){
+        }else if(!this.createSchedule &&  this.internFrom < new Date().toLocaleDateString('lt-LT') && this.internFrom != this.scheduleData.trainee[0].schedules[0].start_date){
             this.scheduleBeforeError = true;
         }else if(this.scheduleFromError){
             this.scheduleFromError = false;

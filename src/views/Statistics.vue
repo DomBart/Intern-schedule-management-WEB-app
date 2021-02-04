@@ -2,10 +2,10 @@
 <body>
     <navi></navi>
     <div class="generaldata_container">
-        <generaldata class="data_text">PRAKTIKANTŲ ŠĮ MĖNESĮ</generaldata>
-        <generaldata class="data_text">PRAKTIKOS VALANDŲ ŠĮ MĖNESĮ</generaldata>
-        <generaldata class="data_text">ATLIKTŲ PRAKTIKOS VALANDŲ ŠĮ MĖNESĮ</generaldata>
-        <generaldata class="data_text">LAISVŲ VALANDŲ ŠĮ MĖNESĮ</generaldata>
+        <generaldata class="data_text">PRAKTIKANTŲ</generaldata>
+        <generaldata class="data_text">SUPLANUOTŲ PRAKTIKOS VALANDŲ</generaldata>
+        <generaldata class="data_text">ATLIKTŲ PRAKTIKOS VALANDŲ</generaldata>
+        <generaldata class="data_text">LAISVŲ VALANDŲ</generaldata>
     </div>
     <statisticstable></statisticstable>
     <confirmdialog></confirmdialog>
