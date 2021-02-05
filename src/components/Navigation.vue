@@ -1,7 +1,6 @@
 <template>
   <div class="navi_container">
     <div class="navi_wrap">
-        <img class="navi_img" src="../assets/logo.svg" alt="Teltonika">
         <div class="navi_links">
             <a class="unselectable" @click="push('Pagrindinis')" v-bind:class="{ text_active: $route.name == 'Pagrindinis'}">PAGRINDINIS</a>
             <a class="unselectable" @click="push('Tvarkarastis')" v-bind:class="{ text_active: $route.name == 'Tvarkarastis'}">GRAFIKAS</a>
